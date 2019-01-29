@@ -14,7 +14,9 @@ class index
 {
     public function index()
     {
-        return 1;
+        $ivlen = openssl_cipher_iv_length('AES-256-CBC');
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        echo $iv;
     }
 
     public function miao()

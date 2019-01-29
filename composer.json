@@ -1,15 +1,17 @@
 {
-  "name": "vendor_name/package_name",
-  "description": "description_text",
+  "name": "zhimiao/tools-server",
+  "description": "纸喵工具集在线服务端",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
     {
-      "name": "author's name",
-      "email": "email@example.com"
+      "name": "倒霉狐狸",
+      "email": "mail@xiaoliu.org"
     }
   ],
   "require": {
-    "zhimiao/frame-php": "dev-master"
+    "zhimiao/frame-php": "dev-master",
+    "alibabacloud/client": "1.0.7",
+    "gregwar/captcha": "1.1.7"
   }
 }
