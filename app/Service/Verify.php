@@ -7,7 +7,83 @@
  * Time: 11:56
  */
 namespace app\Service;
-
+use zhimiao\Utils;
+use app\Service\Utils as APP_Utils;
+use Respect\Validation\Validator as v;
 class Verify {
 
+    /**
+     * 校验图片验证码正确性
+     * @param null $token 生成验证码图片给的token
+     * @param null $code 用户填写的验证码
+     * @return bool|string
+     */
+    public function verifyImageCaptcha($token = null, $code = null)
+    {
+        if (!v::notEmpty()->validate($token)){
+            return 'token不能为空';
+        }
+        if (!v::notEmpty()->validate($code)) {
+            return 'code不能为空';
+        }
+        $token = @json_decode(Utils::decrypt($token), true);
+        if (!v::json()->validate($token)) {
+            return 'token无法解析';
+        }
+        $lock_id = 'verifyImageCaptcha:'. $token['key'];
+        if (!APP_Utils::cacheNumLock($lock_id)) {
+            return '操作过频';
+        }
+        if ($token['expire'] < time()) {
+            return '验证码已经失效了';
+        }
+        if ($token['code'] == $code) {
+            APP_Utils::cacheNumLock($lock_id, 0);
+            return true;
+        }
+        return '验证失败';
+    }
+
+    /**
+     * 校验手机号正确性
+     * @param null $token 生成验证码图片给的token
+     * @param null $code 用户填写的验证码
+     * @return bool|string
+     */
+    public function verifySMSCode($phone = null, $token = null, $code = null)
+    {
+        if (!v::phone()->validate($phone)) {
+            return [-5, null, '手机号无法识别'];
+        }
+        if (!v::notEmpty()->validate($token)){
+            return 'token不能为空';
+        }
+        if (!v::notEmpty()->validate($code)) {
+            return 'code不能为空';
+        }
+        $token = @json_decode(Utils::decrypt($token), true);
+        if (!v::json()->validate($token)) {
+            return 'token无法解析';
+        }
+        $lock_id = 'verifySMSCode:'. $token['key'];
+        if (!APP_Utils::cacheNumLock($lock_id)) {
+            return '操作过频';
+        }
+        if ($token['expire'] < time()) {
+            return '验证码已经失效了';
+        }
+        if ($token['phone'] != $phone) {
+            return '手机号不匹配';
+        }
+        if ($token['code'] == $code) {
+            APP_Utils::cacheNumLock($lock_id, 0);
+            return true;
+        }
+        return '验证失败';
+    }
+
+    public function isLogin($pass = false, $isExpire = true)
+    {
+
+    }
 }
