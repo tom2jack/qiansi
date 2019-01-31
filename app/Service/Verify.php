@@ -7,6 +7,8 @@
  * Time: 11:56
  */
 namespace app\Service;
+use zhimiao\Request;
+use zhimiao\Response;
 use zhimiao\Utils;
 use app\Service\Utils as APP_Utils;
 use Respect\Validation\Validator as v;
@@ -82,8 +84,26 @@ class Verify {
         return '验证失败';
     }
 
+    /**
+     * 判断用户登陆，并返回uid
+     * @param bool $pass
+     * @param bool $isExpire
+     * @return int|string
+     */
     public function isLogin($pass = false, $isExpire = true)
     {
-
+        $login_key = Request::header('LOGIN-KEY');
+        if (!v::notEmpty()->validate($login_key)) {
+            $data = APP_Utils::parseSessionKey($login_key, $isExpire);
+            if(!is_string($data)) {
+                $data = (int) $data['uid'] ?? 0;
+            }
+        } else {
+            $data = '头信息无法识别';
+        }
+        if (!$pass && is_string($data)) {
+            Response::json(-1, null, $data);
+        }
+        return is_string($data) ? 0 : $data;
     }
 }
