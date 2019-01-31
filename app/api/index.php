@@ -1,6 +1,6 @@
 <?php
 /**
- *
+ * 无关紧要莫名其妙的首页
  * Created by PhpStorm.
  * User: 倒霉狐狸
  * Date: 2018-11-27
