@@ -95,4 +95,33 @@ class user
         return 0;
     }
 
+    /**
+     * 修改密码
+     * @param string $old_pwd 旧密码
+     * @param string $new_pwd 新密码
+     */
+    public function resetPwd($old_pwd = null, $new_pwd = null)
+    {
+        $uid = \app\Service\Verify::isLogin();
+        if (!v::length(6, 32)->validate($old_pwd) || !v::length(6, 32)->validate($new_pwd)) {
+            return [-4, null, '密码长度不合法(6位-32位)'];
+        }
+        $old_pwd_hash = $this->db->quickPrepare('select `password` from member where uid=:uid', [':uid' => $uid])->getOnce('password');
+        if ($old_pwd_hash === false) {
+            return [-5, null, '用户不存在'];
+        }
+        if (!password_verify($old_pwd, $old_pwd_hash)) {
+            return [-5, null, '旧密码输入错误'];
+        }
+        $statement = $this->db->quickPrepare('update member set `password`=:password where uid=:uid', [
+                ':uid' => $uid,
+                ':password' => password_hash($new_pwd, PASSWORD_DEFAULT)
+            ]);
+        $ret = $statement->rowCount();
+        $statement->closeCursor();
+        if (!$ret) {
+            return [-6, null, '密码更新失败，请重新尝试'];
+        }
+        return 1;
+    }
 }

@@ -90,7 +90,7 @@ class Verify {
      * @param bool $isExpire
      * @return int|string
      */
-    public function isLogin($pass = false, $isExpire = true)
+    public static function isLogin($pass = false, $isExpire = true)
     {
         $login_key = Request::header('LOGIN-KEY');
         if (!v::notEmpty()->validate($login_key)) {
