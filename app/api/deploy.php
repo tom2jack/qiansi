@@ -12,6 +12,7 @@ namespace app\api;
 use Respect\Validation\Validator as v;
 use zhimiao\Data;
 use zhimiao\Request;
+use zhimiao\Response;
 
 class deploy
 {
@@ -54,7 +55,9 @@ class deploy
     {
         $id = Request::post('id', 0);
         $title = Request::post('title');
+        !empty($title) || Response::json(-4, null, '标题不能为空');
         $deploy_type = Request::post('deploy_type');
+        in_array($deploy_type, [0,1,2]) || Response::json(-4, null, '部署类型不支持');
         $remote_url = Request::post('remote_url', '');
         $local_path = Request::post('local_path', '');
         $branch = Request::post('branch', '');
@@ -63,6 +66,34 @@ class deploy
         if (!v::notEmpty()->validate($title)) {
             return [-4, null, '标题不能为空'];
         }
+        $params = [
+            ':title' => $title,
+            ':deploy_type' => $deploy_type,
+            ':remote_url' => $remote_url,
+            ':local_path' => $local_path,
+            ':branch' => $branch,
+            ':before_command' => $before_command,
+            ':after_command' => $after_command
+        ];
+    }
 
+    /**
+     * 删除应用
+     * @param int $id 应用编号
+     * @return int
+     */
+    public function delete($id = 0)
+    {
+        $id > 0 || Response::json(-4, null, '应用不存在');
+        $statement = Data::pdo()->quickPrepare('delete from deploy where id=:id and uid=:uid', [
+            ':id' => $id,
+            ':uid' => $this->uid
+        ]);
+        $result = $statement->rowCount() == 1;
+        $statement->closeCursor();
+        if ($result) {
+            return 1;
+        }
+        return 0;
     }
 }
