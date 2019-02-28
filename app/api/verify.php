@@ -33,12 +33,13 @@ class verify {
         // 生成验证码图片的Builder对象，配置相应属性
         $builder = new CaptchaBuilder($code, $phrase);
         // 设置背景颜色
-        $builder->setBackgroundColor(220, 210, 230);
-        $builder->setMaxAngle(8);
-        $builder->setMaxBehindLines(4);
-        $builder->setMaxFrontLines(4);
+        // $builder->setBackgroundColor(220, 210, 230);
+        // $builder->setMaxAngle(8);
+        // $builder->setMaxBehindLines(4);
+        // $builder->setMaxFrontLines(4);
+        $builder->setInterpolation(false);
         // 可以设置图片宽高及字体
-        $builder->build($width = 100, $height = 40, $font = null);
+        $builder->build();
         $result = [
             'image' => $builder->inline(),
             'token' => Utils::encrypt(json_encode(
