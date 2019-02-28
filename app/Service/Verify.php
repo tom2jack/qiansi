@@ -28,10 +28,11 @@ class Verify {
         if (!v::notEmpty()->validate($code)) {
             return 'code不能为空';
         }
-        $token = @json_decode(Utils::decrypt($token), true);
+        $token = Utils::decrypt($token);
         if (!v::json()->validate($token)) {
             return 'token无法解析';
         }
+        $token = json_decode($token, true);
         $lock_id = 'verifyImageCaptcha:'. $token['key'];
         if (!APP_Utils::cacheNumLock($lock_id)) {
             return '操作过频';
@@ -63,10 +64,11 @@ class Verify {
         if (!v::notEmpty()->validate($code)) {
             return 'code不能为空';
         }
-        $token = @json_decode(Utils::decrypt($token), true);
+        $token = Utils::decrypt($token);
         if (!v::json()->validate($token)) {
             return 'token无法解析';
         }
+        $token = json_decode($token, true);
         $lock_id = 'verifySMSCode:'. $token['key'];
         if (!APP_Utils::cacheNumLock($lock_id)) {
             return '操作过频';
@@ -93,7 +95,7 @@ class Verify {
     public static function isLogin($pass = false, $isExpire = true)
     {
         $login_key = Request::header('LOGIN-KEY');
-        if (!v::notEmpty()->validate($login_key)) {
+        if (v::notEmpty()->validate($login_key)) {
             $data = APP_Utils::parseSessionKey($login_key, $isExpire);
             if(!is_string($data)) {
                 $data = (int) $data['uid'] ?? 0;
