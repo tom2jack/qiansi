@@ -16,11 +16,12 @@ use zhimiao\Response;
 
 class deploy
 {
-    private $uid;
+    private $uid,$db;
     public function __construct()
     {
         // 获取用户UID并同时判断登陆
         $this->uid = \app\Service\Verify::isLogin();
+        $this->db = Data::pdo();
     }
 
     /**
@@ -50,22 +51,20 @@ class deploy
 
     /**
      * 设置部署数据
+     * @param int $id 应用编号，修改的时候用
+     * @param string $title 应用标题
+     * @param int $deploy_type 应用类型 0-无 1-git 2-zip
+     * @param string $remote_url 资源地址
+     * @param string $local_path 本地部署地址
+     * @param string $branch git分支名
+     * @param string $before_command 前置命令
+     * @param string $after_command 后置命令
+     * @return int
      */
-    public function set()
+    public function set($id = 0, $title = '', $deploy_type = 0, $remote_url = '', $local_path = '', $branch = '', $before_command = '', $after_command = '')
     {
-        $id = Request::post('id', 0);
-        $title = Request::post('title');
         !empty($title) || Response::json(-4, null, '标题不能为空');
-        $deploy_type = Request::post('deploy_type');
         in_array($deploy_type, [0,1,2]) || Response::json(-4, null, '部署类型不支持');
-        $remote_url = Request::post('remote_url', '');
-        $local_path = Request::post('local_path', '');
-        $branch = Request::post('branch', '');
-        $before_command = Request::post('before_command', '');
-        $after_command = Request::post('after_command', '');
-        if (!v::notEmpty()->validate($title)) {
-            return [-4, null, '标题不能为空'];
-        }
         $params = [
             ':title' => $title,
             ':deploy_type' => $deploy_type,
@@ -75,6 +74,29 @@ class deploy
             ':before_command' => $before_command,
             ':after_command' => $after_command
         ];
+        if ($id > 0) {
+            $sql_a = [];
+            foreach ($params as $k => $v) {
+                $sql_a[] = '`' . substr($k, 1) . '`='. $k;
+            }
+            $sql_a = implode(',', $sql_a);
+            $params[':id'] = $id;
+            $params[':uid'] = $this->uid;
+            $statement = $this->db->quickPrepare("update deploy set {$sql_a} where id=:id and uid=:uid", $params);
+        } else {
+            $params[':uid'] = $this->uid;
+            $sql_a = $sql_b = [];
+            foreach ($params as $k => $v) {
+                $sql_a[] = '`' . substr($k, 1) . '`';
+                $sql_b[] = $k;
+            }
+            $sql_a = implode(',', $sql_a);
+            $sql_b = implode(',', $sql_b);
+            $statement = $this->db->quickPrepare("insert into deploy({$sql_a}) values ({$sql_b});", $params);
+        }
+        $result = $statement->rowCount() == 1;
+        $statement->closeCursor();
+        return $result ? 1 : 0;
     }
 
     /**
