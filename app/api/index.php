@@ -10,13 +10,16 @@
 namespace app\api;
 
 
+use zhimiao\Request;
+use zhimiao\Utils;
+
 class index
 {
     public function index()
     {
-        $ivlen = openssl_cipher_iv_length('AES-256-CBC');
-        $iv = openssl_random_pseudo_bytes($ivlen);
-        echo $iv;
+        $param = array_merge(Request::get(), Request::post());
+        var_dump($param);exit;
+        return [1, Utils::decrypt(Request::post('data'))];
     }
 
     public function miao()
