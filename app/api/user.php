@@ -54,6 +54,7 @@ class user
         if (!password_verify($password, $user_info['password'])) {
             return [-5, null, '密码输入错误'];
         }
+        unset($user_info['password']);
         return [1, [
             'user_info' => $user_info,
             'sessionKey' => Utils::createSessionKey($user_info['uid'])
@@ -90,7 +91,10 @@ class user
         $uid = $this->db->lastInsertId();
         if ($uid > 0) {
             $sessionKey = Utils::createSessionKey($uid);
-            return [1, ['sessionKey' => $sessionKey]];
+            return [1, [
+                'uid' => $uid,
+                'sessionKey' => $sessionKey
+            ]];
         }
         return 0;
     }
