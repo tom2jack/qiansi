@@ -13,6 +13,7 @@
     "zhimiao/frame-php": "dev-master",
     "alibabacloud/client": "1.0.7",
     "gregwar/captcha": "1.1.7",
-    "respect/validation": "1.1.29"
+    "respect/validation": "1.1.29",
+    "guzzlehttp/guzzle": "^6.3"
   }
 }

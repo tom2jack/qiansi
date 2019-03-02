@@ -82,4 +82,32 @@ class Utils {
         }
         return $data;
     }
+
+    /**
+     * 加密
+     * @param $encryptStr 待加密内容
+     * @param null $secret 密钥
+     * @param string $iv 向量
+     * @return string
+     */
+    static public function encrypt($encryptStr, $secret = null, $iv = '51ae84ba12c3a6ab991a89070555bae8')
+    {
+        $secret = $secret ?? Config::get('openssl_secret.key');
+        $iv = hex2bin($iv);
+        return openssl_encrypt($encryptStr, Config::get('openssl_secret.method'), $secret, 0, $iv);
+    }
+
+    /**
+     * 解密
+     * @param $encryptStr
+     * @param null $secret
+     * @param string $iv
+     * @return string
+     */
+    static public function decrypt($encryptStr, $secret = null, $iv = '51ae84ba12c3a6ab991a89070555bae8')
+    {
+        $secret = $secret ?? Config::get('openssl_secret.key');
+        $iv = hex2bin($iv);
+        return openssl_decrypt($encryptStr, Config::get('openssl_secret.method'), $secret, 0, $iv);
+    }
 }

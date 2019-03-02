@@ -9,6 +9,10 @@
 
 namespace app\api;
 
+use Respect\Validation\Validator as v;
+use zhimiao\Data;
+use zhimiao\Response;
+use zhimiao\Utils;
 
 class server
 {
@@ -46,29 +50,26 @@ class server
     }
 
     /**
-     * 设置部署数据
-     * @param int $id 应用编号，修改的时候用
-     * @param string $title 应用标题
-     * @param int $deploy_type 应用类型 0-无 1-git 2-zip
-     * @param string $remote_url 资源地址
-     * @param string $local_path 本地部署地址
-     * @param string $branch git分支名
-     * @param string $before_command 前置命令
-     * @param string $after_command 后置命令
-     * @return int
+     * 添加/修改服务器配置
+     * @param int $id 服务器注册编号
+     * @param string $server_name 服务器备注名
+     * @param string $address 服务器地址
+     * @param string $api_secret 接口密钥
+     * @param string $api_rule 接口权限规则
+     * @return array|int
      */
-    public function set($id = 0, $title = '', $deploy_type = 0, $remote_url = '', $local_path = '', $branch = '', $before_command = '', $after_command = '')
+    public function set($id = 0, $server_name = '', $address = '', $api_secret = '', $api_rule = '')
     {
-        !empty($title) || Response::json(-4, null, '标题不能为空');
-        in_array($deploy_type, [0,1,2]) || Response::json(-4, null, '部署类型不支持');
+        !empty($server_name) || Response::json(-4, null, '标题不能为空');
+        !empty($api_secret) || Response::json(-4, null, '接口密钥必填');
+        if (!v::ip()->validate($address) && !v::domain()->validate($address)) {
+            return [-4, null, '地址格式错误'];
+        }
         $params = [
-            ':title' => $title,
-            ':deploy_type' => $deploy_type,
-            ':remote_url' => $remote_url,
-            ':local_path' => $local_path,
-            ':branch' => $branch,
-            ':before_command' => $before_command,
-            ':after_command' => $after_command
+            ':server_name' => $server_name,
+            ':address' => $address,
+            ':api_secret' => $api_secret,
+            ':api_rule' => $api_rule,
         ];
         if ($id > 0) {
             $sql_a = [];
@@ -78,7 +79,7 @@ class server
             $sql_a = implode(',', $sql_a);
             $params[':id'] = $id;
             $params[':uid'] = $this->uid;
-            $statement = $this->db->quickPrepare("update deploy set {$sql_a} where id=:id and uid=:uid", $params);
+            $statement = $this->db->quickPrepare("update `server` set {$sql_a} where id=:id and uid=:uid", $params);
         } else {
             $params[':uid'] = $this->uid;
             $sql_a = $sql_b = [];
@@ -88,7 +89,7 @@ class server
             }
             $sql_a = implode(',', $sql_a);
             $sql_b = implode(',', $sql_b);
-            $statement = $this->db->quickPrepare("insert into deploy({$sql_a}) values ({$sql_b});", $params);
+            $statement = $this->db->quickPrepare("insert into `server`({$sql_a}) values ({$sql_b});", $params);
         }
         $result = $statement->rowCount() == 1;
         $statement->closeCursor();
@@ -96,14 +97,14 @@ class server
     }
 
     /**
-     * 删除应用
+     * 删除服务器
      * @param int $id 应用编号
      * @return int
      */
     public function delete($id = 0)
     {
         $id > 0 || Response::json(-4, null, '应用不存在');
-        $statement = Data::pdo()->quickPrepare('delete from deploy where id=:id and uid=:uid', [
+        $statement = Data::pdo()->quickPrepare('delete from `server` where id=:id and uid=:uid', [
             ':id' => $id,
             ':uid' => $this->uid
         ]);
@@ -113,5 +114,45 @@ class server
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * 校验服务器状态
+     * @param int $id
+     */
+    public function check($id = 0)
+    {
+        $id > 0 || Response::json(-4, null, '服务器不存在');
+        $info = $this->db->quickPrepare('select * from server where id=:id and uid=:uid', [
+            ':id' => $id,
+            ':uid' => $this->uid
+        ])->getOnce();
+        if ($info === false) {
+            return [-5, null, '查无此服务器'];
+        }
+        if (empty($info['api_secret'])) {
+            return [-5, null, '请先配置服务器API密钥'];
+        }
+        $client = new \GuzzleHttp\Client(['timeout' => 1]);
+        $check_data = \app\Service\Utils::encrypt('zhimiao.api.check', $info['api_secret']);
+        $url = 'http://'. $info['address']. ':1314/check';
+        $url = 'http://localhost:1305/index.php?a=miao';
+        try {
+            $result = $client->post($url, [
+                'body' => $check_data
+            ]);
+            if ($result->getStatusCode() != 200) {
+                return [-6, null, '请求失败'];
+            }
+            $data = \app\Service\Utils::decrypt($result->getBody(), $info['api_secret']);
+            if ($data != 'succ') {
+                return [-7, null, '验证失败'];
+            }
+        } catch (\Exception $e) {
+            return [-6, null, '请求失败'];
+        } catch (\Error $e2) {
+            return [-6, null, '请求失败'];
+        }
+        return 1;
     }
 }
