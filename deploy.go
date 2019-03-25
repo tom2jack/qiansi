@@ -11,7 +11,7 @@ import (
 func git_deploy() {
 	var (
 		remote_url = "ssh://git@gitee.com/273000727/go-test.git"
-		path       = "/Users/liutong/GolandProjects/tools-client/dist"
+		path       = "D:\\go\\tools-client\\dist"
 		//branch = "master"
 		git_rsa = ""
 	)
@@ -19,9 +19,15 @@ func git_deploy() {
 	//这里先读取文件，后置于远程
 	pemBytes, _ := ioutil.ReadFile("git_rsa.pem")
 	git_rsa = string(pemBytes)
-	//Info(git_rsa)
+	Info(git_rsa)
 	signer, _ := ssh.ParsePrivateKey([]byte(git_rsa))
-	auth := &gitssh.PublicKeys{User: "git", Signer: signer}
+	auth := &gitssh.PublicKeys{
+		User:   "git",
+		Signer: signer,
+		HostKeyCallbackHelper: gitssh.HostKeyCallbackHelper{
+			HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+		},
+	}
 
 	_, err := os.Stat(path)
 	if err != nil {
@@ -65,5 +71,4 @@ func git_deploy() {
 		Info(ref.Hash().String())
 		Info(ref.Name().String())
 	}
-
 }
