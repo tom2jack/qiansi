@@ -1,14 +1,13 @@
-package main
+package deploy
 
 import (
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
-	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"io/ioutil"
 	"os"
 )
 
-func git_deploy() {
+func Git(cfg *DeployConfig) {
 	var (
 		remote_url = "ssh://git@gitee.com/273000727/go-test.git"
 		path       = "D:\\go\\tools-client\\dist"
