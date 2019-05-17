@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"tools-client/deploy"
 )
 
 var (
@@ -22,7 +23,10 @@ var (
 func main() {
 	//Cron.Start()
 	//Server()
-	git_deploy()
+	config := &deploy.DeployConfig{
+
+	}
+	deploy.Git(config)
 }
 
 func Server() {
