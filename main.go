@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
-	"tools-client/deploy"
+	"tools-client/install"
 )
 
 var (
@@ -23,10 +23,9 @@ var (
 func main() {
 	//Cron.Start()
 	//Server()
-	config := &deploy.DeployConfig{
-
-	}
-	deploy.Git(config)
+	//config :=
+	//deploy.Git(&deploy.DeployConfig{})
+	install.Install()
 }
 
 func Server() {
