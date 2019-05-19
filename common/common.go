@@ -1,7 +1,10 @@
 package common
 
 import (
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
+	"net"
 	"os"
 	"strings"
 )
@@ -33,4 +36,26 @@ func Info(format string, args ...interface{}) {
 // Warning should be used to display a warning
 func Warning(format string, args ...interface{}) {
 	fmt.Printf("\x1b[36;1m%s\x1b[0m\n", fmt.Sprintf(format, args...))
+}
+
+//GetLocalMac 随便获取本机的一个Mac地址
+func GetLocalMac() string {
+	// 获取本机的MAC地址
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		panic("Error : " + err.Error())
+	}
+	for _, inter := range interfaces {
+		if inter.HardwareAddr.String() != "" {
+			return inter.HardwareAddr.String()
+		}
+	}
+	return ""
+}
+
+//GetRandStr 获取随机字符串
+func GetRandStr(len int) string {
+	b := make([]byte, len)
+	rand.Read(b) //在byte切片中随机写入元素
+	return base64.StdEncoding.EncodeToString(b)
 }
