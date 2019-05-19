@@ -1,10 +1,7 @@
 package install
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"strings"
 )
 
 func Install() bool {
@@ -17,17 +14,17 @@ func Install() bool {
 }
 
 func binUser() bool {
-	fmt.Print("请输入纸喵运维平台注册ID:")
-	reader := bufio.NewReader(os.Stdin)
-	str, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("\r\n" + err.Error())
-		return false
+	var UID string
+	for {
+		fmt.Print("请输入纸喵运维平台注册ID:")
+		num, err := fmt.Scanln(&UID)
+		if err != nil || num == 0 || UID == "" {
+			fmt.Println("数据读取失败，请重新输入！")
+			continue
+		} else {
+			break
+		}
 	}
-	str = strings.TrimSpace(str)
-	if str == "" {
-		fmt.Println("\r\n非法输入，已退出")
-	}
-	fmt.Println(str)
+	fmt.Println("数据读取成功：" + UID)
 	return true
 }
