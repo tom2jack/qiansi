@@ -103,7 +103,7 @@ class server
      */
     public function delete($id = 0)
     {
-        $id > 0 || Response::json(-4, null, '应用不存在');
+        $id > 0 || Response::json(-4, null, '服务器ID错误');
         $statement = Data::pdo()->quickPrepare('delete from `server` where id=:id and uid=:uid', [
             ':id' => $id,
             ':uid' => $this->uid
