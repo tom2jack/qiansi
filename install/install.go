@@ -3,17 +3,19 @@ package install
 import (
 	"fmt"
 	"github.com/astaxie/beego/config"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
 )
 
+var (
+	CfgFilePath string          = "config.ini"
+	Cfg         config.Configer = InitConfig()
+)
+
 func Install() bool {
-	cfg()
-	//fmt.Println(os.Hostname())
-	//fmt.Println(common.GetLocalMac())
 	//绑定用户
 	if !binUser() {
 		return false
@@ -21,22 +23,25 @@ func Install() bool {
 	return true
 }
 
-func cfg() {
-	_, err := os.Stat("config.ini")
+//InitConfig 初始化配置
+func InitConfig() config.Configer {
+	_, err := os.Stat(CfgFilePath)
 	if err != nil {
-		file, err := os.Create("config.ini")
+		file, err := os.Create(CfgFilePath)
 		if err != nil {
 			panic("文件无法写入")
 		}
 		file.Close()
 	}
-	cfg, err := config.NewConfig("ini", "config.ini")
+	cfg, err := config.NewConfig("ini", CfgFilePath)
 	if err != nil {
 		panic("配置文件读取错误")
 	}
-	cfg.Set("zhimiao::device", uuid.NewV4().String())
-	cfg.SaveConfigFile("config.ini")
-
+	if cfg.String("zhimiao::device") == "" {
+		cfg.Set("zhimiao::device", uuid.NewV4().String())
+		cfg.SaveConfigFile(CfgFilePath)
+	}
+	return cfg
 }
 
 func binUser() bool {
@@ -52,6 +57,7 @@ func binUser() bool {
 		}
 	}
 	fmt.Println("数据读取成功：" + UID)
+	fmt.Println("当前机器唯一设备号：" + Cfg.String("zhimiao::device"))
 	return true
 }
 
