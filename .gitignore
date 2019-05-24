@@ -54,3 +54,4 @@ Temporary Items
 backup.txt
 backup-*.txt
 composer.phar
+*.exe
