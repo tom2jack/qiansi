@@ -1,10 +1,14 @@
 package routers
 
 import (
+	"github.com/gin-gonic/gin"
 	"tools-server/controllers"
-	"github.com/astaxie/beego"
+)
+
+var (
+	Router *gin.Engine = gin.Default()
 )
 
 func init() {
-    beego.Router("/", &controllers.MainController{})
+	Router.GET("/", controllers.Index)
 }

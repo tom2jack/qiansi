@@ -1,11 +1,11 @@
 package main
 
 import (
-	_ "tools-server/routers"
-	"github.com/astaxie/beego"
+	"github.com/gin-gonic/gin"
+	"tools-server/routers"
 )
 
 func main() {
-	beego.Run()
+	gin.SetMode(gin.DebugMode)
+	routers.Router.Run(":7091")
 }
-
