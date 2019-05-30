@@ -10,5 +10,8 @@ var (
 )
 
 func init() {
-	Router.GET("/", controllers.Index)
+
+	Router.GET("/api/index", controllers.ApiIndex)
+	Router.StaticFile("/", "assets/html/index.html")
+	Router.Static("/static", "assets/html")
 }

@@ -13,7 +13,7 @@ func LoadConfig() {
 }
 
 func AppConfig() *goconfig.ConfigFile {
-	cfg, err := goconfig.LoadConfigFile("conf/app.ini")
+	cfg, err := goconfig.LoadConfigFile("assets/config/app.ini")
 	if err != nil {
 		panic("app配置文件读取异常")
 	}
