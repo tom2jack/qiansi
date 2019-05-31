@@ -17,11 +17,12 @@ func init() {
 }
 
 func main() {
+	defer destroy()
+	gin.Logger()
 	gin.SetMode(conf.App.MustValue("server", "run_mode"))
 	endPoint := conf.App.MustValue("server", "http_port", ":7091")
 	readTimeout := time.Duration(conf.App.MustInt64("server", "read_timeout", 60)) * time.Second
 	writeTimeout := time.Duration(conf.App.MustInt64("server", "write_timeout", 60)) * time.Second
-
 	server := &http.Server{
 		Addr:           endPoint,
 		Handler:        routers.Router,
@@ -31,4 +32,9 @@ func main() {
 	}
 	log.Printf("[info] start http server listening %s", endPoint)
 	server.ListenAndServe()
+}
+
+//Destroy 销毁资源
+func destroy() {
+	models.ZM_Mysql.Close()
 }
