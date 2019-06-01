@@ -16,6 +16,7 @@ func MD5(value string) string {
 	return hex.EncodeToString(m.Sum(nil))
 }
 
+//ParseToken 解析jwtToken
 func ParseToken(tokenString string) (string, error) {
 	jwt_secret, err := conf.App.GetValue("app", "jwt_secret")
 	if err != nil {
@@ -30,19 +31,19 @@ func ParseToken(tokenString string) (string, error) {
 		},
 	)
 
-	if tokenClaims != nil {
+	if tokenClaims == nil {
 		if claims, ok := tokenClaims.Claims.(*jwt.StandardClaims); ok && tokenClaims.Valid {
 			if !claims.VerifyExpiresAt(time.Now().Unix(), false) {
-				return "", fmt.Errorf("22")
+				return "", fmt.Errorf("过期了")
 			}
-			return "", nil
+			return claims.Subject, nil
 		}
 	}
 
-	return "", err
+	return "", fmt.Errorf("解析失败")
 }
 
-// GenerateToken generate tokens used for auth
+//CreateToken 生成jwtToken
 func CreateToken(subject string, expire time.Duration) (string, error) {
 	jwt_secret, err := conf.App.GetValue("app", "jwt_secret")
 	if err != nil {
