@@ -8,12 +8,19 @@ import (
 	"tools-server/conf"
 	"tools-server/models"
 	"tools-server/routers"
+	"tools-server/service"
 )
 
 func init() {
+	//启动服务
+	service.LoadService()
+	//加载路由
 	routers.LoadRouter()
+	//加载配置
 	conf.LoadConfig()
+	//初始化Redis
 	models.LoadRedis()
+	//初始化MySQL
 	models.LoadMysql()
 }
 

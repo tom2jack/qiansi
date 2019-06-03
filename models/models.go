@@ -3,7 +3,6 @@ package models
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -21,22 +20,6 @@ type ModelBase1 struct {
 	ID         int `gorm:"primary_key" json:"id"`
 	CreateTime int `json:"created_time"`
 	UpdateTime int `json:"update_time"`
-}
-
-type Json struct {
-	Code int         `json:"code"`
-	Msg  string      `json:"msg"`
-	Data interface{} `json:"data"`
-}
-
-// Response setting gin.JSON
-func Show(C *gin.Context, code int, msg string, data interface{}) {
-	C.JSON(200, Json{
-		Code: code,
-		Msg:  msg,
-		Data: data,
-	})
-	return
 }
 
 // Setup Initialize the Redis instance

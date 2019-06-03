@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"tools-server/service/utils"
+	"tools-server/common/utils"
 )
 
 // JWT is jwt middleware
