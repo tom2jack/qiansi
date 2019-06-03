@@ -11,6 +11,7 @@ import (
 )
 
 func init() {
+	routers.LoadRouter()
 	conf.LoadConfig()
 	models.LoadRedis()
 	models.LoadMysql()

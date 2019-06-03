@@ -63,6 +63,10 @@ github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+o
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
 github.com/kr/logfmt v0.0.0-20140226030751-b84e30acd515/go.mod h1:+0opPa2QZZtGFBFZlji/RkVcI2GknAs/DXo4wKdlNEc=
 github.com/lib/pq v1.1.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
+github.com/lifei6671/gorand v0.1.0 h1:og5EjinYFv+FynThc30oOKOmM51DgXXhEFgDM3WFD/g=
+github.com/lifei6671/gorand v0.1.0/go.mod h1:KfUSzMHGl6eJzJWCraOCPjrULbMjMWd7PMMFK7Rzfx8=
+github.com/lunny/got v0.0.0-20140525120503-f70a11a7f423 h1:4rPRZEbD5CxuNQx3fekN4ATfUSbR3rtZmcmW2Pm0ijE=
+github.com/lunny/got v0.0.0-20140525120503-f70a11a7f423/go.mod h1:d7nL20cr1AUtvPXG8ccYrEApfE2qWP1kg5+hxHVTK6I=
 github.com/mattn/go-isatty v0.0.7 h1:UvyT9uN+3r7yLEYSlJsbQGdsaB/a0DlgWP3pql6iwOc=
 github.com/mattn/go-isatty v0.0.7/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mattn/go-sqlite3 v1.10.0/go.mod h1:FPy6KqzDD04eiIsT53CuJW3U88zkxoIYsOqkbpncsNc=

@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -15,6 +16,28 @@ var (
 	ZM_Redis *redis.Pool
 	ZM_Mysql *gorm.DB
 )
+
+type ModelBase1 struct {
+	ID         int `gorm:"primary_key" json:"id"`
+	CreateTime int `json:"created_time"`
+	UpdateTime int `json:"update_time"`
+}
+
+type Json struct {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data"`
+}
+
+// Response setting gin.JSON
+func Show(C *gin.Context, code int, msg string, data interface{}) {
+	C.JSON(200, Json{
+		Code: code,
+		Msg:  msg,
+		Data: data,
+	})
+	return
+}
 
 // Setup Initialize the Redis instance
 func LoadRedis() {
@@ -59,66 +82,31 @@ func LoadMysql() {
 		return conf.App.MustValue("mysql", "table_prefix") + defaultTableName
 	}
 
+	ZM_Mysql.LogMode(true)
 	ZM_Mysql.SingularTable(true)
 	ZM_Mysql.DB().SetMaxIdleConns(10)
 	ZM_Mysql.DB().SetMaxOpenConns(100)
 
 	ZM_Mysql.Callback().Create().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
 		if !scope.HasError() {
-			nowTime := time.Now().Unix()
-			if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
+			if createTimeField, ok := scope.FieldByName("CreateTime"); ok {
 				if createTimeField.IsBlank {
-					createTimeField.Set(nowTime)
+					createTimeField.Set(time.Now())
 				}
 			}
 
-			if modifyTimeField, ok := scope.FieldByName("ModifiedOn"); ok {
+			if modifyTimeField, ok := scope.FieldByName("UpdateTime"); ok {
 				if modifyTimeField.IsBlank {
-					modifyTimeField.Set(nowTime)
+					modifyTimeField.Set(time.Now())
 				}
 			}
 		}
 	})
 	ZM_Mysql.Callback().Update().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
 		if _, ok := scope.Get("gorm:update_column"); !ok {
-			scope.SetColumn("ModifiedOn", time.Now().Unix())
+			scope.SetColumn("UpdateTime", time.Now())
 		}
 	})
-	ZM_Mysql.Callback().Delete().Replace("gorm:delete", func(scope *gorm.Scope) {
-		addExtraSpaceIfExist := func(str string) string {
-			if str != "" {
-				return " " + str
-			}
-			return ""
-		}
-		if !scope.HasError() {
-			var extraOption string
-			if str, ok := scope.Get("gorm:delete_option"); ok {
-				extraOption = fmt.Sprint(str)
-			}
-
-			deletedOnField, hasDeletedOnField := scope.FieldByName("DeletedOn")
-
-			if !scope.Search.Unscoped && hasDeletedOnField {
-				scope.Raw(fmt.Sprintf(
-					"UPDATE %v SET %v=%v%v%v",
-					scope.QuotedTableName(),
-					scope.Quote(deletedOnField.DBName),
-					scope.AddToVars(time.Now().Unix()),
-					addExtraSpaceIfExist(scope.CombinedConditionSql()),
-					addExtraSpaceIfExist(extraOption),
-				)).Exec()
-			} else {
-				scope.Raw(fmt.Sprintf(
-					"DELETE FROM %v%v%v",
-					scope.QuotedTableName(),
-					addExtraSpaceIfExist(scope.CombinedConditionSql()),
-					addExtraSpaceIfExist(extraOption),
-				)).Exec()
-			}
-		}
-	})
-
 }
 
 // Set a key/value

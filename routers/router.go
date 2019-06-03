@@ -11,10 +11,12 @@ var (
 	Router *gin.Engine = gin.Default()
 )
 
-func init() {
-	Router.GET("/api/index", api.ApiIndex)
+func LoadRouter() {
 	Router.StaticFile("/", "assets/html/index.html")
 	Router.Static("/static", "assets/html")
+
+	Router.GET("/api/index", api.ApiIndex)
+	Router.GET("/api/ApiRegServer", api.ApiRegServer)
 
 	admin_route := Router.Group("/admin")
 	admin_route.Use(middleware.JWT())

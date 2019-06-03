@@ -9,4 +9,6 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jinzhu/gorm v1.9.8
 	github.com/julienschmidt/httprouter v1.2.0
+	github.com/lifei6671/gorand v0.1.0
+	github.com/lunny/got v0.0.0-20140525120503-f70a11a7f423 // indirect
 )
