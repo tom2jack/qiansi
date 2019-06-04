@@ -6,17 +6,11 @@ import (
 	"strconv"
 	"tools-server/common/utils"
 	"tools-server/models"
+	"tools-server/service/udp/clinet_task_loop"
 )
 
 func ApiIndex(c *gin.Context) {
-	v := &map[string]string{
-		"code": "200",
-		"msg":  "成功了",
-		"id":   c.Query("id"),
-	}
-	c.JSON(200, v)
-	models.RedisSet("zhimiao_test", v, 0)
-	c.JSON(200, v)
+	clinet_task_loop.Task.SET(c.Query("device"), c.Query("have"))
 }
 
 //ApiRegServer 服务器注册

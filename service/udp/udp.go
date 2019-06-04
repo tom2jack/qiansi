@@ -1,39 +1,45 @@
 package udp
 
 import (
-	"flag"
-	"fmt"
+	"log"
 	"net"
 	"os"
-	"time"
+	"tools-server/conf"
+	"tools-server/service/udp/clinet_task_loop"
 )
 
 func Start() {
-	flag.Parse()
-	addr, err := net.ResolveUDPAddr("udp", ":8001")
+	listen := conf.App.MustValue("server", "udp_port", ":8081")
+	addr, err := net.ResolveUDPAddr("udp", listen)
 	if err != nil {
-		fmt.Println("Can't resolve address: ", err)
+		log.Print("Can't resolve address: ", err)
 		os.Exit(1)
 	}
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		fmt.Println("Error listening:", err)
+		log.Print("Error listening:", err)
 		os.Exit(1)
 	}
 	defer conn.Close()
+	log.Printf("Start UDP Service Listening %s", listen)
 	for {
-		data := make([]byte, 1024)
+		data := make([]byte, 200)
 		n, remoteAddr, err := conn.ReadFromUDP(data)
-		if err != nil {
+		if err != nil || n < 4 {
 			continue
 		}
-		go handleClient(string(data[:n]), remoteAddr, conn)
+		go handleClient(data[:n], remoteAddr, conn)
 	}
 }
 
-func handleClient(data string, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
-	fmt.Println("收到信息:", remoteAddr)
-	fmt.Println(data)
-	time.Sleep(5 * time.Second)
-	conn.WriteToUDP([]byte(data), remoteAddr)
+// handleClient 取前3位为任务标识位，后为任务数据，最长200
+func handleClient(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
+	var result []byte
+	switch string(data[:3]) {
+	case "001":
+		result = clinet_task_loop.ClientTaskLoop(data[3:])
+	}
+	if result != nil {
+		conn.WriteToUDP(result, remoteAddr)
+	}
 }
