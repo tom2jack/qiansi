@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"time"
+	"tools-server/common/aliyun"
 	"tools-server/conf"
 	"tools-server/models"
 	"tools-server/routers"
@@ -26,6 +27,8 @@ func init() {
 	models.LoadRedis()
 	//初始化MySQL
 	models.LoadMysql()
+	// 加载阿里云SDK
+	aliyun.LoadAliyunSDK()
 }
 
 func main() {
