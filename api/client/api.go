@@ -6,11 +6,10 @@ import (
 	"strconv"
 	"tools-server/common/utils"
 	"tools-server/models"
-	"tools-server/service/udp/clinet_task_loop"
 )
 
 func ApiIndex(c *gin.Context) {
-	clinet_task_loop.Task.SET(c.Query("device"), c.Query("have"))
+	utils.VerifyBySMS("15061370322")
 }
 
 //ApiRegServer 服务器注册

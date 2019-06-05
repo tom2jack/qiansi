@@ -12,4 +12,5 @@ require (
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/lifei6671/gorand v0.1.0
 	github.com/lunny/got v0.0.0-20140525120503-f70a11a7f423 // indirect
+	github.com/mojocn/base64Captcha v0.0.0-20190509095025-87c9c59224d8
 )
