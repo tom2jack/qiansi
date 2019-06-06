@@ -2,7 +2,7 @@
 package utils
 
 import (
-	"fmt"
+	"log"
 	"sync"
 	"time"
 )
@@ -35,13 +35,13 @@ func (this *LockTable) IsLock(key string, lock_time time.Duration) bool {
 	}
 	if _, ok := this.Items[key]; ok {
 		this.Unlock()
-		fmt.Printf("%s is limited\n", key)
+		log.Printf("[LockTable] %s is limited\n", key)
 		return true
 	}
 	this.Items[key] = item
 	cleannerDuraction := this.CleanerDuraction
 	this.Unlock()
-	fmt.Printf("add %s to table\n", key)
+	log.Printf("[LockTable] add %s to table\n", key)
 	if cleannerDuraction == 0 {
 		this.cleanerCheck()
 	}
@@ -51,7 +51,7 @@ func (this *LockTable) IsLock(key string, lock_time time.Duration) bool {
 func (this *LockTable) cleanerCheck() {
 	this.Lock()
 	defer this.Unlock()
-	fmt.Printf("start timer cleaner Duraction after %.2f s\n", this.CleanerDuraction.Seconds())
+	log.Printf("[LockTable] start timer cleaner Duraction after %.2f s\n", this.CleanerDuraction.Seconds())
 	if this.Cleaner != nil {
 		this.Cleaner.Stop()
 	}
@@ -64,7 +64,7 @@ func (this *LockTable) cleanerCheck() {
 		lifeSpan := item.LifeSpan
 		createOn := item.CreateOn
 		if now.Sub(createOn) >= lifeSpan {
-			fmt.Println("delete key", key)
+			log.Println("[LockTable] delete key", key)
 			delete(this.Items, key)
 		} else {
 			if smallestDuracton == 0 || lifeSpan-now.Sub(createOn) < smallestDuracton {
