@@ -31,6 +31,17 @@ func init() {
 	aliyun.LoadAliyunSDK()
 }
 
+// @title 纸喵 Tools-Server API
+// @version 1.0
+// @description 纸喵软件系列之服务端
+// @termsOfService http://zhimiao.org
+
+// @contact.name API Support
+// @contact.url http://tools.zhimiao.org
+// @contact.email mail@xiaoliu.org
+
+// @host 127.0.0.1
+// @BasePath
 func main() {
 	defer destroy()
 	gin.Logger()

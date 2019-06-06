@@ -1,0 +1,41 @@
+host: 127.0.0.1
+info:
+  contact:
+    email: mail@xiaoliu.org
+    name: API Support
+    url: http://tools.zhimiao.org
+  description: 纸喵软件系列之服务端
+  license: {}
+  termsOfService: http://zhimiao.org
+  title: 纸喵 Tools-Server API
+  version: "1.0"
+paths:
+  /admin/verify/VerifyByImg:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 手机号
+        in: path
+        name: phone
+        required: true
+        type: string
+      - description: 图片验证码句柄
+        in: path
+        name: img_idkey
+        required: true
+        type: string
+      - description: 图片验证码
+        in: path
+        name: img_code
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code":1,'
+          schema:
+            type: string
+      summary: 获取短信验证码
+swagger: "2.0"
