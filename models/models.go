@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
@@ -93,14 +92,10 @@ func LoadMysql() {
 }
 
 // Set a key/value
-func RedisSet(key string, data interface{}, time int) error {
+func RedisSet(key string, value string, time int) error {
 	conn := ZM_Redis.Get()
 	defer conn.Close()
-	value, err := json.Marshal(data)
-	if err != nil {
-		return err
-	}
-	_, err = conn.Do("SET", key, value)
+	_, err := conn.Do("SET", key, value)
 	if err != nil {
 		return err
 	}
@@ -127,13 +122,13 @@ func RedisExists(key string) bool {
 }
 
 // Get get a key
-func RedisGet(key string) ([]byte, error) {
+func RedisGet(key string) (string, error) {
 	conn := ZM_Redis.Get()
 	defer conn.Close()
 
-	reply, err := redis.Bytes(conn.Do("GET", key))
+	reply, err := redis.String(conn.Do("GET", key))
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	return reply, nil

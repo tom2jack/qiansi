@@ -10,6 +10,11 @@ import (
 
 func ApiIndex(c *gin.Context) {
 	utils.VerifyBySMS("15061370322")
+	idkey, img := utils.VerifyByImg("")
+	utils.Show(c, 1, "", map[string]string{
+		"idkey": idkey,
+		"img":   img,
+	})
 }
 
 //ApiRegServer 服务器注册

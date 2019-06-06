@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
 	"time"
@@ -11,45 +10,67 @@ import (
 )
 
 type VerifyStore struct {
-	Pool *redis.Pool
+	prefix string
+	// Expiration time of captchas.
+	expiration int
 }
 
 func init() {
 	// init redis store
-	customeStore := VerifyStore{models.ZM_Redis}
-	base64Captcha.SetCustomStore(&customeStore)
+	customeStore := &VerifyStore{
+		"ZMT:verify:",
+		30 * 60,
+	}
+	base64Captcha.SetCustomStore(customeStore)
 }
 
 // customizeRdsStore implementing Set method of  Store interface
 func (s *VerifyStore) Set(id string, value string) {
-	conn := s.Pool.Get()
-	defer conn.Close()
-	conn.Do("SET", id, value, time.Minute*10)
+	models.RedisSet(s.prefix+id, value, s.expiration)
 }
 
 // customizeRdsStore implementing Get method of  Store interface
 func (s *VerifyStore) Get(id string, clear bool) string {
-	conn := s.Pool.Get()
-	defer conn.Close()
-	reply, _ := redis.Bytes(conn.Do("GET", id))
+	reply, _ := models.RedisGet(s.prefix + id)
 	if clear {
-		conn.Do("DEL", id)
+		models.RedisDelete(s.prefix + id)
 	}
 	return string(reply)
 }
 
 func VerifyBySMS(phone string) error {
-	rand.Seed(time.Now().Unix())
-	rnd := rand.Intn(4)
+	idkey := "ZMT:verify:phone:" + phone
+	lock := models.RedisExists(idkey)
+	if lock {
+		return fmt.Errorf("短信已发送，请耐心等待")
+	}
+	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
 	result := aliyun.SendSmsVerify(phone, string(rnd))
 	if !result {
 		return fmt.Errorf("发送失败")
 	}
+	models.RedisSet(idkey, rnd, 30*60)
 	return nil
 }
 
 func VerifyByImg(idkey string) (string, string) {
-	idkey, captcaInterfaceInstance := base64Captcha.GenerateCaptcha(idkey, base64Captcha.ConfigDigit{})
+	idkey, captcaInterfaceInstance := base64Captcha.GenerateCaptcha(idkey, base64Captcha.ConfigDigit{
+		// Height png height in pixel.
+		// 图像验证码的高度像素.
+		50,
+		// Width Captcha png width in pixel.
+		// 图像验证码的宽度像素
+		150,
+		// DefaultLen Default number of digits in captcha solution.
+		// 默认数字验证长度6.
+		6,
+		// MaxSkew max absolute skew factor of a single digit.
+		// 图像验证码的最大干扰洗漱.
+		4.5,
+		// DotCount Number of background circles.
+		// 图像验证码干扰圆点的数量.
+		30,
+	})
 	base64blob := base64Captcha.CaptchaWriteToBase64Encoding(captcaInterfaceInstance)
 	return idkey, base64blob
 }
