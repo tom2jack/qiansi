@@ -30,6 +30,7 @@ func LoadRouter() {
 	admin_route := Router.Group("/admin")
 	admin_route.GET("/verify/VerifyByImg", admin.VerifyByImg)
 	admin_route.POST("/verify/VerifyBySMS", admin.VerifyBySMS)
+	admin_route.POST("/user/UserSigin", admin.UserSigin)
 	admin_route.Use(middleware.JWT())
 	{
 		admin_route.GET("/index", admin.AdminIndex)
