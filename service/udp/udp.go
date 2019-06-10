@@ -9,7 +9,7 @@ import (
 )
 
 func Start() {
-	listen := conf.App.MustValue("server", "udp_port", ":8081")
+	listen := conf.App.MustValue("server", "udp_listen", ":8081")
 	addr, err := net.ResolveUDPAddr("udp", listen)
 	if err != nil {
 		log.Print("Can't resolve address: ", err)

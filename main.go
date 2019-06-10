@@ -40,13 +40,13 @@ func init() {
 // @contact.url http://tools.zhimiao.org
 // @contact.email mail@xiaoliu.org
 
-// @host 127.0.0.1
+// @host localhost:8000
 // @BasePath
 func main() {
 	defer destroy()
 	gin.Logger()
 	gin.SetMode(conf.App.MustValue("server", "run_mode"))
-	endPoint := conf.App.MustValue("server", "http_port", ":7091")
+	endPoint := conf.App.MustValue("server", "http_listen", ":7091")
 	readTimeout := time.Duration(conf.App.MustInt64("server", "read_timeout", 60)) * time.Second
 	writeTimeout := time.Duration(conf.App.MustInt64("server", "write_timeout", 60)) * time.Second
 	server := &http.Server{
@@ -56,8 +56,11 @@ func main() {
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Printf("Start HTTP Service Listening %s", endPoint)
-	server.ListenAndServe()
+	log.Printf("Start HTTPS Service Listening %s", endPoint)
+	log.Fatal(server.ListenAndServeTLS(
+		conf.App.MustValue("server", "ssl_public_file"),
+		conf.App.MustValue("server", "ssl_private_file"),
+	))
 }
 
 func setLoger() {

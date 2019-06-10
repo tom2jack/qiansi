@@ -31,14 +31,14 @@ func VerifyByImg(c *gin.Context) {
 // @Summary 获取短信验证码
 // @Produce  json
 // @Accept  json
-// @Param phone path string true "手机号"
-// @Param img_idkey path string true "图片验证码句柄"
-// @Param img_code path string true "图片验证码"
+// @Param phone query string true "手机号"
+// @Param img_idkey query string true "图片验证码句柄"
+// @Param img_code query string true "图片验证码"
 // @Success 200 {string} json "{"code":1,
 // 	"msg":"发送成功",
 // 	"data":null
 // }"
-// @Router /admin/verify/VerifyByImg [get]
+// @Router /admin/verify/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
 	phone := c.PostForm("phone")
 	img_idkey := c.PostForm("img_idkey")

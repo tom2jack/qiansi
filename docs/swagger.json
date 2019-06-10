@@ -12,10 +12,29 @@
         "license": {},
         "version": "1.0"
     },
-    "host": "127.0.0.1",
+    "host": "localhost:8000",
     "paths": {
         "/admin/verify/VerifyByImg": {
             "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取图片验证码",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":1,",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/verify/VerifyBySMS": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
@@ -28,21 +47,21 @@
                         "type": "string",
                         "description": "手机号",
                         "name": "phone",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "图片验证码句柄",
                         "name": "img_idkey",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     },
                     {
                         "type": "string",
                         "description": "图片验证码",
                         "name": "img_code",
-                        "in": "path",
+                        "in": "query",
                         "required": true
                     }
                 ],

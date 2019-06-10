@@ -15,6 +15,8 @@ var (
 )
 
 func LoadRouter() {
+	// 加载https跳转
+	Router.Use(middleware.TLS())
 
 	// use ginSwagger middleware to
 	Router.GET("/docs/*any", ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
