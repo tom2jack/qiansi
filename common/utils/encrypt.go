@@ -25,24 +25,22 @@ func ParseToken(tokenString string) (string, error) {
 		return "", err
 	}
 	jwtSecret := []byte(jwt_secret)
-	tokenClaims, err := jwt.ParseWithClaims(
-		tokenString,
-		&jwt.StandardClaims{},
-		func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret, nil
-		},
-	)
+	tokenClaims, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
+	})
 
-	if tokenClaims == nil {
+	if tokenClaims != nil {
 		if claims, ok := tokenClaims.Claims.(*jwt.StandardClaims); ok && tokenClaims.Valid {
 			if !claims.VerifyExpiresAt(time.Now().Unix(), false) {
 				return "", fmt.Errorf("过期了")
 			}
+			if claims.Issuer != "zhimiao-tools-server" {
+				return "", fmt.Errorf("非法来源的签名")
+			}
 			return claims.Subject, nil
 		}
 	}
-
-	return "", fmt.Errorf("解析失败")
+	return "", err
 }
 
 //CreateToken 生成jwtToken

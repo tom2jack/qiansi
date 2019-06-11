@@ -38,8 +38,14 @@ func (s *VerifyStore) Get(id string, clear bool) string {
 	return string(reply)
 }
 
+// 获取手机短信验证码的idkey
+func VerifyBySMSIDKEY(phone string) string {
+	return "ZMT:verify:phone:" + phone
+}
+
+// 短信验证码发送
 func VerifyBySMS(phone string) error {
-	idkey := "ZMT:verify:phone:" + phone
+	idkey := VerifyBySMSIDKEY(phone)
 	lock := models.RedisExists(idkey)
 	if lock {
 		return fmt.Errorf("短信已发送，请耐心等待")
@@ -53,6 +59,7 @@ func VerifyBySMS(phone string) error {
 	return nil
 }
 
+// 图片验证码生成
 func VerifyByImg(idkey string) (string, string) {
 	idkey, captcaInterfaceInstance := base64Captcha.GenerateCaptcha(idkey, base64Captcha.ConfigDigit{
 		// Height png height in pixel.
@@ -75,6 +82,7 @@ func VerifyByImg(idkey string) (string, string) {
 	return idkey, base64blob
 }
 
+// 验证码校验
 func VerifyCheck(idkey string, value string) bool {
 	return base64Captcha.VerifyCaptchaAndIsClear(idkey, value, true)
 }
