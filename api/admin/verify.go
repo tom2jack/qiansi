@@ -7,16 +7,20 @@ import (
 	"tools-server/common/utils"
 )
 
-var IP_LOCK = utils.NewLockTable()
+var ZM_LOCK = utils.NewLockTable()
 
 // @Summary 获取图片验证码
 // @Produce  json
 // @Accept  json
 // @Success 200 {object} utils.Json "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
-// @Router /admin/verify/VerifyByImg [get]
+// @Router /admin/VerifyByImg [get]
 func VerifyByImg(c *gin.Context) {
+	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
+		utils.Show(c, -5, "当前IP数据请求过频，请稍后再试", nil)
+		return
+	}
 	idkey, img := utils.VerifyByImg("")
-	utils.Show(c, 1, "", map[string]string{
+	utils.Show(c, 1, "请求成功", map[string]string{
 		"idkey": idkey,
 		"img":   img,
 	})
@@ -29,7 +33,7 @@ func VerifyByImg(c *gin.Context) {
 // @Param img_idkey formData string true "图片验证码句柄"
 // @Param img_code formData string true "图片验证码"
 // @Success 200 {object} utils.Json "{"code":1,"msg":"发送成功","data":null}"
-// @Router /admin/verify/VerifyBySMS [post]
+// @Router /admin/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
 	phone := c.PostForm("phone")
 	img_idkey := c.PostForm("img_idkey")
@@ -42,7 +46,7 @@ func VerifyBySMS(c *gin.Context) {
 		utils.Show(c, -5, "验证码无效", nil)
 		return
 	}
-	if IP_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
+	if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
 		utils.Show(c, -5, "当前IP数据请求过频，请稍后再试", nil)
 		return
 	}
