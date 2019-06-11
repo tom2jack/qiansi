@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/bcrypt"
+	"log"
 	"time"
 	"tools-server/conf"
 )
@@ -57,4 +59,23 @@ func CreateToken(subject string, expire time.Duration) (string, error) {
 	})
 	token, err := tokenClaims.SignedString(jwtSecret)
 	return token, err
+}
+
+// 密码生成
+func PasswordHash(pwd string) string {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
+	if err != nil {
+		log.Println(err)
+	}
+	return string(hash)
+}
+
+// 密码验证
+func PasswordVerify(hashedPwd string, plainPwd string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
+	if err != nil {
+		log.Print(err)
+		return false
+	}
+	return true
 }
