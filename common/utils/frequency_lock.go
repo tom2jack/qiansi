@@ -33,8 +33,12 @@ func (this *LockTable) IsLock(key string, lock_time time.Duration) bool {
 		LifeSpan: lock_time,
 		CreateOn: time.Now(),
 	}
-	if _, ok := this.Items[key]; ok {
+	if item, ok := this.Items[key]; ok {
 		this.Unlock()
+		if item.LifeSpan-time.Now().Sub(item.CreateOn) < 0 {
+			this.cleanerCheck()
+			return false
+		}
 		log.Printf("[LockTable] %s is limited\n", key)
 		return true
 	}
