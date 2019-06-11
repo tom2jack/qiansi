@@ -8,16 +8,13 @@ import (
 	"tools-server/models"
 )
 
-func ApiIndex(c *gin.Context) {
-	utils.VerifyBySMS("15061370322")
-	idkey, img := utils.VerifyByImg("")
-	utils.Show(c, 1, "", map[string]string{
-		"idkey": idkey,
-		"img":   img,
-	})
-}
-
-//ApiRegServer 服务器注册
+// @Summary 服务器注册
+// @Produce  json
+// @Accept  json
+// @Param uid query string true "用户UID"
+// @Param device query string true "客户端设备号"
+// @Success 200 {string} json "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Router /clinet/ApiRegServer [post]
 func ApiRegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
 	if !(uid > 0) {

@@ -15,26 +15,37 @@ var (
 )
 
 func LoadRouter() {
-	// use ginSwagger middleware to
+	/* ------ 文档模块 ------- */
 	Router.GET("/docs/*any", ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 
+	/* ------ 静态页模块 ------- */
 	Router.StaticFile("/", "assets/html/index.html")
 	Router.Static("/static", "assets/html")
 
-	Router.GET("/api/index", client.ApiIndex)
-	Router.GET("/api/ApiRegServer", client.ApiRegServer)
-	// 后台模块
-	admin_route := Router.Group("/admin")
-	// 获取图片验证码
-	admin_route.GET("/verify/VerifyByImg", admin.VerifyByImg)
-	// 获取短信验证码
-	admin_route.POST("/verify/VerifyBySMS", admin.VerifyBySMS)
-	// 登录
-	admin_route.POST("/user/UserSigin", admin.UserSigin)
-	// 注册
-	admin_route.POST("/user/UserSiginUp", admin.UserSiginUp)
-	admin_route.Use(middleware.JWT())
+	/* ------ 客户端模块 ------- */
+	client_route := Router.Group("/clinet")
 	{
-		admin_route.GET("/index", admin.AdminIndex)
+		// 服务器注册
+		client_route.GET("/ApiRegServer", client.ApiRegServer)
 	}
+
+	/* ------ 后台模块 ------- */
+	admin_route := Router.Group("/admin")
+	{
+		// 获取图片验证码
+		admin_route.GET("/VerifyByImg", admin.VerifyByImg)
+		// 获取短信验证码
+		admin_route.POST("/VerifyBySMS", admin.VerifyBySMS)
+		// 登录
+		admin_route.POST("/UserSigin", admin.UserSigin)
+		// 注册
+		admin_route.POST("/UserSiginUp", admin.UserSiginUp)
+		// 需要登陆的部分
+		admin_route.Use(middleware.JWT())
+		{
+			admin_route.GET("/index", admin.AdminIndex)
+			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
+		}
+	}
+
 }

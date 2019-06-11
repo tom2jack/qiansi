@@ -20,18 +20,41 @@ info:
   title: 纸喵 Tools-Server API
   version: "1.0"
 paths:
-  /admin/user/UserSigin:
+  /admin/UserResetPwd:
     post:
       consumes:
+      - multipart/form-data
+      parameters:
+      - description: 旧密码
+        in: formData
+        name: old_password
+        required: true
+        type: string
+      - description: 新密码
+        in: formData
+        name: new_password
+        required: true
+        type: string
+      produces:
       - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "修改成功", "data": null}}'
+          schema:
+            type: string
+      summary: 修改密码
+  /admin/UserSigin:
+    post:
+      consumes:
+      - multipart/form-data
       parameters:
       - description: 手机号
-        in: query
+        in: formData
         name: phone
         required: true
         type: string
       - description: 密码
-        in: query
+        in: formData
         name: password
         required: true
         type: string
@@ -39,11 +62,47 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{'
+          description: '{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
+            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
+            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
             type: string
       summary: 登录
-  /admin/verify/VerifyByImg:
+  /admin/UserSiginUp:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 手机号
+        in: formData
+        name: phone
+        required: true
+        type: string
+      - description: 密码
+        in: formData
+        name: password
+        required: true
+        type: string
+      - description: 短信验证码
+        in: formData
+        name: code
+        required: true
+        type: string
+      - description: 邀请人UID
+        in: formData
+        name: inviter_uid
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
+            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
+            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
+          schema:
+            type: string
+      summary: 注册账号
+  /admin/VerifyByImg:
     get:
       consumes:
       - application/json
@@ -53,9 +112,10 @@ paths:
         "200":
           description: '{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 获取图片验证码
-  /admin/verify/VerifyBySMS:
+  /admin/VerifyBySMS:
     post:
       consumes:
       - multipart/form-data
@@ -76,12 +136,37 @@ paths:
         required: true
         type: string
       produces:
-      - '*/*'
+      - application/json
       responses:
         "200":
-          description: OK
+          description: '{"code":1,"msg":"发送成功","data":null}'
           schema:
             $ref: '#/definitions/utils.Json'
             type: object
       summary: 获取短信验证码
+  /clinet/ApiRegServer:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 用户UID
+        in: query
+        name: uid
+        required: true
+        type: string
+      - description: 客户端设备号
+        in: query
+        name: device
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
+            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
+            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
+          schema:
+            type: string
+      summary: 服务器注册
 swagger: "2.0"
