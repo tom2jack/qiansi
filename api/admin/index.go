@@ -9,6 +9,7 @@ func AdminIndex(c *gin.Context) {
 		"code": "200",
 		"msg":  "成功了",
 		"id":   c.Query("id"),
+		"uid":  c.GetString("LOGIN-TOKEN"),
 	}
 	c.JSON(200, v)
 }
