@@ -18,7 +18,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":1,'
+          description: '{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}'
           schema:
             type: string
       summary: 获取图片验证码
@@ -28,17 +28,17 @@ paths:
       - application/json
       parameters:
       - description: 手机号
-        in: query
+        in: formData
         name: phone
         required: true
         type: string
       - description: 图片验证码句柄
-        in: query
+        in: formData
         name: img_idkey
         required: true
         type: string
       - description: 图片验证码
-        in: query
+        in: formData
         name: img_code
         required: true
         type: string
@@ -46,7 +46,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":1,'
+          description: '{"code":1,"msg":"发送成功","data":null}'
           schema:
             type: string
       summary: 获取短信验证码
