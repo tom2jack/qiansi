@@ -12,7 +12,7 @@ var IP_LOCK = utils.NewLockTable()
 // @Summary 获取图片验证码
 // @Produce  json
 // @Accept  json
-// @Success 200 {string} json "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
+// @Success 200 {object} utils.Json "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
 // @Router /admin/verify/VerifyByImg [get]
 func VerifyByImg(c *gin.Context) {
 	idkey, img := utils.VerifyByImg("")
@@ -23,12 +23,12 @@ func VerifyByImg(c *gin.Context) {
 }
 
 // @Summary 获取短信验证码
-// @Produce  json
-// @Accept  json
+// @Produce json
+// @Accept  multipart/form-data
 // @Param phone formData string true "手机号"
 // @Param img_idkey formData string true "图片验证码句柄"
 // @Param img_code formData string true "图片验证码"
-// @Success 200 {string} json "{"code":1,"msg":"发送成功","data":null}"
+// @Success 200 {object} utils.Json "{"code":1,"msg":"发送成功","data":null}"
 // @Router /admin/verify/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
 	phone := c.PostForm("phone")

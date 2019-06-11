@@ -1,3 +1,13 @@
+definitions:
+  utils.Json:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -10,6 +20,29 @@ info:
   title: 纸喵 Tools-Server API
   version: "1.0"
 paths:
+  /admin/user/UserSigin:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 手机号
+        in: query
+        name: phone
+        required: true
+        type: string
+      - description: 密码
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{'
+          schema:
+            type: string
+      summary: 登录
   /admin/verify/VerifyByImg:
     get:
       consumes:
@@ -25,7 +58,7 @@ paths:
   /admin/verify/VerifyBySMS:
     post:
       consumes:
-      - application/json
+      - multipart/form-data
       parameters:
       - description: 手机号
         in: formData
@@ -43,11 +76,12 @@ paths:
         required: true
         type: string
       produces:
-      - application/json
+      - '*/*'
       responses:
         "200":
-          description: '{"code":1,"msg":"发送成功","data":null}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 获取短信验证码
 swagger: "2.0"

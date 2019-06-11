@@ -8,10 +8,10 @@ import (
 
 func TLS() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		endPoint := conf.App.MustValue("server", "http_listen", ":7091")
+		https_listen := conf.App.MustValue("server", "https_listen")
 		secureMiddleware := secure.New(secure.Options{
 			SSLRedirect: true,
-			SSLHost:     endPoint,
+			SSLHost:     https_listen,
 		})
 		err := secureMiddleware.Process(c.Writer, c.Request)
 		// If there was an error, do not continue.

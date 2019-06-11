@@ -2,6 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/unrolled/secure"
+	"golang.org/x/sync/errgroup"
 	"io"
 	"log"
 	"net/http"
@@ -9,10 +11,13 @@ import (
 	"time"
 	"tools-server/common/aliyun"
 	"tools-server/conf"
+	"tools-server/middleware"
 	"tools-server/models"
 	"tools-server/routers"
 	"tools-server/service"
 )
+
+var g errgroup.Group
 
 func init() {
 	//加载配置
@@ -44,23 +49,65 @@ func init() {
 // @BasePath
 func main() {
 	defer destroy()
-	gin.Logger()
 	gin.SetMode(conf.App.MustValue("server", "run_mode"))
-	endPoint := conf.App.MustValue("server", "http_listen", ":7091")
+	http_listen := conf.App.MustValue("server", "http_listen")
+	https_listen := conf.App.MustValue("server", "https_listen")
 	readTimeout := time.Duration(conf.App.MustInt64("server", "read_timeout", 60)) * time.Second
 	writeTimeout := time.Duration(conf.App.MustInt64("server", "write_timeout", 60)) * time.Second
-	server := &http.Server{
-		Addr:           endPoint,
+	http_server := &http.Server{
+		Addr:           http_listen,
 		Handler:        routers.Router,
 		ReadTimeout:    readTimeout,
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Printf("Start HTTPS Service Listening %s", endPoint)
-	log.Fatal(server.ListenAndServeTLS(
-		conf.App.MustValue("server", "ssl_public_file"),
-		conf.App.MustValue("server", "ssl_private_file"),
-	))
+	https_server := &http.Server{
+		Addr:           https_listen,
+		Handler:        routers.Router,
+		ReadTimeout:    readTimeout,
+		WriteTimeout:   writeTimeout,
+		MaxHeaderBytes: 1 << 20,
+	}
+	log.Printf("Start HTTP Service Listening %s", http_listen)
+	r := gin.New()
+	r.Use(middleware.TLS())
+	r.GET("/*any", func(c *gin.Context) {
+		c.String(301, "为了通信安全，请使用本站的https服务， http --> https")
+	})
+	g.Go(func() error {
+		return http_server.ListenAndServe()
+	})
+
+	log.Printf("Start HTTPS Service Listening %s", https_listen)
+	g.Go(func() error {
+		return https_server.ListenAndServeTLS(
+			conf.App.MustValue("server", "ssl_public_file"),
+			conf.App.MustValue("server", "ssl_private_file"),
+		)
+	})
+
+	if err := g.Wait(); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Fatal()
+}
+
+func httpRedirecting() {
+	https_listen := conf.App.MustValue("server", "https_listen")
+	http_listen := conf.App.MustValue("server", "http_listen")
+	secureMiddleware := secure.New(secure.Options{
+		SSLRedirect: true,
+		SSLHost:     https_listen,
+	})
+	var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("为了通信安全，请使用本站的https服务， http --> https"))
+	})
+	app := secureMiddleware.Handler(myHandler)
+	// HTTP
+	go func() {
+		log.Fatal(http.ListenAndServe(http_listen, app))
+	}()
 }
 
 func setLoger() {
