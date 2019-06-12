@@ -45,6 +45,7 @@ func LoadRouter() {
 		{
 			admin_route.GET("/index", admin.AdminIndex)
 			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
+			admin_route.POST("/ServerLists", admin.ServerLists)
 		}
 	}
 
