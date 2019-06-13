@@ -18,7 +18,7 @@ type UserInfo struct {
 // @Accept  multipart/form-data
 // @Param phone formData string true "手机号"
 // @Param password formData string true "密码"
-// @Success 200 {string} json "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSigin [post]
 func UserSigin(c *gin.Context) {
 	phone := c.PostForm("phone")
@@ -61,7 +61,7 @@ func UserSigin(c *gin.Context) {
 // @Param password formData string true "密码"
 // @Param code formData string true "短信验证码"
 // @Param inviter_uid formData int false "邀请人UID"
-// @Success 200 {string} json "{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSiginUp [post]
 func UserSiginUp(c *gin.Context) {
 	var row int
@@ -127,7 +127,7 @@ func UserSiginUp(c *gin.Context) {
 // @Accept  multipart/form-data
 // @Param old_password formData string true "旧密码"
 // @Param new_password formData string true "新密码"
-// @Success 200 {string} json "{"code": 1,"msg": "修改成功", "data": null}}"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "修改成功", "data": null}}"
 // @Router /admin/UserResetPwd [post]
 func UserResetPwd(c *gin.Context) {
 	old_password := c.PostForm("old_password")

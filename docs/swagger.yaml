@@ -20,6 +20,40 @@ info:
   title: 纸喵 Tools-Server API
   version: "1.0"
 paths:
+  /admin/DeployLists:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId":
+            "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
+            0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
+          schema:
+            type: string
+      summary: 获取部署服务列表
+  /admin/ServerDel:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 服务器ID
+        in: formData
+        name: server_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId":
+            "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
+            0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
+          schema:
+            type: string
+      summary: 删除服务器
   /admin/ServerLists:
     post:
       consumes:
@@ -28,10 +62,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "读取成功","data": [{"ApiSecret": "123456","CreateTime":
-            "2019-03-02T16:10:10+08:00","DeviceId": "","Domain": "127.0.0.1","Id":
-            1,"ServerName": "纸喵5号机","ServerRuleId": 0,"ServerStatus": 0,"Uid": 2,"UpdateTime":
-            "2019-05-22T17:40:18+08:00"}]}'
+          description: '{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId":
+            "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
+            0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
           schema:
             type: string
       summary: 获取服务器(客户端)列表
