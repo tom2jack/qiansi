@@ -32,7 +32,47 @@ func DeployLists(c *gin.Context) {
 // @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeployCreate [POST]
 func DeployCreate(c *gin.Context) {
-	// TODO
+	param := &models.Deploy{}
+	if c.ShouldBind(param) != nil {
+		utils.Show(c, -4, "入参绑定失败", nil)
+		return
+	}
+	param.Id = 0
+	param.Uid = c.GetInt("UID")
+	if models.ZM_Mysql.Create(param).RowsAffected > 0 {
+		utils.Show(c, 1, "创建成功", param)
+		return
+	}
+	utils.Show(c, 0, "创建失败", nil)
+}
+
+// @Summary 修改部署服务
+// @Produce  json
+// @Accept  json
+// @Param deploy_id formData string true "服务器ID"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
+// @Router /admin/DeployUpdate [POST]
+func DeploySet(c *gin.Context) {
+	type paramData struct {
+		AfterCommand  string
+		BeforeCommand string
+		Branch        string
+		DeployType    int
+		LocalPath     string
+		RemoteUrl     string
+		Title         string
+	}
+	param := &paramData{}
+	deploy := &models.Deploy{}
+	if c.ShouldBind(param) != nil {
+		utils.Show(c, -4, "入参绑定失败", nil)
+		return
+	}
+	if models.ZM_Mysql.Where("id=? and uid=?", c.PostForm("Id"), c.GetInt("UID")).Update(deploy).RowsAffected > 0 {
+		utils.Show(c, 1, "创建成功", param)
+		return
+	}
+	utils.Show(c, 0, "创建失败", nil)
 }
 
 // @Summary 删除部署服务
