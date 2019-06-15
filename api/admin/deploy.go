@@ -25,54 +25,39 @@ func DeployLists(c *gin.Context) {
 	utils.Show(c, 1, "读取成功", d)
 }
 
-// @Summary 创建部署服务
+// @Summary 设置部署应用
 // @Produce  json
 // @Accept  json
-// @Param deploy_id formData string true "服务器ID"
+// @Param Id formData string true "应用ID"
+// @Param AfterCommand formData string true "后置命令"
+// @Param BeforeCommand formData string true "前置命令"
+// @Param Branch formData string true "抓取分支"
+// @Param DeployType formData int true "部署方式"
+// @Param LocalPath formData string true "部署地址"
+// @Param RemoteUrl formData string true "资源地址"
+// @Param Title formData string true "应用名称"
 // @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/DeployCreate [POST]
-func DeployCreate(c *gin.Context) {
+// @Router /admin/DeploySet [POST]
+func DeploySet(c *gin.Context) {
 	param := &models.Deploy{}
 	if c.ShouldBind(param) != nil {
 		utils.Show(c, -4, "入参绑定失败", nil)
 		return
 	}
-	param.Id = 0
-	param.Uid = c.GetInt("UID")
-	if models.ZM_Mysql.Create(param).RowsAffected > 0 {
-		utils.Show(c, 1, "创建成功", param)
-		return
+	if param.Id == 0 {
+		param.Uid = c.GetInt("UID")
+		if models.ZM_Mysql.Save(param).RowsAffected > 0 {
+			utils.Show(c, 1, "创建成功", param)
+			return
+		}
 	}
-	utils.Show(c, 0, "创建失败", nil)
-}
-
-// @Summary 修改部署服务
-// @Produce  json
-// @Accept  json
-// @Param deploy_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/DeployUpdate [POST]
-func DeploySet(c *gin.Context) {
-	type paramData struct {
-		AfterCommand  string
-		BeforeCommand string
-		Branch        string
-		DeployType    int
-		LocalPath     string
-		RemoteUrl     string
-		Title         string
+	if param.Id > 0 {
+		if models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", param.Id, c.GetInt("UID")).Updates(param).RowsAffected > 0 {
+			utils.Show(c, 1, "更新成功", param)
+			return
+		}
 	}
-	param := &paramData{}
-	deploy := &models.Deploy{}
-	if c.ShouldBind(param) != nil {
-		utils.Show(c, -4, "入参绑定失败", nil)
-		return
-	}
-	if models.ZM_Mysql.Where("id=? and uid=?", c.PostForm("Id"), c.GetInt("UID")).Update(deploy).RowsAffected > 0 {
-		utils.Show(c, 1, "创建成功", param)
-		return
-	}
-	utils.Show(c, 0, "创建失败", nil)
+	utils.Show(c, 0, "系统错误", nil)
 }
 
 // @Summary 删除部署服务

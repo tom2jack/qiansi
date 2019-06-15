@@ -14,6 +14,35 @@
     },
     "host": "localhost:8000",
     "paths": {
+        "/admin/DeployDel": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "删除部署服务",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "服务器ID",
+                        "name": "deploy_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeployLists": {
             "get": {
                 "consumes": [
@@ -25,9 +54,88 @@
                 "summary": "获取部署服务列表",
                 "responses": {
                     "200": {
-                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"CreateTime\": \"2019-03-02T16:10:10+08:00\",\"DeviceId\": \"\",\"Domain\": \"127.0.0.1\",\"Id\": 1,\"ServerName\": \"纸喵5号机\",\"ServerRuleId\": 0,\"ServerStatus\": 0,\"Uid\": 2,\"UpdateTime\": \"2019-05-22T17:40:18+08:00\"}]}",
+                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"AfterCommand\": \"324545\",\"BeforeCommand\": \"1232132132\",\"Branch\": \"123213\",\"CreateTime\": \"2019-02-28T10:24:41+08:00\",\"DeployType\": 1,\"Id\": 491,\"LocalPath\": \"123213\",\"NowVersion\": 0,\"RemoteUrl\": \"123213\",\"Title\": \"491-一号机器的修改241\",\"Uid\": 2,\"UpdateTime\": \"2019-02-28T10:25:17+08:00\"}]}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/DeploySet": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "设置部署应用",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "应用ID",
+                        "name": "Id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "后置命令",
+                        "name": "AfterCommand",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "前置命令",
+                        "name": "BeforeCommand",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "抓取分支",
+                        "name": "Branch",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "部署方式",
+                        "name": "DeployType",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署地址",
+                        "name": "LocalPath",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "资源地址",
+                        "name": "RemoteUrl",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "应用名称",
+                        "name": "Title",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }
@@ -53,9 +161,10 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"CreateTime\": \"2019-03-02T16:10:10+08:00\",\"DeviceId\": \"\",\"Domain\": \"127.0.0.1\",\"Id\": 1,\"ServerName\": \"纸喵5号机\",\"ServerRuleId\": 0,\"ServerStatus\": 0,\"Uid\": 2,\"UpdateTime\": \"2019-05-22T17:40:18+08:00\"}]}",
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }
@@ -74,7 +183,8 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"CreateTime\": \"2019-03-02T16:10:10+08:00\",\"DeviceId\": \"\",\"Domain\": \"127.0.0.1\",\"Id\": 1,\"ServerName\": \"纸喵5号机\",\"ServerRuleId\": 0,\"ServerStatus\": 0,\"Uid\": 2,\"UpdateTime\": \"2019-05-22T17:40:18+08:00\"}]}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }
@@ -109,7 +219,8 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }
@@ -144,7 +255,8 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }
@@ -192,7 +304,8 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
                         }
                     }
                 }

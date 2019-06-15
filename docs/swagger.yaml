@@ -20,6 +20,25 @@ info:
   title: 纸喵 Tools-Server API
   version: "1.0"
 paths:
+  /admin/DeployDel:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 服务器ID
+        in: formData
+        name: deploy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 删除部署服务
   /admin/DeployLists:
     get:
       consumes:
@@ -28,12 +47,68 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId":
-            "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
-            0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
+          description: '{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand":
+            "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType":
+            1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title":
+            "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 获取部署服务列表
+  /admin/DeploySet:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 应用ID
+        in: formData
+        name: Id
+        required: true
+        type: string
+      - description: 后置命令
+        in: formData
+        name: AfterCommand
+        required: true
+        type: string
+      - description: 前置命令
+        in: formData
+        name: BeforeCommand
+        required: true
+        type: string
+      - description: 抓取分支
+        in: formData
+        name: Branch
+        required: true
+        type: string
+      - description: 部署方式
+        in: formData
+        name: DeployType
+        required: true
+        type: integer
+      - description: 部署地址
+        in: formData
+        name: LocalPath
+        required: true
+        type: string
+      - description: 资源地址
+        in: formData
+        name: RemoteUrl
+        required: true
+        type: string
+      - description: 应用名称
+        in: formData
+        name: Title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 设置部署应用
   /admin/ServerDel:
     delete:
       consumes:
@@ -48,11 +123,10 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId":
-            "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
-            0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
+          description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 删除服务器
   /admin/ServerLists:
     post:
@@ -66,7 +140,8 @@ paths:
             "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId":
             0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 获取服务器(客户端)列表
   /admin/UserResetPwd:
     post:
@@ -89,7 +164,8 @@ paths:
         "200":
           description: '{"code": 1,"msg": "修改成功", "data": null}}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 修改密码
   /admin/UserSigin:
     post:
@@ -114,7 +190,8 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 登录
   /admin/UserSiginUp:
     post:
@@ -148,7 +225,8 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            type: string
+            $ref: '#/definitions/utils.Json'
+            type: object
       summary: 注册账号
   /admin/VerifyByImg:
     get:
