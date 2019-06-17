@@ -9,6 +9,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 	"strconv"
 	"tools-server/common/utils"
 	"tools-server/models"
@@ -79,4 +80,88 @@ func DeployDel(c *gin.Context) {
 		return
 	}
 	utils.Show(c, 1, "操作成功", *db)
+}
+
+// @Summary 部署应用关联服务器
+// @Produce  json
+// @Accept  json
+// @Param deploy_id formData string true "部署应用ID"
+// @Param server_id formData string true "服务器ID"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "关联成功","data": null}"
+// @Router /admin/DeployRelationServer [POST]
+func DeployRelationServer(c *gin.Context) {
+	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
+	if err != nil || !(deploy_id > 0) {
+		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		return
+	}
+	server_id, err := strconv.Atoi(c.PostForm("server_id"))
+	if err != nil || !(server_id > 0) {
+		utils.Show(c, -4, "服务器ID读取错误", nil)
+		return
+	}
+	var (
+		num int
+		db  *gorm.DB
+	)
+	db = models.ZM_Mysql.Table("server").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
+	if db.Error != nil || num == 0 {
+		utils.Show(c, -5, "服务器不存在", nil)
+		return
+	}
+	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
+	if db.Error != nil || num == 0 {
+		utils.Show(c, -5, "部署服务不存在", nil)
+		return
+	}
+	relation := &models.DeployServerRelation{
+		ServerId: server_id,
+		DeployId: deploy_id,
+	}
+	db = models.ZM_Mysql.Save(relation)
+	if db.Error != nil || db.RowsAffected != 1 {
+		utils.Show(c, -5, "关联失败", nil)
+		return
+	}
+	utils.Show(c, 1, "关联成功", nil)
+}
+
+// @Summary 部署应用取消关联服务器
+// @Produce  json
+// @Accept  json
+// @Param deploy_id formData string true "部署应用ID"
+// @Param server_id formData string true "服务器ID"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "关联解除成功","data": null}"
+// @Router /admin/DeployUnRelationServer [DELETE]
+func DeployUnRelationServer(c *gin.Context) {
+	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
+	if err != nil || !(deploy_id > 0) {
+		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		return
+	}
+	server_id, err := strconv.Atoi(c.PostForm("server_id"))
+	if err != nil || !(server_id > 0) {
+		utils.Show(c, -4, "服务器ID读取错误", nil)
+		return
+	}
+	var (
+		num int
+		db  *gorm.DB
+	)
+	db = models.ZM_Mysql.Table("server").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
+	if db.Error != nil || num == 0 {
+		utils.Show(c, -5, "服务器不存在", nil)
+		return
+	}
+	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
+	if db.Error != nil || num == 0 {
+		utils.Show(c, -5, "部署服务不存在", nil)
+		return
+	}
+	db = models.ZM_Mysql.Delete(models.DeployServerRelation{}, "server_id=? and deploy_id=?", server_id, deploy_id)
+	if db.Error != nil || db.RowsAffected != 1 {
+		utils.Show(c, -5, "关联解除失败", nil)
+		return
+	}
+	utils.Show(c, 1, "关联解除成功", nil)
 }

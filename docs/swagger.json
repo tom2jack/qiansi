@@ -63,6 +63,42 @@
                 }
             }
         },
+        "/admin/DeployRelationServer": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "部署应用关联服务器",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "部署应用ID",
+                        "name": "deploy_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "服务器ID",
+                        "name": "server_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"关联成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeploySet": {
             "post": {
                 "consumes": [
@@ -133,6 +169,42 @@
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/DeployUnRelationServer": {
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "部署应用取消关联服务器",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "部署应用ID",
+                        "name": "deploy_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "服务器ID",
+                        "name": "server_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"关联解除成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/utils.Json"

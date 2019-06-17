@@ -55,6 +55,30 @@ paths:
             $ref: '#/definitions/utils.Json'
             type: object
       summary: 获取部署服务列表
+  /admin/DeployRelationServer:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 部署应用ID
+        in: formData
+        name: deploy_id
+        required: true
+        type: string
+      - description: 服务器ID
+        in: formData
+        name: server_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "关联成功","data": null}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 部署应用关联服务器
   /admin/DeploySet:
     post:
       consumes:
@@ -109,6 +133,30 @@ paths:
             $ref: '#/definitions/utils.Json'
             type: object
       summary: 设置部署应用
+  /admin/DeployUnRelationServer:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 部署应用ID
+        in: formData
+        name: deploy_id
+        required: true
+        type: string
+      - description: 服务器ID
+        in: formData
+        name: server_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "关联解除成功","data": null}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 部署应用取消关联服务器
   /admin/ServerDel:
     delete:
       consumes:

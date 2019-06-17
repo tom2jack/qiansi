@@ -50,6 +50,8 @@ func LoadRouter() {
 			admin_route.GET("/DeployLists", admin.DeployLists)
 			admin_route.DELETE("/DeployDel", admin.DeployDel)
 			admin_route.POST("/DeploySet", admin.DeploySet)
+			admin_route.POST("/DeployRelationServer", admin.DeployRelationServer)
+			admin_route.DELETE("/DeployUnRelationServer", admin.DeployUnRelationServer)
 		}
 	}
 
