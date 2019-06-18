@@ -15,6 +15,7 @@ func init() {
 	RUN = true
 }
 
+// ClientTaskLoop 轮训， Task结构为 {001{deploy_id}:1}
 func ClientTaskLoop(request []byte) []byte {
 	have := Task.GET(string(request))
 	if have != "" {

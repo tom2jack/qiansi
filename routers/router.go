@@ -27,6 +27,7 @@ func LoadRouter() {
 	{
 		// 服务器注册
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
+		client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
 	}
 
 	/* ------ 后台模块 ------- */
@@ -52,6 +53,7 @@ func LoadRouter() {
 			admin_route.POST("/DeploySet", admin.DeploySet)
 			admin_route.POST("/DeployRelationServer", admin.DeployRelationServer)
 			admin_route.DELETE("/DeployUnRelationServer", admin.DeployUnRelationServer)
+			admin_route.GET("/DeployDo", admin.DeployDo)
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"tools-server/common/utils"
 	"tools-server/models"
+	"tools-server/service/udp/clinet_task_loop"
 )
 
 // @Summary 获取部署服务列表
@@ -153,7 +154,7 @@ func DeployUnRelationServer(c *gin.Context) {
 		utils.Show(c, -5, "服务器不存在", nil)
 		return
 	}
-	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
+	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", deploy_id, c.GetInt("UID")).Count(&num)
 	if db.Error != nil || num == 0 {
 		utils.Show(c, -5, "部署服务不存在", nil)
 		return
@@ -164,4 +165,32 @@ func DeployUnRelationServer(c *gin.Context) {
 		return
 	}
 	utils.Show(c, 1, "关联解除成功", nil)
+}
+
+// @Summary 启动部署
+// @Produce  json
+// @Accept  json
+// @Param deploy_id formData string true "部署应用ID"
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "启动成功","data": null}"
+// @Router /admin/DeployDo [GET]
+func DeployDo(c *gin.Context) {
+	deploy_id, err := strconv.Atoi(c.Query("deploy_id"))
+	if err != nil || !(deploy_id > 0) {
+		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		return
+	}
+	var (
+		db *gorm.DB
+	)
+	db = models.ZM_Mysql.Exec("update deploy set now_version=now_version+1 where id=? and uid=?", deploy_id, c.GetInt("UID"))
+	if db.Error != nil || db.RowsAffected != 1 {
+		utils.Show(c, -5, "部署服务不存在", nil)
+		return
+	}
+	server := &[]models.Server{}
+	models.ZM_Mysql.Select("id").Where("id in (select server_id from deploy_server_relation where deploy_id=?)", deploy_id).Find(server)
+	for _, v := range *server {
+		clinet_task_loop.Task.SET(strconv.Itoa(v.Id), "1")
+	}
+	utils.Show(c, 1, "启动成功", server)
 }

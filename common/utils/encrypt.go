@@ -1,6 +1,9 @@
 package utils
 
 import (
+	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -76,4 +79,36 @@ func PasswordVerify(hashedPwd string, plainPwd string) bool {
 		return false
 	}
 	return true
+}
+
+//---------------DES加密  解密--------------------
+func EncyptogAES(src, key string) string {
+	s := []byte(src)
+	k := []byte(key)
+	block, err := aes.NewCipher(k)
+	if err != nil {
+		return ""
+	}
+	blockSize := block.BlockSize()
+	paddingCount := blockSize - len(s)%blockSize
+	//填充数据为：paddingCount ,填充的值为：paddingCount
+	paddingStr := bytes.Repeat([]byte{byte(paddingCount)}, paddingCount)
+	new_s := append(s, paddingStr...)
+	blockMode := cipher.NewCBCEncrypter(block, []byte(key))
+	blockMode.CryptBlocks(new_s, new_s)
+	return string(new_s)
+
+}
+func DecrptogAES(src, key string) string {
+	s := []byte(src)
+	k := []byte(key)
+	block, err := aes.NewCipher(k)
+	if err != nil {
+		return ""
+	}
+	blockMode := cipher.NewCBCDecrypter(block, k)
+	blockMode.CryptBlocks(s, s)
+	n := len(s)
+	count := int(s[n-1])
+	return string(s[:n-count])
 }
