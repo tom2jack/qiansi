@@ -1,8 +1,6 @@
 package client
 
 import (
-	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
 	"strconv"
@@ -53,18 +51,12 @@ func ApiRegServer(c *gin.Context) {
 // @Summary 获取服务器部署任务清单
 // @Produce  json
 // @Accept  json
-// @Param server_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "关联解除成功","data": null}"
-// @Router /clinet/ApiGetDeployTask [post]
+// @Success 200 {object} utils.Json "{"code": 1,"msg": "读取成功","data": [deploy]}"
+// @Router /clinet/ApiGetDeployTask [GET]
 func ApiGetDeployTask(c *gin.Context) {
-
-	server_id, err := strconv.Atoi(c.PostForm("server_id"))
-	if err != nil || !(server_id > 0) {
-		utils.Show(c, -4, "服务器ID读取错误", nil)
-		return
-	}
+	server_id := c.GetInt("SERVER-ID")
 	deploy := &[]models.Deploy{}
-	models.ZM_Mysql.Exec("SELECT d.* FROM deploy d LEFT JOIN `deploy_server_relation` r on d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
-	str, _ := json.Marshal(deploy)
-	c.String(200, str)
+	// models.ZM_Mysql.Raw()
+	models.ZM_Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
+	utils.ClientShow(c, 1, "读取成功", deploy)
 }

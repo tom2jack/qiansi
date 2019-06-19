@@ -87,6 +87,7 @@ func EncyptogAES(src, key string) string {
 	k := []byte(key)
 	block, err := aes.NewCipher(k)
 	if err != nil {
+		print(err.Error())
 		return ""
 	}
 	blockSize := block.BlockSize()

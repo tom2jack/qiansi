@@ -1,6 +1,10 @@
 package utils
 
-import "github.com/gin-gonic/gin"
+import (
+	"encoding/json"
+	"github.com/gin-gonic/gin"
+	"tools-server/models"
+)
 
 type Json struct {
 	Code int         `json:"code"`
@@ -9,11 +13,29 @@ type Json struct {
 }
 
 // Response setting gin.JSON
-func Show(C *gin.Context, code int, msg string, data interface{}) {
-	C.JSON(200, Json{
+func Show(c *gin.Context, code int, msg string, data interface{}) {
+	c.JSON(200, Json{
 		Code: code,
 		Msg:  msg,
 		Data: data,
 	})
 	return
+}
+
+func ClientShow(c *gin.Context, code int, msg string, data interface{}) {
+	json_str, err := json.Marshal(Json{
+		Code: code,
+		Msg:  msg,
+		Data: data,
+	})
+	if err != nil {
+		c.String(500, "ERROR!")
+		return
+	}
+	server_id := c.GetInt("SERVER-ID")
+	server := &models.Server{}
+	models.ZM_Mysql.Select("api_secret").Limit(1).Find(server, server_id)
+	result := EncyptogAES(string(json_str), server.ApiSecret)
+	// result = base64.StdEncoding.EncodeToString([]byte(result))
+	c.String(200, result)
 }

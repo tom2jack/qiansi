@@ -23,11 +23,15 @@ func LoadRouter() {
 	Router.Static("/static", "assets/html")
 
 	/* ------ 客户端模块 ------- */
-	client_route := Router.Group("/clinet")
+	client_route := Router.Group("/client")
 	{
-		// 服务器注册
+		// 客户端注册
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
-		client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
+		// 客户端交互请求
+		client_route.Use(middleware.ClientAuth())
+		{
+			client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
+		}
 	}
 
 	/* ------ 后台模块 ------- */
