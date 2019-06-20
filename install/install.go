@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"github.com/astaxie/beego/config"
 	uuid "github.com/satori/go.uuid"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"time"
+	"tools-client/request/http"
 )
 
 var (
@@ -58,25 +56,13 @@ func binUser() bool {
 	}
 	fmt.Println("数据读取成功：" + UID)
 	fmt.Println("当前机器唯一设备号：" + Cfg.String("zhimiao::device"))
-	return true
-}
 
-func RequestJob(UID string, HostName string) {
-	client := &http.Client{
-		Transport: &http.Transport{
-			ResponseHeaderTimeout: time.Second * 3,
-		},
-	}
-	url := "http://localhost:1305/index.php?c=api&a=regServer&uid=" + UID + "&hostname=" + HostName
-	resp, err := client.Get(url)
+	server, err := http.RegServer(UID, Cfg.String("zhimiao::device"))
 	if err != nil {
 		fmt.Println(err.Error())
-		return
 	}
-	body, _ := ioutil.ReadAll(resp.Body)
-	resp.Body.Close()
-	if string(body) != "2" {
-		return
-	}
-
+	Cfg.Set("zhimiao::UID", UID)
+	Cfg.Set("zhimiao::ApiSecret", server.ApiSecret)
+	Cfg.SaveConfigFile(CfgFilePath)
+	return true
 }
