@@ -37,7 +37,7 @@ func ApiRegServer(c *gin.Context) {
 		utils.Show(c, -5, "设备已存在，请勿重复注册", nil)
 		return
 	}
-	api_secret := string(gorand.KRand(150, gorand.KC_RAND_KIND_ALL))
+	api_secret := string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL))
 	server := &models.Server{
 		Uid:       uid,
 		ApiSecret: api_secret,
