@@ -19,7 +19,7 @@ func init() {
 func ClientTaskLoop(request []byte) []byte {
 	have := Task.GET(string(request))
 	if have != "" {
-		return []byte(have)
+		return []byte("1")
 	}
 	return nil
 }

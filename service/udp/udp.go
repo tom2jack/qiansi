@@ -39,7 +39,8 @@ func handleClient(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
 	case "001":
 		result = clinet_task_loop.ClientTaskLoop(data[3:])
 	}
-	if result != nil {
-		conn.WriteToUDP(result, remoteAddr)
+	if result == nil {
+		result = []byte("0")
 	}
+	conn.WriteToUDP(result, remoteAddr)
 }
