@@ -5,6 +5,7 @@ import (
 	"github.com/astaxie/beego/config"
 	uuid "github.com/satori/go.uuid"
 	"os"
+	"strconv"
 	"tools-client/request/http"
 )
 
@@ -12,6 +13,10 @@ var (
 	CfgFilePath string          = "config.ini"
 	Cfg         config.Configer = InitConfig()
 )
+
+func IsInstall() bool {
+	return Cfg.String("zhimiao::device") != "" && Cfg.String("zhimiao::DeployID") != ""
+}
 
 func Install() bool {
 	//绑定用户
@@ -63,6 +68,8 @@ func binUser() bool {
 	}
 	Cfg.Set("zhimiao::UID", UID)
 	Cfg.Set("zhimiao::ApiSecret", server.ApiSecret)
+	Cfg.Set("zhimiao::DeployID", strconv.Itoa(server.Id))
 	Cfg.SaveConfigFile(CfgFilePath)
+	fmt.Println("Bind User Successful！")
 	return true
 }
