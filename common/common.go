@@ -1,6 +1,8 @@
 package common
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"encoding/base64"
 	"fmt"
@@ -58,4 +60,18 @@ func GetRandStr(len int) string {
 	b := make([]byte, len)
 	rand.Read(b) //在byte切片中随机写入元素
 	return base64.StdEncoding.EncodeToString(b)
+}
+
+func DecrptogAES(src, key string) string {
+	s := []byte(src)
+	k := []byte(key)
+	block, err := aes.NewCipher(k)
+	if err != nil {
+		return ""
+	}
+	blockMode := cipher.NewCBCDecrypter(block, k)
+	blockMode.CryptBlocks(s, s)
+	n := len(s)
+	count := int(s[n-1])
+	return string(s[:n-count])
 }
