@@ -1,15 +1,17 @@
 package deploy
 
-import "fmt"
-
-// 部署信息配置
-type DeployConfig struct {
-	SourcePath   string
-	LocalPath    string
-	SourceBranch string
-}
+import (
+	"tools-client/models"
+	"tools-client/request"
+)
 
 func Run() {
-	// TODO: 任务查询，分发执行
-	fmt.Print("执行查询！")
+	TaskList := []models.Deploy{}
+	request.GetDeployTask(&TaskList)
+	for _, v := range TaskList {
+		switch v.DeployType {
+		case 1:
+			Git(&v)
+		}
+	}
 }

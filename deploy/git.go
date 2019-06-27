@@ -4,24 +4,13 @@ import (
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	"io/ioutil"
 	"os"
 	"tools-client/common"
+	"tools-client/models"
 )
 
-func Git(cfg *DeployConfig) {
-	var (
-		remote_url = "ssh://git@gitee.com/273000727/go-test.git"
-		path       = "D:\\go\\tools-client\\dist"
-		//branch = "master"
-		git_rsa = ""
-	)
-	common.Info(remote_url)
-	//这里先读取文件，后置于远程
-	pemBytes, _ := ioutil.ReadFile("git_rsa.pem")
-	git_rsa = string(pemBytes)
-	common.Info(git_rsa)
-	signer, _ := ssh.ParsePrivateKey([]byte(git_rsa))
+func Git(deploy *models.Deploy) {
+	signer, _ := ssh.ParsePrivateKey([]byte(deploy.DeployKeys))
 	auth := &gitssh.PublicKeys{
 		User:   "git",
 		Signer: signer,
@@ -30,12 +19,12 @@ func Git(cfg *DeployConfig) {
 		},
 	}
 
-	_, err := os.Stat(path)
+	_, err := os.Stat(deploy.LocalPath)
 	if err != nil {
 		//克隆项目
-		r, err := git.PlainClone(path, false, &git.CloneOptions{
+		r, err := git.PlainClone(deploy.LocalPath, false, &git.CloneOptions{
 			Auth: auth,
-			URL:  remote_url,
+			URL:  deploy.RemoteUrl,
 		})
 		common.CheckIfError(err)
 		// ... retrieving the branch being pointed by HEAD
@@ -45,7 +34,7 @@ func Git(cfg *DeployConfig) {
 		common.Info(ref.Name().String())
 	} else {
 		// We instance\iate a new repository targeting the given path (the .git folder)
-		r, err := git.PlainOpen(path)
+		r, err := git.PlainOpen(deploy.LocalPath)
 		common.CheckIfError(err)
 		w, _ := r.Worktree()
 		common.CheckIfError(err)
