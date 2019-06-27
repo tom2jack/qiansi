@@ -4,18 +4,21 @@ import (
 	"fmt"
 	"github.com/jakecoffman/cron"
 	"net"
+	"os"
+	"tools-client/common"
 	"tools-client/deploy"
 	"tools-client/install"
 )
 
 func main() {
+	// 判断安装
 	if !install.IsInstall() {
 		install.Install()
+		os.Exit(0)
 	}
+	// 主程启动，定时扫描任务
 	c := cron.New()
-	c.AddFunc("*/3 * * * * ?", func() {
-		go TaskLoop()
-	}, "TaskLoop")
+	c.AddFunc("*/3 * * * * ?", TaskLoop, "TaskLoop")
 	c.Start()
 	select {}
 }
@@ -26,7 +29,7 @@ func TaskLoop() {
 	if err != nil {
 		panic("客户端启动失败-" + err.Error())
 	}
-	request := "001" + install.Cfg.String("zhimiao::DeployID")
+	request := "001" + common.Cfg.String("zhimiao::clientid")
 	conn.Write([]byte(request))
 	var result [1]byte
 	conn.Read(result[0:])
