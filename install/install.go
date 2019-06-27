@@ -2,49 +2,29 @@ package install
 
 import (
 	"fmt"
-	"github.com/astaxie/beego/config"
 	uuid "github.com/satori/go.uuid"
-	"os"
 	"strconv"
-	"tools-client/request/http"
+	"tools-client/common"
+	"tools-client/request"
 )
 
 var (
-	CfgFilePath string          = "config.ini"
-	Cfg         config.Configer = InitConfig()
+	cfg = common.Cfg
 )
 
 func IsInstall() bool {
-	return Cfg.String("zhimiao::device") != "" && Cfg.String("zhimiao::DeployID") != ""
+	return cfg.String("zhimiao::device") != "" && cfg.String("zhimiao::clientid") != ""
 }
 
 func Install() bool {
+	if cfg.String("zhimiao::device") == "" {
+		cfg.Set("zhimiao::device", uuid.NewV4().String())
+	}
 	//绑定用户
 	if !binUser() {
 		return false
 	}
 	return true
-}
-
-//InitConfig 初始化配置
-func InitConfig() config.Configer {
-	_, err := os.Stat(CfgFilePath)
-	if err != nil {
-		file, err := os.Create(CfgFilePath)
-		if err != nil {
-			panic("文件无法写入")
-		}
-		file.Close()
-	}
-	cfg, err := config.NewConfig("ini", CfgFilePath)
-	if err != nil {
-		panic("配置文件读取错误")
-	}
-	if cfg.String("zhimiao::device") == "" {
-		cfg.Set("zhimiao::device", uuid.NewV4().String())
-		cfg.SaveConfigFile(CfgFilePath)
-	}
-	return cfg
 }
 
 func binUser() bool {
@@ -60,16 +40,16 @@ func binUser() bool {
 		}
 	}
 	fmt.Println("数据读取成功：" + UID)
-	fmt.Println("当前机器唯一设备号：" + Cfg.String("zhimiao::device"))
+	fmt.Println("当前机器唯一设备号：" + cfg.String("zhimiao::device"))
 
-	server, err := http.RegServer(UID, Cfg.String("zhimiao::device"))
+	server, err := request.RegServer(UID, cfg.String("zhimiao::device"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	Cfg.Set("zhimiao::UID", UID)
-	Cfg.Set("zhimiao::ApiSecret", server.ApiSecret)
-	Cfg.Set("zhimiao::DeployID", strconv.Itoa(server.Id))
-	Cfg.SaveConfigFile(CfgFilePath)
+	cfg.Set("zhimiao::uid", UID)
+	cfg.Set("zhimiao::apisecret", server.ApiSecret)
+	cfg.Set("zhimiao::clientid", strconv.Itoa(server.Id))
+	cfg.SaveConfigFile(common.GetConfigPath())
 	fmt.Println("Bind User Successful！")
 	return true
 }
