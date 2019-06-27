@@ -37,5 +37,6 @@ func ClientShow(c *gin.Context, code int, msg string, data interface{}) {
 	models.ZM_Mysql.Select("api_secret").Limit(1).Find(server, server_id)
 	result := EncyptogAES(string(json_str), server.ApiSecret)
 	// result = base64.StdEncoding.EncodeToString([]byte(result))
+	c.Header("ZHIMIAO-Encypt", "1")
 	c.String(200, result)
 }
