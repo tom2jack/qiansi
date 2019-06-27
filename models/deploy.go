@@ -9,6 +9,7 @@ type Deploy struct {
 	BeforeCommand string    `xorm:"not null default '' comment('前置命令') VARCHAR(2000)"`
 	Branch        string    `xorm:"not null default '' comment('git分支') VARCHAR(100)"`
 	CreateTime    time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' DATETIME"`
+	DeployKeys    string    `xorm:"not null default '' comment('部署私钥') VARCHAR(3000)"`
 	DeployType    int       `xorm:"not null default 0 comment('部署类型 0-本地 1-git 2-zip') TINYINT(1)"`
 	Id            int       `xorm:"not null pk autoincr comment('应用唯一编号') index(IX_UID) INT(10)"`
 	LocalPath     string    `xorm:"not null default '' comment('本地部署地址') VARCHAR(500)"`

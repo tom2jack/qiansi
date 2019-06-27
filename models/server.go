@@ -5,7 +5,7 @@ import (
 )
 
 type Server struct {
-	ApiSecret    string    `xorm:"not null default '' comment('API密钥') VARCHAR(255)"`
+	ApiSecret    string    `xorm:"not null default '' comment('API密钥') VARCHAR(32)"`
 	CreateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 	DeviceId     string    `xorm:"not null comment('服务器唯一设备号') CHAR(36)"`
 	Domain       string    `xorm:"not null comment('服务器地址(域名/ip)') VARCHAR(255)"`
