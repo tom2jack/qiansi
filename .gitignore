@@ -1,14 +1,53 @@
-# Binaries for programs and plugins
+$RECYCLE.BIN/
+*.[568vq]
+*.a
+*.cab
+*.cgo1.go
+*.cgo2.c
 *.exe
-*.exe~
-*.dll
+*.lnk
+*.msi
+*.msm
+*.msp
+*.o
+*.prof
 *.so
-*.dylib
-
-# Test binary, built with `go test -c`
+*.swp
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+.AppleDB
+.AppleDesktop
+.AppleDouble
+.DS_Store
+.DocumentRevisions-V100
+.LSOverride
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+._*
+.apdisk
+.fseventsd
 .idea
+Desktop.ini
+Network Trash Folder
+Temporary Items
+Thumbs.db
+[568vq].out
+_cgo_defun.c
+_cgo_export.*
+_cgo_gotypes.go
+_obj
+_test
+_testmain.go
+backup-*.txt
+backup.txt
+bin
+bin/
+composer.lock
+composer.phar
+ehthumbs.db
+packages/
+test/bin/
+vendor
+
 config.ini
