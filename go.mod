@@ -1,8 +1,13 @@
+<<<<<<< HEAD
 module tools-server
+=======
+module tools-client
+>>>>>>> client
 
 go 1.12
 
 require (
+<<<<<<< HEAD
 	github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
 	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190603120859-57a2ce229fb6
@@ -30,4 +35,11 @@ require (
 	golang.org/x/sys v0.0.0-20190602015325-4c4f7f33c9ed // indirect
 	golang.org/x/text v0.3.2 // indirect
 	golang.org/x/tools v0.0.0-20190606050223-4d9ae51c2468 // indirect
+=======
+	github.com/astaxie/beego v1.11.1
+	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
+	github.com/satori/go.uuid v1.2.0
+	golang.org/x/crypto v0.0.0-20181127143415-eb0de9b17e85
+	gopkg.in/src-d/go-git.v4 v4.10.0
+>>>>>>> client
 )

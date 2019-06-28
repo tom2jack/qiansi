@@ -48,4 +48,10 @@ composer.phar
 ehthumbs.db
 packages/
 test/bin/
+<<<<<<< HEAD
 vendor
+=======
+vendor
+
+config.ini
+>>>>>>> client
