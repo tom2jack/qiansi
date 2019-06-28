@@ -8,6 +8,10 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190605052313-b394c08122fc
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/fatedier/beego v0.0.0-20171024143340-6c6a4f5bd5eb
+	github.com/fatedier/frp v0.27.0
+	github.com/fatedier/golib v0.2.0
+	github.com/fatedier/kcp-go v2.0.4-0.20190317085623-2063a803e6fe+incompatible
 	github.com/gin-gonic/gin v1.4.0
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
@@ -20,6 +24,7 @@ require (
 	github.com/ugorji/go v1.1.5-pre // indirect
 	github.com/unrolled/secure v1.0.0
 	golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5
+	golang.org/x/net v0.0.0-20190503192946-f4e77d36d62c
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	gopkg.in/src-d/go-git.v4 v4.11.0
 )

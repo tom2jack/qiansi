@@ -5,6 +5,7 @@ import (
 	"github.com/jakecoffman/cron"
 	"net"
 	"os"
+	"qiansi/common/zmlog"
 	"qiansi/conf"
 	"qiansi/qiansi-client/deploy"
 	"qiansi/qiansi-client/install"
@@ -12,6 +13,7 @@ import (
 
 func init() {
 	conf.C = conf.LoadConfig("config.ini")
+	zmlog.InitLog("file", "log.txt", "warn", 30)
 }
 
 func main() {

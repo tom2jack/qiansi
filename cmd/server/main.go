@@ -4,11 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
 	"golang.org/x/sync/errgroup"
-	"io"
-	"log"
 	"net/http"
-	"os"
 	"qiansi/common/aliyun"
+	"qiansi/common/zmlog"
 	"qiansi/conf"
 	"qiansi/models"
 	"qiansi/qiansi-server/middleware"
@@ -23,7 +21,7 @@ func init() {
 	//加载配置
 	conf.S = conf.LoadConfig("assets/config/server.ini")
 	// 配置日志记录方式
-	setLoger()
+	zmlog.InitLog()
 	//加载路由
 	routers.LoadRouter()
 	//启动服务
@@ -68,7 +66,7 @@ func main() {
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
-	log.Printf("Start HTTP Service Listening %s", http_listen)
+	zmlog.Info("Start HTTP Service Listening %s", http_listen)
 	r := gin.New()
 	r.Use(middleware.TLS())
 	r.GET("/*any", func(c *gin.Context) {
@@ -78,7 +76,7 @@ func main() {
 		return http_server.ListenAndServe()
 	})
 
-	log.Printf("Start HTTPS Service Listening %s", https_listen)
+	zmlog.Info("Start HTTPS Service Listening %s", https_listen)
 	g.Go(func() error {
 		return https_server.ListenAndServeTLS(
 			conf.S.MustValue("server", "ssl_public_file"),
@@ -87,10 +85,8 @@ func main() {
 	})
 
 	if err := g.Wait(); err != nil {
-		log.Fatal(err)
+		zmlog.Error(err.Error())
 	}
-
-	log.Fatal()
 }
 
 func httpRedirecting() {
@@ -106,20 +102,8 @@ func httpRedirecting() {
 	app := secureMiddleware.Handler(myHandler)
 	// HTTP
 	go func() {
-		log.Fatal(http.ListenAndServe(http_listen, app))
+		zmlog.Error(http.ListenAndServe(http_listen, app).Error())
 	}()
-}
-
-func setLoger() {
-	// 禁用控制台颜色，将日志写入文件时不需要控制台颜色。
-	//gin.DisableConsoleColor()
-	log_file := conf.S.MustValue("server", "log_file", "")
-	if log_file != "" {
-		// 记录到文件。
-		f, _ := os.Create("gin.log")
-		// 如果需要同时将日志写入文件和控制台，请使用以下代码。
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
-	}
 }
 
 //Destroy 销毁资源

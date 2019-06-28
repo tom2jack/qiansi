@@ -6,7 +6,7 @@ import (
 	"qiansi/models"
 )
 
-type Json struct {
+type ApiResponseJson struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data"`
@@ -14,7 +14,7 @@ type Json struct {
 
 // Response setting gin.JSON
 func Show(c *gin.Context, code int, msg string, data interface{}) {
-	c.JSON(200, Json{
+	c.JSON(200, ApiResponseJson{
 		Code: code,
 		Msg:  msg,
 		Data: data,
@@ -23,7 +23,7 @@ func Show(c *gin.Context, code int, msg string, data interface{}) {
 }
 
 func ClientShow(c *gin.Context, code int, msg string, data interface{}) {
-	json_str, err := json.Marshal(Json{
+	json_str, err := json.Marshal(ApiResponseJson{
 		Code: code,
 		Msg:  msg,
 		Data: data,
