@@ -8,17 +8,9 @@ definitions:
       msg:
         type: string
     type: object
-host: localhost:8000
 info:
-  contact:
-    email: mail@xiaoliu.org
-    name: API Support
-    url: http://tools.zhimiao.org
-  description: 纸喵软件系列之服务端
+  contact: {}
   license: {}
-  termsOfService: http://zhimiao.org
-  title: 纸喵 Tools-Server API
-  version: "1.0"
 paths:
   /admin/DeployDel:
     delete:
@@ -39,6 +31,25 @@ paths:
             $ref: '#/definitions/utils.Json'
             type: object
       summary: 删除部署服务
+  /admin/DeployDo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 部署应用ID
+        in: formData
+        name: deploy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "启动成功","data": null}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 启动部署
   /admin/DeployLists:
     get:
       consumes:
@@ -318,6 +329,19 @@ paths:
             $ref: '#/definitions/utils.Json'
             type: object
       summary: 获取短信验证码
+  /clinet/ApiGetDeployTask:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "读取成功","data": [deploy]}'
+          schema:
+            $ref: '#/definitions/utils.Json'
+            type: object
+      summary: 获取服务器部署任务清单
   /clinet/ApiRegServer:
     post:
       consumes:
@@ -343,4 +367,3 @@ paths:
           schema:
             type: string
       summary: 服务器注册
-swagger: "2.0"

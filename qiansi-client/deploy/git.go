@@ -5,8 +5,8 @@ import (
 	"gopkg.in/src-d/go-git.v4"
 	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
 	"os"
-	"tools-client/common"
-	"tools-client/models"
+	"qiansi/common"
+	"qiansi/models"
 )
 
 func Git(deploy *models.Deploy) {

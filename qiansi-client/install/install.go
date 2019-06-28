@@ -3,22 +3,18 @@ package install
 import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
+	"qiansi/conf"
+	"qiansi/qiansi-client/request"
 	"strconv"
-	"tools-client/common"
-	"tools-client/request"
-)
-
-var (
-	cfg = common.Cfg
 )
 
 func IsInstall() bool {
-	return cfg.String("zhimiao::device") != "" && cfg.String("zhimiao::clientid") != ""
+	return conf.C.MustValue("zhimiao", "device") != "" && conf.C.MustValue("zhimiao", "clientid") != ""
 }
 
 func Install() bool {
-	if cfg.String("zhimiao::device") == "" {
-		cfg.Set("zhimiao::device", uuid.NewV4().String())
+	if conf.C.MustValue("zhimiao", "device") == "" {
+		conf.C.SetValue("zhimiao", "device", uuid.NewV4().String())
 	}
 	//绑定用户
 	if !binUser() {
@@ -40,16 +36,16 @@ func binUser() bool {
 		}
 	}
 	fmt.Println("数据读取成功：" + UID)
-	fmt.Println("当前机器唯一设备号：" + cfg.String("zhimiao::device"))
+	fmt.Println("当前机器唯一设备号：" + conf.C.MustValue("zhimiao", "device"))
 
-	server, err := request.RegServer(UID, cfg.String("zhimiao::device"))
+	server, err := request.RegServer(UID, conf.C.MustValue("zhimiao", "device"))
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	cfg.Set("zhimiao::uid", UID)
-	cfg.Set("zhimiao::apisecret", server.ApiSecret)
-	cfg.Set("zhimiao::clientid", strconv.Itoa(server.Id))
-	cfg.SaveConfigFile(common.GetConfigPath())
+	conf.C.SetValue("zhimiao", "uid", UID)
+	conf.C.SetValue("zhimiao", "apisecret", server.ApiSecret)
+	conf.C.SetValue("zhimiao", "clientid", strconv.Itoa(server.Id))
+	conf.C.Save()
 	fmt.Println("Bind User Successful！")
 	return true
 }

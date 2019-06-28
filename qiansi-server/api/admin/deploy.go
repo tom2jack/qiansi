@@ -10,10 +10,10 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"qiansi/common/utils"
+	"qiansi/models"
+	"qiansi/qiansi-server/service/udp/clinet_task_loop"
 	"strconv"
-	"tools-server/common/utils"
-	"tools-server/models"
-	"tools-server/server/service/udp/clinet_task_loop"
 )
 
 // @Summary 获取部署服务列表

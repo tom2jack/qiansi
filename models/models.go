@@ -6,8 +6,8 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
+	"qiansi/conf"
 	"time"
-	"tools-server/conf"
 )
 
 var (

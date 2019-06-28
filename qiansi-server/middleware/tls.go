@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
-	"tools-server/conf"
+	"qiansi/conf"
 )
 
 func TLS() gin.HandlerFunc {

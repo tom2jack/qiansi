@@ -4,8 +4,8 @@ import (
 	"log"
 	"net"
 	"os"
-	"tools-server/conf"
-	clinet_task_loop2 "tools-server/server/service/udp/clinet_task_loop"
+	"qiansi/conf"
+	clinet_task_loop2 "qiansi/qiansi-server/service/udp/clinet_task_loop"
 )
 
 func Start() {

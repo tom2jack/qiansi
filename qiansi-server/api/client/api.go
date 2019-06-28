@@ -3,9 +3,9 @@ package client
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
+	"qiansi/common/utils"
+	"qiansi/models"
 	"strconv"
-	"tools-server/common/utils"
-	"tools-server/models"
 )
 
 // @Summary 服务器注册

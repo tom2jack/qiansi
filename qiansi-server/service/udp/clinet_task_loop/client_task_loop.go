@@ -1,6 +1,6 @@
 package clinet_task_loop
 
-import "tools-server/common/utils"
+import "qiansi/common/utils"
 
 var (
 	Task *utils.SafeMap

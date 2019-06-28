@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
+	"qiansi/common/aliyun"
+	"qiansi/models"
 	"time"
-	"tools-server/common/aliyun"
-	"tools-server/models"
 )
 
 type VerifyStore struct {

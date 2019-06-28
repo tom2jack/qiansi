@@ -7,9 +7,10 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"qiansi/common/utils"
+	"qiansi/conf"
+	"qiansi/models"
 	"time"
-	"tools-client/common"
-	"tools-client/models"
 )
 
 var (
@@ -35,14 +36,14 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 		return nil, err
 	}
 	// 设置header头
-	if client_id := common.Cfg.String("zhimiao::clientid"); client_id != "" {
+	if client_id := conf.C.MustValue("zhimiao", "clientid"); client_id != "" {
 		req.Header.Add("SERVER-ID", client_id)
 	}
 	resp, err := ZMHTTP.Do(req)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 	// 请求判断
 	if resp.StatusCode != 200 {
 		return nil, fmt.Errorf("非法请求")
@@ -53,7 +54,7 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	}
 	// 解密判断
 	if resp.Header.Get("ZHIMIAO-Encypt") == "1" {
-		raw = []byte(common.DecrptogAES(string(raw), common.Cfg.String("zhimiao::apisecret")))
+		raw = []byte(utils.DecrptogAES(string(raw), conf.C.MustValue("zhimiao", "apisecret")))
 	}
 	// 解析统一包装
 	apibody := &ApiBody{}

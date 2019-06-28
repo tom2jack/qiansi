@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	_ "tools-server/docs"
-	"tools-server/server/api/admin"
-	"tools-server/server/api/client"
-	"tools-server/server/middleware"
+	_ "qiansi/docs"
+	"qiansi/qiansi-server/api/admin"
+	"qiansi/qiansi-server/api/client"
+	"qiansi/qiansi-server/middleware"
 )
 
 var (

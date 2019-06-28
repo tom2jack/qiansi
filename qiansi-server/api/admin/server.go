@@ -9,9 +9,9 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"qiansi/common/utils"
+	"qiansi/models"
 	"strconv"
-	"tools-server/common/utils"
-	"tools-server/models"
 )
 
 // @Summary 获取服务器(客户端)列表

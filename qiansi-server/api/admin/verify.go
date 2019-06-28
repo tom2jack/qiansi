@@ -3,8 +3,8 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"log"
+	"qiansi/common/utils"
 	"time"
-	"tools-server/common/utils"
 )
 
 var ZM_LOCK = utils.NewLockTable()

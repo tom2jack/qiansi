@@ -1,13 +1,13 @@
 package deploy
 
 import (
-	"tools-client/models"
-	"tools-client/request"
+	"qiansi/models"
+	"qiansi/qiansi-client/request"
 )
 
 func Run() {
 	TaskList := []models.Deploy{}
-	request.GetDeployTask(&TaskList)
+	_ = request.GetDeployTask(&TaskList)
 	for _, v := range TaskList {
 		switch v.DeployType {
 		case 1:

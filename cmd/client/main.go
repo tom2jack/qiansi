@@ -5,10 +5,14 @@ import (
 	"github.com/jakecoffman/cron"
 	"net"
 	"os"
-	"tools-client/common"
-	"tools-client/deploy"
-	"tools-client/install"
+	"qiansi/conf"
+	"qiansi/qiansi-client/deploy"
+	"qiansi/qiansi-client/install"
 )
+
+func init() {
+	conf.C = conf.LoadConfig("config.ini")
+}
 
 func main() {
 	// 判断安装
@@ -29,7 +33,7 @@ func TaskLoop() {
 	if err != nil {
 		panic("客户端启动失败-" + err.Error())
 	}
-	request := "001" + common.Cfg.String("zhimiao::clientid")
+	request := "001" + conf.C.MustValue("zhimiao", "clientid")
 	conn.Write([]byte(request))
 	var result [1]byte
 	conn.Read(result[0:])

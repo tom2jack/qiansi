@@ -1,7 +1,7 @@
 package service
 
 import (
-	udp2 "tools-server/server/service/udp"
+	udp2 "qiansi/qiansi-server/service/udp"
 )
 
 func LoadService() {

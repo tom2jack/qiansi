@@ -1,18 +1,8 @@
 {
-    "swagger": "2.0",
     "info": {
-        "description": "纸喵软件系列之服务端",
-        "title": "纸喵 Tools-Server API",
-        "termsOfService": "http://zhimiao.org",
-        "contact": {
-            "name": "API Support",
-            "url": "http://tools.zhimiao.org",
-            "email": "mail@xiaoliu.org"
-        },
-        "license": {},
-        "version": "1.0"
+        "contact": {},
+        "license": {}
     },
-    "host": "localhost:8000",
     "paths": {
         "/admin/DeployDel": {
             "delete": {
@@ -35,6 +25,35 @@
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/DeployDo": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "启动部署",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "部署应用ID",
+                        "name": "deploy_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/utils.Json"
@@ -438,6 +457,26 @@
                 "responses": {
                     "200": {
                         "description": "{\"code\":1,\"msg\":\"发送成功\",\"data\":null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/utils.Json"
+                        }
+                    }
+                }
+            }
+        },
+        "/clinet/ApiGetDeployTask": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取服务器部署任务清单",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/utils.Json"

@@ -8,13 +8,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"qiansi/common/aliyun"
+	"qiansi/conf"
+	"qiansi/models"
+	"qiansi/qiansi-server/middleware"
+	"qiansi/qiansi-server/routers"
+	"qiansi/qiansi-server/service"
 	"time"
-	"tools-server/common/aliyun"
-	"tools-server/conf"
-	"tools-server/models"
-	"tools-server/server/middleware"
-	"tools-server/server/routers"
-	"tools-server/server/service"
 )
 
 var g errgroup.Group
@@ -36,7 +36,7 @@ func init() {
 	aliyun.LoadAliyunSDK()
 }
 
-// @title 纸喵 Tools-Server API
+// @title 纸喵 qiansi API
 // @version 1.0
 // @description 纸喵软件系列之服务端
 // @termsOfService http://zhimiao.org

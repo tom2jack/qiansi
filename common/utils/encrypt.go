@@ -10,8 +10,8 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"qiansi/conf"
 	"time"
-	"tools-server/conf"
 )
 
 // MD5 md5 encryption
@@ -37,7 +37,7 @@ func ParseToken(tokenString string) (string, error) {
 			if !claims.VerifyExpiresAt(time.Now().Unix(), false) {
 				return "", fmt.Errorf("过期了")
 			}
-			if claims.Issuer != "zhimiao-tools-server" {
+			if claims.Issuer != "zhimiao-qiansi" {
 				return "", fmt.Errorf("非法来源的签名")
 			}
 			return claims.Subject, nil
@@ -56,7 +56,7 @@ func CreateToken(subject string, expire time.Duration) (string, error) {
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(expire).Unix(),
-		Issuer:    "zhimiao-tools-server",
+		Issuer:    "zhimiao-qiansi",
 	})
 	token, err := tokenClaims.SignedString(jwtSecret)
 	return token, err
