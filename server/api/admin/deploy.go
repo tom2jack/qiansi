@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"tools-server/common/utils"
 	"tools-server/models"
-	"tools-server/service/udp/clinet_task_loop"
+	"tools-server/server/service/udp/clinet_task_loop"
 )
 
 // @Summary 获取部署服务列表

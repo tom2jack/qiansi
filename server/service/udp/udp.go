@@ -5,11 +5,11 @@ import (
 	"net"
 	"os"
 	"tools-server/conf"
-	"tools-server/service/udp/clinet_task_loop"
+	clinet_task_loop2 "tools-server/server/service/udp/clinet_task_loop"
 )
 
 func Start() {
-	listen := conf.App.MustValue("server", "udp_listen", ":8081")
+	listen := conf.S.MustValue("server", "udp_listen", ":8081")
 	addr, err := net.ResolveUDPAddr("udp", listen)
 	if err != nil {
 		log.Print("Can't resolve address: ", err)
@@ -37,7 +37,7 @@ func handleClient(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
 	var result []byte
 	switch string(data[:3]) {
 	case "001":
-		result = clinet_task_loop.ClientTaskLoop(data[3:])
+		result = clinet_task_loop2.ClientTaskLoop(data[3:])
 	}
 	if result == nil {
 		result = []byte("0")

@@ -31,10 +31,10 @@ func SendSmsVerify(phone string, code string) bool {
 	request.Domain = "dysmsapi.aliyuncs.com"
 	request.Version = "2017-05-25"
 	request.ApiName = "SendSms"
-	request.QueryParams["RegionId"] = conf.App.MustValue("AliyunSms", "RegionId")
+	request.QueryParams["RegionId"] = conf.S.MustValue("AliyunSms", "RegionId")
 	request.QueryParams["PhoneNumbers"] = phone
-	request.QueryParams["SignName"] = conf.App.MustValue("AliyunSms", "SignName")
-	request.QueryParams["TemplateCode"] = conf.App.MustValue("AliyunSms", "TemplateCode")
+	request.QueryParams["SignName"] = conf.S.MustValue("AliyunSms", "SignName")
+	request.QueryParams["TemplateCode"] = conf.S.MustValue("AliyunSms", "TemplateCode")
 	request.QueryParams["TemplateParam"] = string(param)
 	response, err := ZM_Clinet.ProcessCommonRequest(request)
 	if err != nil {

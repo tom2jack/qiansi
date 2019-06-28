@@ -24,16 +24,16 @@ type ModelBase1 struct {
 // Setup Initialize the Redis instance
 func LoadRedis() {
 	ZM_Redis = &redis.Pool{
-		MaxIdle:     conf.App.MustInt("redis", "max_idle"),
-		MaxActive:   conf.App.MustInt("redis", "max_active"),
-		IdleTimeout: time.Duration(conf.App.MustInt("redis", "idle_timeout")) * time.Second,
+		MaxIdle:     conf.S.MustInt("redis", "max_idle"),
+		MaxActive:   conf.S.MustInt("redis", "max_active"),
+		IdleTimeout: time.Duration(conf.S.MustInt("redis", "idle_timeout")) * time.Second,
 		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", conf.App.MustValue("redis", "host"))
+			c, err := redis.Dial("tcp", conf.S.MustValue("redis", "host"))
 			if err != nil {
 				return nil, err
 			}
-			if conf.App.MustValue("redis", "auth") != "" {
-				if _, err := c.Do("AUTH", conf.App.MustValue("redis", "auth")); err != nil {
+			if conf.S.MustValue("redis", "auth") != "" {
+				if _, err := c.Do("AUTH", conf.S.MustValue("redis", "auth")); err != nil {
 					c.Close()
 					return nil, err
 				}
@@ -51,17 +51,17 @@ func LoadRedis() {
 func LoadMysql() {
 	var err error
 	ZM_Mysql, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		conf.App.MustValue("mysql", "user"),
-		conf.App.MustValue("mysql", "password"),
-		conf.App.MustValue("mysql", "host"),
-		conf.App.MustValue("mysql", "database"),
+		conf.S.MustValue("mysql", "user"),
+		conf.S.MustValue("mysql", "password"),
+		conf.S.MustValue("mysql", "host"),
+		conf.S.MustValue("mysql", "database"),
 	))
 	if err != nil {
 		log.Fatalf("models.Setup err: %v", err)
 	}
 
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return conf.App.MustValue("mysql", "table_prefix") + defaultTableName
+		return conf.S.MustValue("mysql", "table_prefix") + defaultTableName
 	}
 
 	ZM_Mysql.LogMode(true)

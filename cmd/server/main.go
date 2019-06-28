@@ -11,17 +11,17 @@ import (
 	"time"
 	"tools-server/common/aliyun"
 	"tools-server/conf"
-	"tools-server/middleware"
 	"tools-server/models"
-	"tools-server/routers"
-	"tools-server/service"
+	"tools-server/server/middleware"
+	"tools-server/server/routers"
+	"tools-server/server/service"
 )
 
 var g errgroup.Group
 
 func init() {
 	//加载配置
-	conf.LoadConfig()
+	conf.S = conf.LoadConfig("assets/config/server.ini")
 	// 配置日志记录方式
 	setLoger()
 	//加载路由
@@ -49,11 +49,11 @@ func init() {
 // @BasePath
 func main() {
 	defer destroy()
-	gin.SetMode(conf.App.MustValue("server", "run_mode"))
-	http_listen := conf.App.MustValue("server", "http_listen")
-	https_listen := conf.App.MustValue("server", "https_listen")
-	readTimeout := time.Duration(conf.App.MustInt64("server", "read_timeout", 60)) * time.Second
-	writeTimeout := time.Duration(conf.App.MustInt64("server", "write_timeout", 60)) * time.Second
+	gin.SetMode(conf.S.MustValue("server", "run_mode"))
+	http_listen := conf.S.MustValue("server", "http_listen")
+	https_listen := conf.S.MustValue("server", "https_listen")
+	readTimeout := time.Duration(conf.S.MustInt64("server", "read_timeout", 60)) * time.Second
+	writeTimeout := time.Duration(conf.S.MustInt64("server", "write_timeout", 60)) * time.Second
 	http_server := &http.Server{
 		Addr:           http_listen,
 		Handler:        routers.Router,
@@ -81,8 +81,8 @@ func main() {
 	log.Printf("Start HTTPS Service Listening %s", https_listen)
 	g.Go(func() error {
 		return https_server.ListenAndServeTLS(
-			conf.App.MustValue("server", "ssl_public_file"),
-			conf.App.MustValue("server", "ssl_private_file"),
+			conf.S.MustValue("server", "ssl_public_file"),
+			conf.S.MustValue("server", "ssl_private_file"),
 		)
 	})
 
@@ -94,8 +94,8 @@ func main() {
 }
 
 func httpRedirecting() {
-	https_listen := conf.App.MustValue("server", "https_listen")
-	http_listen := conf.App.MustValue("server", "http_listen")
+	https_listen := conf.S.MustValue("server", "https_listen")
+	http_listen := conf.S.MustValue("server", "http_listen")
 	secureMiddleware := secure.New(secure.Options{
 		SSLRedirect: true,
 		SSLHost:     https_listen,
@@ -113,7 +113,7 @@ func httpRedirecting() {
 func setLoger() {
 	// 禁用控制台颜色，将日志写入文件时不需要控制台颜色。
 	//gin.DisableConsoleColor()
-	log_file := conf.App.MustValue("server", "log_file", "")
+	log_file := conf.S.MustValue("server", "log_file", "")
 	if log_file != "" {
 		// 记录到文件。
 		f, _ := os.Create("gin.log")

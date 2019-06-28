@@ -13,9 +13,9 @@ var (
 func LoadAliyunSDK() {
 	var err error
 	ZM_Clinet, err = sdk.NewClientWithAccessKey(
-		conf.App.MustValue("Aliyun", "RegionId"),
-		conf.App.MustValue("Aliyun", "AccessKey"),
-		conf.App.MustValue("Aliyun", "AccessSecret"),
+		conf.S.MustValue("Aliyun", "RegionId"),
+		conf.S.MustValue("Aliyun", "AccessKey"),
+		conf.S.MustValue("Aliyun", "AccessSecret"),
 	)
 	if err != nil {
 		log.Print(err.Error())

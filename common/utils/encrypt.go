@@ -23,7 +23,7 @@ func MD5(value string) string {
 
 //ParseToken 解析jwtToken
 func ParseToken(tokenString string) (string, error) {
-	jwt_secret, err := conf.App.GetValue("app", "jwt_secret")
+	jwt_secret, err := conf.S.GetValue("app", "jwt_secret")
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +48,7 @@ func ParseToken(tokenString string) (string, error) {
 
 //CreateToken 生成jwtToken
 func CreateToken(subject string, expire time.Duration) (string, error) {
-	jwt_secret, err := conf.App.GetValue("app", "jwt_secret")
+	jwt_secret, err := conf.S.GetValue("app", "jwt_secret")
 	if err != nil {
 		return "", err
 	}

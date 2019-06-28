@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
-	"tools-server/api/admin"
-	"tools-server/api/client"
 	_ "tools-server/docs"
-	"tools-server/middleware"
+	"tools-server/server/api/admin"
+	"tools-server/server/api/client"
+	"tools-server/server/middleware"
 )
 
 var (
