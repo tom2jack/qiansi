@@ -13,7 +13,7 @@ import (
 
 func init() {
 	conf.C = conf.LoadConfig("config.ini")
-	zmlog.InitLog("file", "log.txt", "warn", 30)
+	zmlog.InitLog()
 }
 
 func main() {

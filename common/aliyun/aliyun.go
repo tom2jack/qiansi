@@ -2,7 +2,7 @@ package aliyun
 
 import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
-	"log"
+	"qiansi/common/zmlog"
 	"qiansi/conf"
 )
 
@@ -18,6 +18,6 @@ func LoadAliyunSDK() {
 		conf.S.MustValue("Aliyun", "AccessSecret"),
 	)
 	if err != nil {
-		log.Print(err.Error())
+		zmlog.Error(err.Error())
 	}
 }

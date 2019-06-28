@@ -9,7 +9,7 @@ import (
 	"fmt"
 	jwt "github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
-	"log"
+	"qiansi/common/zmlog"
 	"qiansi/conf"
 	"time"
 )
@@ -66,7 +66,7 @@ func CreateToken(subject string, expire time.Duration) (string, error) {
 func PasswordHash(pwd string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
 	if err != nil {
-		log.Println(err)
+		zmlog.Warn(err.Error())
 	}
 	return string(hash)
 }
@@ -75,7 +75,7 @@ func PasswordHash(pwd string) string {
 func PasswordVerify(hashedPwd string, plainPwd string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
 	if err != nil {
-		log.Print(err)
+		zmlog.Warn(err.Error())
 		return false
 	}
 	return true

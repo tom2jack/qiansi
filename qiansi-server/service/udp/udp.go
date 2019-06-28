@@ -1,9 +1,9 @@
 package udp
 
 import (
-	"log"
 	"net"
 	"os"
+	"qiansi/common/zmlog"
 	"qiansi/conf"
 	clinet_task_loop2 "qiansi/qiansi-server/service/udp/clinet_task_loop"
 )
@@ -12,16 +12,15 @@ func Start() {
 	listen := conf.S.MustValue("server", "udp_listen", ":8081")
 	addr, err := net.ResolveUDPAddr("udp", listen)
 	if err != nil {
-		log.Print("Can't resolve address: ", err)
+		zmlog.Error("Can't resolve address: %v", err)
 		os.Exit(1)
 	}
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		log.Print("Error listening:", err)
-		os.Exit(1)
+		zmlog.Error("Error listening: %v", err)
 	}
 	defer conn.Close()
-	log.Printf("Start UDP Service Listening %s", listen)
+	zmlog.Info("Start UDP Service Listening %s", listen)
 	for {
 		data := make([]byte, 200)
 		n, remoteAddr, err := conn.ReadFromUDP(data)

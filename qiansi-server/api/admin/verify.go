@@ -2,8 +2,8 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"qiansi/common/utils"
+	"qiansi/common/zmlog"
 	"time"
 )
 
@@ -52,7 +52,7 @@ func VerifyBySMS(c *gin.Context) {
 	}
 	err := utils.VerifyBySMS(phone)
 	if err != nil {
-		log.Printf("[短信发送失败]：%s-%s", phone, err.Error())
+		zmlog.Warn("[短信发送失败]：%s-%s", phone, err.Error())
 		utils.Show(c, -5, "短信发送失败", nil)
 		return
 	}

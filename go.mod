@@ -8,7 +8,6 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190605052313-b394c08122fc
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
-	github.com/fatedier/beego v0.0.0-20171024143340-6c6a4f5bd5eb
 	github.com/fatedier/frp v0.27.0
 	github.com/fatedier/golib v0.2.0
 	github.com/fatedier/kcp-go v2.0.4-0.20190317085623-2063a803e6fe+incompatible
