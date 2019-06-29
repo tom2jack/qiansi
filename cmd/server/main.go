@@ -21,7 +21,7 @@ func init() {
 	//加载配置
 	conf.S = conf.LoadConfig("assets/config/server.ini")
 	// 配置日志记录方式
-	zmlog.InitLog()
+	zmlog.InitLog("server.log")
 	//加载路由
 	routers.LoadRouter()
 	//启动服务
