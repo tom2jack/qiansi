@@ -19,28 +19,31 @@ func InitLog(logfile string) {
 	}
 }
 
+func logDo(stat string, format string, v ...interface{}) {
+	format = fmt.Sprintf("\n%s [%s] %s\n", time.Now().Format("2006-01-02 15:04:05"), stat, format)
+	if stat == "ERROR" {
+		fmt.Fprintf(gin.DefaultErrorWriter, format, v...)
+		os.Exit(0)
+	}
+	fmt.Fprintf(gin.DefaultErrorWriter, format, v...)
+}
+
 func Error(format string, v ...interface{}) {
-	format = time.Now().Format("2006-01-02 15:04:05") + " [ERROR] " + format + "\n"
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v)
-	os.Exit(0)
+	logDo("ERROR", format, v...)
 }
 
 func Warn(format string, v ...interface{}) {
-	format = time.Now().Format("2006-01-02 15:04:05") + " [WARN] " + format + "\n"
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v)
+	logDo("WARN", format, v...)
 }
 
 func Info(format string, v ...interface{}) {
-	format = time.Now().Format("2006-01-02 15:04:05") + " [INFO] " + format + "\n"
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v)
+	logDo("INFO", format, v...)
 }
 
 func Debug(format string, v ...interface{}) {
-	format = time.Now().Format("2006-01-02 15:04:05") + " [DEBUG] " + format + "\n"
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v)
+	logDo("DEBUG", format, v...)
 }
 
 func Trace(format string, v ...interface{}) {
-	format = time.Now().Format("2006-01-02 15:04:05") + " [TRACE] " + format + "\n"
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v)
+	logDo("TRACE", format, v...)
 }

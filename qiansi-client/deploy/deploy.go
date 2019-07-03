@@ -24,5 +24,5 @@ func LogPush(format string, v ...interface{}) {
 	if pc, _, _, ok := runtime.Caller(1); ok {
 		fname = runtime.FuncForPC(pc).Name()
 	}
-	zmlog.Info("("+fname+") "+format, v)
+	zmlog.Info("("+fname+") "+format, v...)
 }
