@@ -41,16 +41,25 @@ func Git(deploy *models.Deploy) error {
 	if err != nil {
 		return err
 	}
+	head, err := repository.Head()
+	if err != nil {
+		return err
+	}
 	LogPush("成功抓取仓库分支图，正在执行当前工作区清理...")
 	err = tree.Clean(&git.CleanOptions{Dir: true})
 	if err != nil {
 		return err
 	}
-	head, err := repository.Head()
+	err = tree.Checkout(&git.CheckoutOptions{
+		Force:  true,
+		Branch: head.Name(),
+	})
 	if err != nil {
 		return err
 	}
-	LogPush("当前分支: %s, 部署分支: %s", head.Name().Short(), deploy.Branch)
+	// 获取远程分支信息
+	remote, err := repository.Storer.Reference(plumbing.NewRemoteReferenceName(git.DefaultRemoteName, deploy.Branch))
+	LogPush("当前分支: %s(%s), 部署分支: %s, 部署版本：%s", head.Name().Short(), head.Hash(), deploy.Branch, remote.Hash())
 	if head.Name().Short() != deploy.Branch {
 		LogPush("分支数据不相同，正在尝试切换分支...")
 		b, err := repository.Branches()
@@ -75,14 +84,25 @@ func Git(deploy *models.Deploy) error {
 				LogPush("创建分支报错: %v", err)
 				return err
 			}
-		}
-		err = tree.Checkout(&git.CheckoutOptions{
-			// Create: needCreate,
-			Force:  true,
-			Branch: plumbing.NewBranchReferenceName(deploy.Branch),
-		})
-		if err != nil {
-			return err
+			err = tree.Checkout(&git.CheckoutOptions{
+				Create: true,
+				Force:  true,
+				Hash:   remote.Hash(),
+				Branch: plumbing.NewBranchReferenceName(deploy.Branch),
+			})
+			if err != nil {
+				return err
+			}
+		} else {
+			LogPush("本地寻址成功，正在切换分支到: %s, Hash:%s", deploy.Branch, remote.Hash())
+			err = tree.Checkout(&git.CheckoutOptions{
+				Create: false,
+				Force:  true,
+				Branch: plumbing.NewBranchReferenceName(deploy.Branch),
+			})
+			if err != nil {
+				return err
+			}
 		}
 		LogPush("分支切换完毕，正在刷新工作区信息数据...")
 		head, err = repository.Head()
@@ -92,19 +112,21 @@ func Git(deploy *models.Deploy) error {
 	}
 	LogPush("正在拉取远程最新数据...")
 	err = tree.Pull(&git.PullOptions{
-		// TODO:reference not found
-		RemoteName:    git.DefaultRemoteName,
-		ReferenceName: plumbing.NewRemoteReferenceName("heads", deploy.Branch),
-		SingleBranch:  false,
-		Auth:          auth,
+		// Name of the remote to be pulled. If empty, uses the default.
+		RemoteName: git.DefaultRemoteName,
+		// Remote branch to clone. If empty, uses HEAD.
+		ReferenceName: plumbing.NewBranchReferenceName(deploy.Branch),
+		// Fetch only ReferenceName if true.
+		SingleBranch: false,
+		Auth:         auth,
 	})
 	if err != nil {
 		if err.Error() != git.NoErrAlreadyUpToDate.Error() {
 			return err
 		}
-		LogPush("没啥可更新的，当前hash:%s, 当前ref:%s", head.Hash().String(), head.Name().Short())
+		LogPush("没啥可更新的，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
 	} else {
-		LogPush("数据更新完毕，当前hash:%s, 当前ref:%s", head.Hash().String(), head.Name().Short())
+		LogPush("数据更新完毕，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
 	}
 	return nil
 }
