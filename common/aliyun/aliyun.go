@@ -2,8 +2,8 @@ package aliyun
 
 import (
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
+	"qiansi/common/conf"
 	"qiansi/common/zmlog"
-	"qiansi/conf"
 )
 
 var (
