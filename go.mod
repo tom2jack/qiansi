@@ -20,13 +20,12 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
 	github.com/jinzhu/gorm v1.9.8
-	github.com/kr/pty v1.1.4 // indirect
 	github.com/lifei6671/gorand v0.1.0
 	github.com/mailru/easyjson v0.0.0-20190403194419-1ea4449da983 // indirect
 	github.com/mattn/go-isatty v0.0.8 // indirect
 	github.com/mojocn/base64Captcha v0.0.0-20190509095025-87c9c59224d8
+	github.com/progrium/go-shell v0.0.0-20181023041501-104b11941186
 	github.com/satori/go.uuid v1.2.0
-	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/swaggo/gin-swagger v1.1.0
 	github.com/swaggo/swag v1.5.0
 	github.com/ugorji/go v1.1.5-pre // indirect

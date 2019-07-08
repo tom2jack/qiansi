@@ -1,10 +1,12 @@
 package deploy
 
 import (
+	"github.com/progrium/go-shell"
 	"qiansi/common/zmlog"
 	"qiansi/models"
 	"qiansi/qiansi-client/request"
 	"runtime"
+	"strings"
 )
 
 func Run() {
@@ -25,4 +27,27 @@ func LogPush(format string, v ...interface{}) {
 		fname = runtime.FuncForPC(pc).Name()
 	}
 	zmlog.Info("("+fname+") "+format, v...)
+}
+
+func RunShell(work_path, cmd string) error {
+	if runtime.GOOS == "windows" {
+		shell.Shell = []string{""}
+	}
+	// shell.Shell = []string{}
+	// shell.Trace = true
+	shell.Panic = false
+
+	cmd = strings.ReplaceAll(cmd, "\r\n", "\n")
+	cmds := strings.Split(cmd, "\n")
+	for _, v := range cmds {
+		if v == "" {
+			continue
+		}
+		res := shell.Cmd(v)
+		res.SetWorkDir(work_path)
+		o := res.Run()
+		LogPush("正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, o.String(), o.Error().Error())
+	}
+
+	return nil
 }
