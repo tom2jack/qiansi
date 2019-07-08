@@ -3,8 +3,8 @@ package udp
 import (
 	"net"
 	"os"
+	"qiansi/common/conf"
 	"qiansi/common/zmlog"
-	"qiansi/conf"
 	clinet_task_loop2 "qiansi/qiansi-server/service/udp/clinet_task_loop"
 )
 

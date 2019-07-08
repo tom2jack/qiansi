@@ -5,8 +5,8 @@ import (
 	"github.com/jakecoffman/cron"
 	"net"
 	"os"
+	"qiansi/common/conf"
 	"qiansi/common/zmlog"
-	"qiansi/conf"
 	"qiansi/qiansi-client/deploy"
 	"qiansi/qiansi-client/install"
 )

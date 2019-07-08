@@ -7,10 +7,10 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/dgrijalva/jwt-go"
 	"golang.org/x/crypto/bcrypt"
+	"qiansi/common/conf"
 	"qiansi/common/zmlog"
-	"qiansi/conf"
 	"time"
 )
 

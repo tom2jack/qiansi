@@ -3,7 +3,7 @@ package install
 import (
 	"fmt"
 	uuid "github.com/satori/go.uuid"
-	"qiansi/conf"
+	"qiansi/common/conf"
 	"qiansi/qiansi-client/request"
 	"strconv"
 )
