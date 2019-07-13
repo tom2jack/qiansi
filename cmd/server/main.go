@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"qiansi/common/aliyun"
 	"qiansi/common/conf"
+	"qiansi/common/models"
 	"qiansi/common/zmlog"
-	"qiansi/models"
 	"qiansi/qiansi-server/routers"
 	"qiansi/qiansi-server/service"
 	"time"
@@ -41,7 +41,6 @@ func init() {
 // @contact.url http://tools.zhimiao.org
 // @contact.email mail@xiaoliu.org
 
-// @license.url https
 // @host localhost:8000
 // @BasePath
 func main() {

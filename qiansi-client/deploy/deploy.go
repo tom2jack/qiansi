@@ -2,8 +2,8 @@ package deploy
 
 import (
 	"github.com/progrium/go-shell"
+	"qiansi/common/models"
 	"qiansi/common/zmlog"
-	"qiansi/models"
 	"qiansi/qiansi-client/request"
 	"runtime"
 	"strings"

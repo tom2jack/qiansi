@@ -6,7 +6,7 @@ import (
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	"qiansi/models"
+	"qiansi/common/models"
 )
 
 func Git(deploy *models.Deploy) error {

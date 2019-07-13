@@ -9,15 +9,15 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"qiansi/common/models"
 	"qiansi/common/utils"
-	"qiansi/models"
 	"strconv"
 )
 
 // @Summary 获取服务器(客户端)列表
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId": "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId": 0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId": "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId": 0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}"
 // @Router /admin/ServerLists [post]
 func ServerLists(c *gin.Context) {
 	s := &[]models.Server{}
@@ -29,7 +29,7 @@ func ServerLists(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param server_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerDel [DELETE]
 func ServerDel(c *gin.Context) {
 	server_id, err := strconv.Atoi(c.PostForm("server_id"))

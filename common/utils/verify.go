@@ -5,7 +5,7 @@ import (
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
 	"qiansi/common/aliyun"
-	"qiansi/models"
+	"qiansi/common/models"
 	"time"
 )
 

@@ -3,8 +3,8 @@ package client
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
+	"qiansi/common/models"
 	"qiansi/common/utils"
-	"qiansi/models"
 	"strconv"
 )
 
@@ -13,7 +13,7 @@ import (
 // @Accept  json
 // @Param uid query string true "用户UID"
 // @Param device query string true "客户端设备号"
-// @Success 200 {string} json "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /clinet/ApiRegServer [post]
 func ApiRegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
@@ -51,7 +51,7 @@ func ApiRegServer(c *gin.Context) {
 // @Summary 获取服务器部署任务清单
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "读取成功","data": [deploy]}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "读取成功","data": [deploy]}"
 // @Router /clinet/ApiGetDeployTask [GET]
 func ApiGetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")

@@ -2,11 +2,11 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"github.com/swaggo/gin-swagger/swaggerFiles"
-	_ "qiansi/docs"
 	"qiansi/qiansi-server/api/admin"
 	"qiansi/qiansi-server/api/client"
+	_ "qiansi/qiansi-server/docs"
 	"qiansi/qiansi-server/middleware"
 )
 

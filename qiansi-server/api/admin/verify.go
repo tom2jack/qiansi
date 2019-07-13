@@ -12,7 +12,7 @@ var ZM_LOCK = utils.NewLockTable()
 // @Summary 获取图片验证码
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} utils.Json "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
+// @Success 200 {object} models.ApiResult "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
 // @Router /admin/VerifyByImg [get]
 func VerifyByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
@@ -32,7 +32,7 @@ func VerifyByImg(c *gin.Context) {
 // @Param phone formData string true "手机号"
 // @Param img_idkey formData string true "图片验证码句柄"
 // @Param img_code formData string true "图片验证码"
-// @Success 200 {object} utils.Json "{"code":1,"msg":"发送成功","data":null}"
+// @Success 200 {object} models.ApiResult "{"code":1,"msg":"发送成功","data":null}"
 // @Router /admin/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
 	phone := c.PostForm("phone")

@@ -10,8 +10,8 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
+	"qiansi/common/models"
 	"qiansi/common/utils"
-	"qiansi/models"
 	"qiansi/qiansi-server/service/udp/clinet_task_loop"
 	"strconv"
 )
@@ -19,7 +19,7 @@ import (
 // @Summary 获取部署服务列表
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand": "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType": 1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title": "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand": "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType": 1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title": "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}"
 // @Router /admin/DeployLists [get]
 func DeployLists(c *gin.Context) {
 	d := &[]models.Deploy{}
@@ -38,7 +38,7 @@ func DeployLists(c *gin.Context) {
 // @Param LocalPath formData string true "部署地址"
 // @Param RemoteUrl formData string true "资源地址"
 // @Param Title formData string true "应用名称"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeploySet [POST]
 func DeploySet(c *gin.Context) {
 	param := &models.Deploy{}
@@ -66,7 +66,7 @@ func DeploySet(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param deploy_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeployDel [DELETE]
 func DeployDel(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
@@ -88,7 +88,7 @@ func DeployDel(c *gin.Context) {
 // @Accept  json
 // @Param deploy_id formData string true "部署应用ID"
 // @Param server_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "关联成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "关联成功","data": null}"
 // @Router /admin/DeployRelationServer [POST]
 func DeployRelationServer(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
@@ -132,7 +132,7 @@ func DeployRelationServer(c *gin.Context) {
 // @Accept  json
 // @Param deploy_id formData string true "部署应用ID"
 // @Param server_id formData string true "服务器ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "关联解除成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "关联解除成功","data": null}"
 // @Router /admin/DeployUnRelationServer [DELETE]
 func DeployUnRelationServer(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
@@ -171,7 +171,7 @@ func DeployUnRelationServer(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param deploy_id formData string true "部署应用ID"
-// @Success 200 {object} utils.Json "{"code": 1,"msg": "启动成功","data": null}"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
 // @Router /admin/DeployDo [GET]
 func DeployDo(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.Query("deploy_id"))

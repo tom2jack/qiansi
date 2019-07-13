@@ -3,7 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"qiansi/models"
+	"qiansi/common/models"
 )
 
 type ApiResponseJson struct {
