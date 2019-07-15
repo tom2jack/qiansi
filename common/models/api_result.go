@@ -13,10 +13,26 @@ type ApiResult struct {
 }
 
 func NewApiResult(arg ...interface{}) *ApiResult {
-	return &ApiResult{
+	result := &ApiResult{
 		Code: 1,
 		Msg:  "操作成功",
 	}
+	for k, v := range arg {
+		if k == 0 {
+			if v1, ok := v.(int); ok {
+				result.setCode(v1)
+			}
+		}
+		if k == 1 && v != nil {
+			result.setData(v)
+		}
+		if k == 2 {
+			if v3, ok := v.(string); ok {
+				result.setMsg(v3)
+			}
+		}
+	}
+	return result
 }
 
 func (r *ApiResult) setData(data interface{}) *ApiResult {

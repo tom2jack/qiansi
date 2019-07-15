@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"qiansi/common/captcha"
 	"qiansi/common/models"
 	"qiansi/common/utils"
 	"strconv"
@@ -89,7 +90,7 @@ func UserSiginUp(c *gin.Context) {
 			return
 		}
 	}
-	if len(code) < 4 || !utils.VerifyCheck(utils.VerifyBySMSIDKEY(phone), code) {
+	if len(code) < 4 || !captcha.VerifyCheck(captcha.VerifyBySMSIDKEY(phone), code) {
 		utils.Show(c, -4, "验证码错误", nil)
 		return
 	}
