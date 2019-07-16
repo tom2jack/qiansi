@@ -11,7 +11,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"qiansi/common/models"
-	"qiansi/common/utils"
 	"qiansi/qiansi-server/service/udp/clinet_task_loop"
 	"strconv"
 )
@@ -24,7 +23,7 @@ import (
 func DeployLists(c *gin.Context) {
 	d := &[]models.Deploy{}
 	models.ZM_Mysql.Order("id desc").Find(d, "uid=?", c.GetInt("UID"))
-	utils.Show(c, 1, "读取成功", d)
+	models.NewApiResult(c, 1, "读取成功", d).Json(c)
 }
 
 // @Summary 设置部署应用
@@ -43,23 +42,23 @@ func DeployLists(c *gin.Context) {
 func DeploySet(c *gin.Context) {
 	param := &models.Deploy{}
 	if c.ShouldBind(param) != nil {
-		utils.Show(c, -4, "入参绑定失败", nil)
+		models.NewApiResult(c, -4, "入参绑定失败", nil).Json(c)
 		return
 	}
 	if param.Id == 0 {
 		param.Uid = c.GetInt("UID")
 		if models.ZM_Mysql.Save(param).RowsAffected > 0 {
-			utils.Show(c, 1, "创建成功", param)
+			models.NewApiResult(c, 1, "创建成功", param).Json(c)
 			return
 		}
 	}
 	if param.Id > 0 {
 		if models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", param.Id, c.GetInt("UID")).Updates(param).RowsAffected > 0 {
-			utils.Show(c, 1, "更新成功", param)
+			models.NewApiResult(c, 1, "更新成功", param).Json(c)
 			return
 		}
 	}
-	utils.Show(c, 0, "系统错误", nil)
+	models.NewApiResult(c, 0, "系统错误", nil).Json(c)
 }
 
 // @Summary 删除部署服务
@@ -71,16 +70,16 @@ func DeploySet(c *gin.Context) {
 func DeployDel(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
 	if err != nil || !(deploy_id > 0) {
-		utils.Show(c, -4, "服务器ID读取错误", nil)
+		models.NewApiResult(c, -4, "服务器ID读取错误", nil).Json(c)
 		return
 	}
 
 	db := models.ZM_Mysql.Delete(models.Deploy{}, "id=? and uid=?", deploy_id, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		utils.Show(c, -5, "删除失败", *db)
+		models.NewApiResult(c, -5, "删除失败", *db).Json(c)
 		return
 	}
-	utils.Show(c, 1, "操作成功", *db)
+	models.NewApiResult(c, 1, "操作成功", *db).Json(c)
 }
 
 // @Summary 部署应用关联服务器
@@ -93,12 +92,12 @@ func DeployDel(c *gin.Context) {
 func DeployRelationServer(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
 	if err != nil || !(deploy_id > 0) {
-		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		models.NewApiResult(c, -4, "部署应用ID读取错误", nil).Json(c)
 		return
 	}
 	server_id, err := strconv.Atoi(c.PostForm("server_id"))
 	if err != nil || !(server_id > 0) {
-		utils.Show(c, -4, "服务器ID读取错误", nil)
+		models.NewApiResult(c, -4, "服务器ID读取错误", nil).Json(c)
 		return
 	}
 	var (
@@ -107,12 +106,12 @@ func DeployRelationServer(c *gin.Context) {
 	)
 	db = models.ZM_Mysql.Table("server").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
 	if db.Error != nil || num == 0 {
-		utils.Show(c, -5, "服务器不存在", nil)
+		models.NewApiResult(c, -5, "服务器不存在", nil).Json(c)
 		return
 	}
 	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
 	if db.Error != nil || num == 0 {
-		utils.Show(c, -5, "部署服务不存在", nil)
+		models.NewApiResult(c, -5, "部署服务不存在", nil).Json(c)
 		return
 	}
 	relation := &models.DeployServerRelation{
@@ -121,10 +120,10 @@ func DeployRelationServer(c *gin.Context) {
 	}
 	db = models.ZM_Mysql.Save(relation)
 	if db.Error != nil || db.RowsAffected != 1 {
-		utils.Show(c, -5, "关联失败", nil)
+		models.NewApiResult(c, -5, "关联失败", nil).Json(c)
 		return
 	}
-	utils.Show(c, 1, "关联成功", nil)
+	models.NewApiResult(c, 1, "关联成功", nil).Json(c)
 }
 
 // @Summary 部署应用取消关联服务器
@@ -137,12 +136,12 @@ func DeployRelationServer(c *gin.Context) {
 func DeployUnRelationServer(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.PostForm("deploy_id"))
 	if err != nil || !(deploy_id > 0) {
-		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		models.NewApiResult(c, -4, "部署应用ID读取错误", nil).Json(c)
 		return
 	}
 	server_id, err := strconv.Atoi(c.PostForm("server_id"))
 	if err != nil || !(server_id > 0) {
-		utils.Show(c, -4, "服务器ID读取错误", nil)
+		models.NewApiResult(c, -4, "服务器ID读取错误", nil).Json(c)
 		return
 	}
 	var (
@@ -151,20 +150,20 @@ func DeployUnRelationServer(c *gin.Context) {
 	)
 	db = models.ZM_Mysql.Table("server").Where("id=? and uid=?", server_id, c.GetInt("UID")).Count(&num)
 	if db.Error != nil || num == 0 {
-		utils.Show(c, -5, "服务器不存在", nil)
+		models.NewApiResult(c, -5, "服务器不存在", nil).Json(c)
 		return
 	}
 	db = models.ZM_Mysql.Table("deploy").Where("id=? and uid=?", deploy_id, c.GetInt("UID")).Count(&num)
 	if db.Error != nil || num == 0 {
-		utils.Show(c, -5, "部署服务不存在", nil)
+		models.NewApiResult(c, -5, "部署服务不存在", nil).Json(c)
 		return
 	}
 	db = models.ZM_Mysql.Delete(models.DeployServerRelation{}, "server_id=? and deploy_id=?", server_id, deploy_id)
 	if db.Error != nil || db.RowsAffected != 1 {
-		utils.Show(c, -5, "关联解除失败", nil)
+		models.NewApiResult(c, -5, "关联解除失败", nil).Json(c)
 		return
 	}
-	utils.Show(c, 1, "关联解除成功", nil)
+	models.NewApiResult(c, 1, "关联解除成功", nil).Json(c)
 }
 
 // @Summary 启动部署
@@ -176,7 +175,7 @@ func DeployUnRelationServer(c *gin.Context) {
 func DeployDo(c *gin.Context) {
 	deploy_id, err := strconv.Atoi(c.Query("deploy_id"))
 	if err != nil || !(deploy_id > 0) {
-		utils.Show(c, -4, "部署应用ID读取错误", nil)
+		models.NewApiResult(c, -4, "部署应用ID读取错误", nil).Json(c)
 		return
 	}
 	var (
@@ -184,7 +183,7 @@ func DeployDo(c *gin.Context) {
 	)
 	db = models.ZM_Mysql.Exec("update deploy set now_version=now_version+1 where id=? and uid=?", deploy_id, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		utils.Show(c, -5, "部署服务不存在", nil)
+		models.NewApiResult(c, -5, "部署服务不存在", nil).Json(c)
 		return
 	}
 	server := &[]models.Server{}
@@ -192,5 +191,5 @@ func DeployDo(c *gin.Context) {
 	for _, v := range *server {
 		clinet_task_loop.Task.SET(strconv.Itoa(v.Id), "1")
 	}
-	utils.Show(c, 1, "启动成功", server)
+	models.NewApiResult(c, 1, "启动成功", server).Json(c)
 }

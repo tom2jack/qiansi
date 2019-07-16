@@ -50,11 +50,11 @@ func (r *ApiResult) setCode(code int) *ApiResult {
 	return r
 }
 
-func (r *ApiResult) Success(c *gin.Context) {
+func (r *ApiResult) Json(c *gin.Context) {
 	c.JSON(200, r)
 }
 
-func (r *ApiResult) Client(c *gin.Context) {
+func (r *ApiResult) Encypt(c *gin.Context) {
 	json_str, err := json.Marshal(r)
 	if err != nil {
 		c.String(500, "ERROR!")

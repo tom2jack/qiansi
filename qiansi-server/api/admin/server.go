@@ -10,7 +10,6 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"qiansi/common/models"
-	"qiansi/common/utils"
 	"strconv"
 )
 
@@ -22,7 +21,7 @@ import (
 func ServerLists(c *gin.Context) {
 	s := &[]models.Server{}
 	models.ZM_Mysql.Raw("select id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time from `server` where uid=?", c.GetInt("UID")).Scan(s)
-	utils.Show(c, 1, "读取成功", s)
+	models.NewApiResult(c, 1, "读取成功", s).Json(c)
 }
 
 // @Summary 删除服务器
@@ -34,14 +33,14 @@ func ServerLists(c *gin.Context) {
 func ServerDel(c *gin.Context) {
 	server_id, err := strconv.Atoi(c.PostForm("server_id"))
 	if err != nil || !(server_id > 0) {
-		utils.Show(c, -4, "服务器ID读取错误", nil)
+		models.NewApiResult(c, -4, "服务器ID读取错误", nil).Json(c)
 		return
 	}
 
 	db := models.ZM_Mysql.Delete(models.Server{}, "id=? and uid=?", server_id, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		utils.Show(c, -5, "删除失败", *db)
+		models.NewApiResult(c, -5, "删除失败", *db).Json(c)
 		return
 	}
-	utils.Show(c, 1, "操作成功", *db)
+	models.NewApiResult(c, 1, "操作成功", *db).Json(c)
 }

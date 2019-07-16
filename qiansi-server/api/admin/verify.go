@@ -3,6 +3,7 @@ package admin
 import (
 	"github.com/gin-gonic/gin"
 	"qiansi/common/captcha"
+	"qiansi/common/models"
 	"qiansi/common/utils"
 	"qiansi/common/zmlog"
 	"time"
@@ -17,14 +18,14 @@ var ZM_LOCK = utils.NewLockTable()
 // @Router /admin/VerifyByImg [get]
 func VerifyByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
-		utils.Show(c, -5, "当前IP数据请求过频，请稍后再试", nil)
+		models.NewApiResult(c, -5, "当前IP数据请求过频，请稍后再试", nil).Json(c)
 		return
 	}
 	idkey, img := captcha.VerifyByImg("")
-	utils.Show(c, 1, "请求成功", map[string]string{
+	models.NewApiResult(c, 1, "请求成功", map[string]string{
 		"idkey": idkey,
 		"img":   img,
-	})
+	}).Json(c)
 }
 
 // @Summary 获取短信验证码
@@ -40,22 +41,22 @@ func VerifyBySMS(c *gin.Context) {
 	img_idkey := c.PostForm("img_idkey")
 	img_code := c.PostForm("img_code")
 	if len(phone) != 11 {
-		utils.Show(c, -4, "手机号错误", nil)
+		models.NewApiResult(c, -4, "手机号错误", nil).Json(c)
 		return
 	}
 	if !captcha.VerifyCheck(img_idkey, img_code) {
-		utils.Show(c, -5, "验证码无效", nil)
+		models.NewApiResult(c, -5, "验证码无效", nil).Json(c)
 		return
 	}
 	if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
-		utils.Show(c, -5, "当前IP数据请求过频，请稍后再试", nil)
+		models.NewApiResult(c, -5, "当前IP数据请求过频，请稍后再试", nil).Json(c)
 		return
 	}
 	err := captcha.VerifyBySMS(phone)
 	if err != nil {
 		zmlog.Warn("[短信发送失败]：%s-%s", phone, err.Error())
-		utils.Show(c, -5, "短信发送失败", nil)
+		models.NewApiResult(c, -5, "短信发送失败", nil).Json(c)
 		return
 	}
-	utils.Show(c, 1, "发送成功", nil)
+	models.NewApiResult(c, 1, "发送成功", nil).Json(c)
 }
