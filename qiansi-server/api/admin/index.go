@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"qiansi/common/zmlog"
 )
 
 func AdminIndex(c *gin.Context) {
@@ -11,5 +12,6 @@ func AdminIndex(c *gin.Context) {
 		"id":   c.Query("id"),
 		"uid":  c.GetString("LOGIN-TOKEN"),
 	}
+	zmlog.Info("%v", v)
 	c.JSON(200, v)
 }

@@ -22,10 +22,10 @@ func InitLog(logfile string) {
 func logDo(stat string, format string, v ...interface{}) {
 	format = fmt.Sprintf("\n%s [%s] %s\n", time.Now().Format("2006-01-02 15:04:05"), stat, format)
 	if stat == "ERROR" {
-		fmt.Fprintf(gin.DefaultErrorWriter, format, v...)
+		fmt.Fprintf(gin.DefaultWriter, format, v...)
 		os.Exit(0)
 	}
-	fmt.Fprintf(gin.DefaultErrorWriter, format, v...)
+	fmt.Fprintf(gin.DefaultWriter, format, v...)
 }
 
 func Error(format string, v ...interface{}) {

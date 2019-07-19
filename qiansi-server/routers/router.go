@@ -45,10 +45,10 @@ func LoadRouter() {
 		admin_route.POST("/UserSigin", admin.UserSigin)
 		// 注册
 		admin_route.POST("/UserSiginUp", admin.UserSiginUp)
+		admin_route.GET("/index", admin.AdminIndex)
 		// 需要登陆的部分
 		admin_route.Use(middleware.JWT())
 		{
-			admin_route.GET("/index", admin.AdminIndex)
 			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
 			admin_route.GET("/ServerLists", admin.ServerLists)
 			admin_route.DELETE("/ServerDel", admin.ServerDel)
