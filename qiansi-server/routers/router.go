@@ -37,6 +37,7 @@ func LoadRouter() {
 	/* ------ 后台模块 ------- */
 	admin_route := Router.Group("/admin")
 	{
+		admin_route.GET("/index", admin.AdminIndex)
 		// 获取图片验证码
 		admin_route.GET("/VerifyByImg", admin.VerifyByImg)
 		// 获取短信验证码
@@ -45,7 +46,8 @@ func LoadRouter() {
 		admin_route.POST("/UserSigin", admin.UserSigin)
 		// 注册
 		admin_route.POST("/UserSiginUp", admin.UserSiginUp)
-		admin_route.GET("/index", admin.AdminIndex)
+		// 启动部署
+		admin_route.GET("/DeployDo", admin.DeployDo)
 		// 需要登陆的部分
 		admin_route.Use(middleware.JWT())
 		{
@@ -57,7 +59,7 @@ func LoadRouter() {
 			admin_route.POST("/DeploySet", admin.DeploySet)
 			admin_route.POST("/DeployRelationServer", admin.DeployRelationServer)
 			admin_route.DELETE("/DeployUnRelationServer", admin.DeployUnRelationServer)
-			admin_route.GET("/DeployDo", admin.DeployDo)
+
 		}
 	}
 
