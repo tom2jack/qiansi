@@ -17,23 +17,23 @@ import (
 func ApiRegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
 	if !(uid > 0) {
-		models.NewApiResult(c, -4, "用户UID非法", nil).Json(c)
+		models.NewApiResult(-4, "用户UID非法").Json(c)
 		return
 	}
 	device := c.Query("device")
 	if len(device) != 36 {
-		models.NewApiResult(c, -4, "客户端唯一标识号非法", nil).Json(c)
+		models.NewApiResult(-4, "客户端唯一标识号非法").Json(c)
 		return
 	}
 	var row int
 	models.ZM_Mysql.Table("member").Where("uid = ?", uid).Count(&row)
 	if row == 0 {
-		models.NewApiResult(c, -5, "用户不存在", nil).Json(c)
+		models.NewApiResult(-5, "用户不存在").Json(c)
 		return
 	}
 	models.ZM_Mysql.Table("server").Where("device_id=?", device).Count(&row)
 	if row > 0 {
-		models.NewApiResult(c, -5, "设备已存在，请勿重复注册", nil).Json(c)
+		models.NewApiResult(-5, "设备已存在，请勿重复注册").Json(c)
 		return
 	}
 	api_secret := string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL))
@@ -44,7 +44,7 @@ func ApiRegServer(c *gin.Context) {
 		Domain:    c.ClientIP(),
 	}
 	models.ZM_Mysql.Create(server)
-	models.NewApiResult(c, 1, "成功", server).Json(c)
+	models.NewApiResult(1, "成功", server).Json(c)
 }
 
 // @Summary 获取服务器部署任务清单
@@ -57,5 +57,5 @@ func ApiGetDeployTask(c *gin.Context) {
 	deploy := &[]models.Deploy{}
 	// models.ZM_Mysql.Raw()
 	models.ZM_Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
-	models.NewApiResult(c, 1, "读取成功", deploy).Encypt(c)
+	models.NewApiResult(1, "读取成功", deploy).Encypt(c)
 }

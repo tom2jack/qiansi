@@ -23,13 +23,13 @@ func NewApiResult(arg ...interface{}) *ApiResult {
 				result.setCode(v1)
 			}
 		}
-		if k == 1 && v != nil {
-			result.setData(v)
-		}
-		if k == 2 {
-			if v3, ok := v.(string); ok {
-				result.setMsg(v3)
+		if k == 1 {
+			if v2, ok := v.(string); ok {
+				result.setData(v2)
 			}
+		}
+		if k == 2 && v != nil {
+			result.setData(v)
 		}
 	}
 	return result

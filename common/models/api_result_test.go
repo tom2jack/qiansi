@@ -3,5 +3,5 @@ package models
 import "testing"
 
 func TestNewApiResult(t *testing.T) {
-	t.Log(*NewApiResult(8, nil, "成功"))
+	t.Log(*NewApiResult(8, "成功"))
 }

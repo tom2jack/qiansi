@@ -18,11 +18,11 @@ var ZM_LOCK = utils.NewLockTable()
 // @Router /admin/VerifyByImg [get]
 func VerifyByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
-		models.NewApiResult(c, -5, "当前IP数据请求过频，请稍后再试", nil).Json(c)
+		models.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
 		return
 	}
 	idkey, img := captcha.VerifyByImg("")
-	models.NewApiResult(c, 1, "请求成功", map[string]string{
+	models.NewApiResult(1, "请求成功", map[string]string{
 		"idkey": idkey,
 		"img":   img,
 	}).Json(c)
@@ -41,22 +41,22 @@ func VerifyBySMS(c *gin.Context) {
 	img_idkey := c.PostForm("img_idkey")
 	img_code := c.PostForm("img_code")
 	if len(phone) != 11 {
-		models.NewApiResult(c, -4, "手机号错误", nil).Json(c)
+		models.NewApiResult(-4, "手机号错误").Json(c)
 		return
 	}
 	if !captcha.VerifyCheck(img_idkey, img_code) {
-		models.NewApiResult(c, -5, "验证码无效", nil).Json(c)
+		models.NewApiResult(-5, "验证码无效").Json(c)
 		return
 	}
 	if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
-		models.NewApiResult(c, -5, "当前IP数据请求过频，请稍后再试", nil).Json(c)
+		models.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
 		return
 	}
 	err := captcha.VerifyBySMS(phone)
 	if err != nil {
 		zmlog.Warn("[短信发送失败]：%s-%s", phone, err.Error())
-		models.NewApiResult(c, -5, "短信发送失败", nil).Json(c)
+		models.NewApiResult(-5, "短信发送失败").Json(c)
 		return
 	}
-	models.NewApiResult(c, 1, "发送成功", nil).Json(c)
+	models.NewApiResult(1, "发送成功").Json(c)
 }
