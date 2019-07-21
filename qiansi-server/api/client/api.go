@@ -59,3 +59,30 @@ func ApiGetDeployTask(c *gin.Context) {
 	models.ZM_Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
 	models.NewApiResult(1, "读取成功", deploy).Encypt(c)
 }
+
+// @Summary 客户端日志推送
+// @Produce  json
+// @Accept  multipart/form-data
+// @Param server_id formData string true "客户端平台编号"
+// @Param device formData string true "客户端设备号"
+// @Param content formData string true "日志文本内容"
+// @Success 200 {object} models.ApiResult ""
+// @Router /clinet/LogPush [post]
+func LogPush(c *gin.Context) {
+	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
+	device := c.PostForm("device")
+	content := c.PostForm("content")
+	var row int
+	models.ZM_Mysql.Table("server").Where("id=? and device_id=?", serverId, device).Count(&row)
+	if row == 0 {
+		c.Status(403)
+		return
+	}
+	serverLog := &models.ServerLog{
+		ServerId: serverId,
+		DeviceId: device,
+		Content:  content,
+	}
+	models.ZM_Mysql.Create(serverLog)
+	models.NewApiResult(1).Json(c)
+}

@@ -27,6 +27,8 @@ func LoadRouter() {
 	{
 		// 客户端注册
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
+		// 客户端日志推送
+		client_route.POST("/LogPush", client.LogPush)
 		// 客户端交互请求
 		client_route.Use(middleware.ClientAuth())
 		{

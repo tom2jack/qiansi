@@ -7,10 +7,12 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"qiansi/common/conf"
 	"qiansi/common/models"
 	"qiansi/common/utils"
 	"qiansi/common/zmlog"
+	"strings"
 	"time"
 )
 
@@ -32,7 +34,11 @@ type ApiBody struct {
 }
 
 func request(method string, url string, body io.Reader) ([]byte, error) {
-	req, err := http.NewRequest(method, BASE_URL+url, body)
+	var real_metod = method
+	if real_metod == "RAW" {
+		real_metod = "POST"
+	}
+	req, err := http.NewRequest(real_metod, BASE_URL+url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -40,6 +46,10 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	if client_id := conf.C.MustValue("zhimiao", "clientid"); client_id != "" {
 		req.Header.Add("SERVER-ID", client_id)
 	}
+	if method == "POST" {
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	}
+
 	resp, err := ZMHTTP.Do(req)
 	if err != nil {
 		return nil, err
@@ -62,9 +72,14 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	if err := json.Unmarshal(raw, apibody); err != nil {
 		return nil, err
 	}
-	raw = []byte(*apibody.Data)
 	if apibody.Code < 1 {
 		return raw, fmt.Errorf(apibody.Msg)
+	}
+	// 防止没有返回数据的情况下发生painc错误
+	if apibody.Data != nil {
+		raw = []byte(*apibody.Data)
+	} else {
+		raw = nil
 	}
 	zmlog.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, BASE_URL+url, string(raw))
 	return raw, nil
@@ -88,6 +103,20 @@ func GetDeployTask(task *[]models.Deploy) error {
 		return err
 	}
 	if err := json.Unmarshal(raw, task); err != nil {
+		return err
+	}
+	return nil
+}
+
+// 推送日志
+func LogPush(log string) error {
+	body := url.Values{
+		"server_id": {conf.C.MustValue("zhimiao", "clientid")},
+		"device":    {conf.C.MustValue("zhimiao", "device")},
+		"content":   {log},
+	}
+	_, err := request("POST", "/client/LogPush", strings.NewReader(body.Encode()))
+	if err != nil {
 		return err
 	}
 	return nil

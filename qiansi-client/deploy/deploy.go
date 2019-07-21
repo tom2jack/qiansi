@@ -1,6 +1,7 @@
 package deploy
 
 import (
+	"fmt"
 	"github.com/progrium/go-shell"
 	"qiansi/common/models"
 	"qiansi/common/zmlog"
@@ -36,6 +37,8 @@ func LogPush(format string, v ...interface{}) {
 		fname = runtime.FuncForPC(pc).Name()
 	}
 	zmlog.Info("("+fname+") "+format, v...)
+	// 反向推送日志到千丝平台
+	request.LogPush(fmt.Sprintf("("+fname+") "+format, v...))
 }
 
 func RunShell(work_path, cmd string) error {
