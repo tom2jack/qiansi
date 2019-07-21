@@ -30,7 +30,7 @@ func main() {
 }
 
 func TaskLoop() {
-	conn, err := net.Dial("udp", "127.0.0.1:8002")
+	conn, err := net.Dial("udp", "127.0.0.1:8001")
 	defer conn.Close()
 	if err != nil {
 		panic("客户端启动失败-" + err.Error())

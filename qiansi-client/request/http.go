@@ -10,6 +10,7 @@ import (
 	"qiansi/common/conf"
 	"qiansi/common/models"
 	"qiansi/common/utils"
+	"qiansi/common/zmlog"
 	"time"
 )
 
@@ -22,7 +23,7 @@ var (
 	}
 )
 
-const BASE_URL = "https://localhost:8001"
+const BASE_URL = "http://localhost:8000"
 
 type ApiBody struct {
 	Code int
@@ -65,6 +66,7 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	if apibody.Code < 1 {
 		return raw, fmt.Errorf(apibody.Msg)
 	}
+	zmlog.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, BASE_URL+url, string(raw))
 	return raw, nil
 }
 
