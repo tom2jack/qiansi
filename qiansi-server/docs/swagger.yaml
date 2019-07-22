@@ -45,7 +45,7 @@ paths:
       - application/json
       parameters:
       - description: 部署应用ID
-        in: formData
+        in: query
         name: deploy_id
         required: true
         type: string
@@ -57,7 +57,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ApiResult'
             type: object
-      summary: 启动部署
+      summary: '启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数'
   /admin/DeployLists:
     get:
       consumes:
@@ -376,4 +376,33 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 服务器注册
+  /clinet/LogPush:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: 客户端平台编号
+        in: formData
+        name: server_id
+        required: true
+        type: string
+      - description: 客户端设备号
+        in: formData
+        name: device
+        required: true
+        type: string
+      - description: 日志文本内容
+        in: formData
+        name: content
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResult'
+            type: object
+      summary: 客户端日志推送
 swagger: "2.0"
