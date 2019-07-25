@@ -69,7 +69,7 @@ func LogPush(format string, v ...interface{}) {
 func RunShell(work_path, cmd string) error {
 	defer shell.ErrExit()
 	if runtime.GOOS == "windows" {
-		shell.Shell = []string{"C:\\Windows\\System32\\cmd.exe", "/c"}
+		shell.Shell = []string{"cmd", "/c"}
 	}
 	shell.Panic = false
 	cmd = strings.ReplaceAll(cmd, "\r\n", "\n")

@@ -8,7 +8,7 @@ piqng baidu.com
 
 `)
 	RunShell("c:\\", `
-pinqg baidu.com
+ping baidu.com
 `)
 
 }
