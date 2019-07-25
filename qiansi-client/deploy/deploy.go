@@ -4,30 +4,55 @@ import (
 	"fmt"
 	"github.com/progrium/go-shell"
 	"qiansi/common/models"
+	"qiansi/common/utils"
 	"qiansi/common/zmlog"
 	"qiansi/qiansi-client/request"
 	"runtime"
+	"strconv"
 	"strings"
+	"time"
 )
 
+var (
+	Task *utils.SafeMap
+	RUN  bool = false
+)
+
+func init() {
+	if RUN {
+		return
+	}
+	Task = utils.NewSafeMap()
+	RUN = true
+}
+
 func Run() {
+	// TODO: 原子执行逻辑
 	TaskList := []models.Deploy{}
 	_ = request.GetDeployTask(&TaskList)
 	for _, v := range TaskList {
-		// 执行前置命令
-		if v.BeforeCommand != "" {
-			RunShell(v.LocalPath, v.BeforeCommand)
-		}
-		// 选择部署操作
-		switch v.DeployType {
-		case 1:
-			Git(&v)
-		}
-		// 执行后置命令
-		if v.AfterCommand != "" {
-			RunShell(v.LocalPath, v.AfterCommand)
-		}
+		go runTask(v)
 	}
+}
+
+func runTask(deploy models.Deploy) {
+	if !Task.SETNX(strconv.Itoa(deploy.Id), strconv.FormatInt(time.Now().Unix(), 36)) {
+		return
+	}
+	// 执行前置命令
+	if deploy.BeforeCommand != "" {
+		RunShell(deploy.LocalPath, deploy.BeforeCommand)
+	}
+	// 选择部署操作
+	switch deploy.DeployType {
+	case 1:
+		Git(&deploy)
+	}
+	// 执行后置命令
+	if deploy.AfterCommand != "" {
+		RunShell(deploy.LocalPath, deploy.AfterCommand)
+	}
+	Task.DEL(strconv.Itoa(deploy.Id))
 }
 
 func LogPush(format string, v ...interface{}) {

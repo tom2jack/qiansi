@@ -45,7 +45,7 @@ func TaskLoop() {
 
 	switch data {
 	case "1":
-		go deploy.Run()
+		deploy.Run()
 	default:
 		fmt.Println("Task loop miss:", data)
 	}
