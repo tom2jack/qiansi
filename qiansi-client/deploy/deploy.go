@@ -26,7 +26,7 @@ func init() {
 	RUN = true
 }
 
-func Run() {
+func Run(data []byte) {
 	// TODO: 原子执行逻辑
 	TaskList := []models.Deploy{}
 	_ = request.GetDeployTask(&TaskList)

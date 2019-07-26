@@ -5,7 +5,6 @@ import (
 	"os"
 	"qiansi/common/conf"
 	"qiansi/common/zmlog"
-	clinet_task_loop2 "qiansi/qiansi-server/service/udp/clinet_task_loop"
 )
 
 func Start() {
@@ -22,7 +21,7 @@ func Start() {
 	defer conn.Close()
 	zmlog.Info("Start UDP Service Listening %s", listen)
 	for {
-		data := make([]byte, 200)
+		data := make([]byte, 255)
 		n, remoteAddr, err := conn.ReadFromUDP(data)
 		if err != nil || n < 4 {
 			continue
@@ -35,8 +34,9 @@ func Start() {
 func handleClient(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
 	var result []byte
 	switch string(data[:3]) {
+	// 部署任务
 	case "001":
-		result = clinet_task_loop2.ClientTaskLoop(data[3:])
+		result = ClientTaskLoop(data[3:])
 	}
 	if result == nil {
 		result = []byte("0")

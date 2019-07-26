@@ -8,8 +8,8 @@ import (
 	"qiansi/common/conf"
 	"qiansi/common/models"
 	"qiansi/common/zmlog"
+	"qiansi/qiansi-server/net_service"
 	"qiansi/qiansi-server/routers"
-	"qiansi/qiansi-server/service"
 	"time"
 )
 
@@ -23,7 +23,7 @@ func init() {
 	//加载路由
 	routers.LoadRouter()
 	//启动服务
-	service.LoadService()
+	net_service.LoadService()
 	//初始化Redis
 	models.LoadRedis()
 	//初始化MySQL
