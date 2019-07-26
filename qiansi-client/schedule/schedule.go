@@ -23,12 +23,12 @@ func TaskLoop() {
 	}
 	request := "001" + conf.C.MustValue("zhimiao", "clientid")
 	conn.Write([]byte(request))
-	var result [255]byte
-	n, _ := conn.Read(result[0:])
-	choose := string(result[:2])
-	data := string(result[2:n])
+	var r [255]byte
+	n, _ := conn.Read(r[0:])
+	choose := string(r[:3])
+	data := r[3:n]
 	switch choose {
-	case "1":
+	case "001":
 		deploy.Run(data)
 	}
 }
