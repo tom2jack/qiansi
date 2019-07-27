@@ -1,9 +1,9 @@
 package net_service
 
 import (
-	udp2 "qiansi/qiansi-server/net_service/udp"
+	"qiansi/qiansi-server/net_service/udp_service"
 )
 
 func LoadService() {
-	go udp2.Start()
+	go udp_service.Start()
 }

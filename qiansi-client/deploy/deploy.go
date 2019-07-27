@@ -27,8 +27,8 @@ func init() {
 }
 
 func Run(data string) {
-	// TODO: 原子执行逻辑
 	TaskList := []models.Deploy{}
+	// 此处请求只有一次机会
 	_ = request.GetDeployTask(&TaskList)
 	for _, v := range TaskList {
 		go runTask(v)
@@ -37,6 +37,7 @@ func Run(data string) {
 
 func runTask(deploy models.Deploy) {
 	if !Task.SETNX(strconv.Itoa(deploy.Id), strconv.FormatInt(time.Now().Unix(), 36)) {
+		zmlog.Warn("%d号部署任务未完成，拒绝执行", deploy.Id)
 		return
 	}
 	// 执行前置命令
@@ -56,7 +57,6 @@ func runTask(deploy models.Deploy) {
 }
 
 func LogPush(format string, v ...interface{}) {
-	// TODO: 推送至千丝平台
 	var fname = "default"
 	if pc, _, _, ok := runtime.Caller(1); ok {
 		fname = runtime.FuncForPC(pc).Name()

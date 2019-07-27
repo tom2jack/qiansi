@@ -11,7 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
 	"qiansi/common/models"
-	"qiansi/qiansi-server/net_service/udp"
+	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
 )
 
@@ -189,7 +189,7 @@ func DeployDo(c *gin.Context) {
 	server := &[]models.Server{}
 	models.ZM_Mysql.Select("id").Where("id in (select server_id from deploy_server_relation where deploy_id=?)", deploy_id).Find(server)
 	for _, v := range *server {
-		udp.Task.SET(strconv.Itoa(v.Id), "1")
+		udp_service.Hook001.Deploy.SET(strconv.Itoa(v.Id), "1")
 	}
 	models.NewApiResult(1, "启动成功", server).Json(c)
 }

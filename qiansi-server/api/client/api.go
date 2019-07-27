@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
 	"qiansi/common/models"
+	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
 )
 
@@ -54,6 +55,7 @@ func ApiRegServer(c *gin.Context) {
 // @Router /clinet/ApiGetDeployTask [GET]
 func ApiGetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
+	defer udp_service.Hook001.Deploy.DEL(strconv.Itoa(server_id))
 	deploy := &[]models.Deploy{}
 	// models.ZM_Mysql.Raw()
 	models.ZM_Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)

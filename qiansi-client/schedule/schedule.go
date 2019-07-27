@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/jakecoffman/cron"
-	"log"
 	"net"
 	"qiansi/common/conf"
 	"qiansi/common/models/udp_hook"
+	"qiansi/common/zmlog"
 	"qiansi/qiansi-client/deploy"
 	"time"
 )
@@ -36,11 +36,11 @@ func TaskLoop() {
 		return
 	}
 	resultBuf := bytes.NewBuffer(r[:n])
-	log.Print(n)
+
 	var result = &udp_hook.Hook001DTO{}
 	dec := gob.NewDecoder(resultBuf)
 	dec.Decode(result)
-
+	zmlog.Info("接收数据:%#v\n长度:%d", result, n)
 	// 判断是否含有部署数据
 	if result.Deploy != "" {
 		go deploy.Run(result.Deploy)
