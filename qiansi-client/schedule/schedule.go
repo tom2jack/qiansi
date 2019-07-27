@@ -1,9 +1,12 @@
 package schedule
 
 import (
+	"bytes"
+	"encoding/gob"
 	"github.com/jakecoffman/cron"
 	"net"
 	"qiansi/common/conf"
+	"qiansi/common/models/udp_hook"
 	"qiansi/qiansi-client/deploy"
 )
 
@@ -25,10 +28,13 @@ func TaskLoop() {
 	conn.Write([]byte(request))
 	var r [255]byte
 	n, _ := conn.Read(r[0:])
-	choose := string(r[:3])
-	data := r[3:n]
-	switch choose {
-	case "001":
-		deploy.Run(data)
+	resultBuf := bytes.NewBuffer(r[:n])
+	var result = &udp_hook.Hook001DTO{}
+	dec := gob.NewDecoder(resultBuf)
+	dec.Decode(result)
+
+	// 判断是否含有部署数据
+	if result.Deploy != "" {
+		deploy.Run(result.Deploy)
 	}
 }

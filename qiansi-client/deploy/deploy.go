@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	Task *utils.SafeMap
+	Task *utils.SafeStringMap
 	RUN  bool = false
 )
 
@@ -22,11 +22,11 @@ func init() {
 	if RUN {
 		return
 	}
-	Task = utils.NewSafeMap()
+	Task = utils.NewSafeStringMap()
 	RUN = true
 }
 
-func Run(data []byte) {
+func Run(data string) {
 	// TODO: 原子执行逻辑
 	TaskList := []models.Deploy{}
 	_ = request.GetDeployTask(&TaskList)

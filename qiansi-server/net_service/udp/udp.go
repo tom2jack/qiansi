@@ -26,20 +26,17 @@ func Start() {
 		if err != nil || n < 4 {
 			continue
 		}
-		go handleClient(data[:n], remoteAddr, conn)
+		go func(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
+			var result []byte
+			switch string(data[:3]) {
+			// 部署任务
+			case "001":
+				result = Hook_001(data[3:])
+			}
+			if result == nil {
+				result = []byte("0")
+			}
+			conn.WriteToUDP(result, remoteAddr)
+		}(data[:n], remoteAddr, conn)
 	}
-}
-
-// handleClient 取前3位为任务标识位，后为任务数据，最长200
-func handleClient(data []byte, remoteAddr *net.UDPAddr, conn *net.UDPConn) {
-	var result []byte
-	switch string(data[:3]) {
-	// 部署任务
-	case "001":
-		result = ClientTaskLoop(data[3:])
-	}
-	if result == nil {
-		result = []byte("0")
-	}
-	conn.WriteToUDP(result, remoteAddr)
 }
