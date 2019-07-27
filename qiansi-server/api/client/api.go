@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
 	"qiansi/common/models"
+	"qiansi/common/utils"
 	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
 )
@@ -73,7 +74,7 @@ func ApiGetDeployTask(c *gin.Context) {
 func LogPush(c *gin.Context) {
 	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
 	device := c.PostForm("device")
-	content := c.PostForm("content")
+	content := utils.MustUtf8(c.PostForm("content"))
 	var row int
 	models.ZM_Mysql.Table("server").Where("id=? and device_id=?", serverId, device).Count(&row)
 	if row == 0 {
