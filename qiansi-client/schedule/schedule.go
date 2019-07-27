@@ -4,10 +4,12 @@ import (
 	"bytes"
 	"encoding/gob"
 	"github.com/jakecoffman/cron"
+	"log"
 	"net"
 	"qiansi/common/conf"
 	"qiansi/common/models/udp_hook"
 	"qiansi/qiansi-client/deploy"
+	"time"
 )
 
 var Cron *cron.Cron
@@ -20,21 +22,27 @@ func LoadSchedule() {
 
 func TaskLoop() {
 	conn, err := net.Dial("udp", "127.0.0.1:8001")
-	defer conn.Close()
 	if err != nil {
 		return
 	}
+	defer conn.Close()
+	// 整体耗时不超过3s
+	conn.SetDeadline(time.Now().Add(3 * time.Second))
 	request := "001" + conf.C.MustValue("zhimiao", "clientid")
 	conn.Write([]byte(request))
-	var r [255]byte
+	var r [20480]byte
 	n, _ := conn.Read(r[0:])
+	if n < 20 {
+		return
+	}
 	resultBuf := bytes.NewBuffer(r[:n])
+	log.Print(n)
 	var result = &udp_hook.Hook001DTO{}
 	dec := gob.NewDecoder(resultBuf)
 	dec.Decode(result)
 
 	// 判断是否含有部署数据
 	if result.Deploy != "" {
-		deploy.Run(result.Deploy)
+		go deploy.Run(result.Deploy)
 	}
 }

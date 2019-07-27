@@ -9,9 +9,9 @@ import (
 )
 
 func TestHook_001(t *testing.T) {
-	Hook001.Deploy.SET("111", "this is data ooo")
-	r := Hook_001([]byte("111"))
-	log.Println(string(r))
+	Hook001.Deploy.SET("1111", "11")
+	r := Hook_001([]byte("1111"))
+	log.Println(len(r))
 
 	network := bytes.NewBuffer(r)
 	// 3.创建解码器
