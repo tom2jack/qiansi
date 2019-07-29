@@ -40,7 +40,7 @@ func binUser() bool {
 
 	server, err := request.RegServer(UID, conf.C.MustValue("zhimiao", "device"))
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("注册失败了")
 	}
 	conf.C.SetValue("zhimiao", "uid", UID)
 	conf.C.SetValue("zhimiao", "apisecret", server.ApiSecret)
