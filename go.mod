@@ -6,6 +6,7 @@ require (
 	github.com/Unknwon/goconfig v0.0.0-20190425194916-3dba17dd7b9e
 	github.com/alecthomas/template v0.0.0-20160405071501-a0175ee3bccc
 	github.com/aliyun/alibaba-cloud-sdk-go v0.0.0-20190708091929-88eb281ef085
+	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/codegangsta/negroni v1.0.0 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fatedier/frp v0.27.0

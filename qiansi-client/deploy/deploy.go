@@ -82,7 +82,11 @@ func RunShell(work_path, cmd string) error {
 		res.SetWorkDir(work_path)
 		o := res.Run()
 		o.Wait()
-		LogPush("正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, o.String(), o.Error().Error())
+		out := o.String()
+		if runtime.GOOS == "windows" {
+			out = utils.ConvertToString(out, "gbk", "utf8")
+		}
+		LogPush("正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, out, o.Error().Error())
 	}
 	return nil
 }
