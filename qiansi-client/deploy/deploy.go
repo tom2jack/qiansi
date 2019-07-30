@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 )
 
 var (
@@ -83,7 +84,7 @@ func RunShell(work_path, cmd string) error {
 		o := res.Run()
 		o.Wait()
 		out := o.String()
-		if runtime.GOOS == "windows" {
+		if !utf8.ValidString(out) {
 			out = utils.ConvertToString(out, "gbk", "utf8")
 		}
 		LogPush("正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, out, o.Error().Error())
