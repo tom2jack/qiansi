@@ -5,6 +5,7 @@ import (
 	"github.com/lifei6671/gorand"
 	"qiansi/common/models"
 	"qiansi/common/utils"
+	"qiansi/common/zmlog"
 	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
 )
@@ -88,4 +89,19 @@ func LogPush(c *gin.Context) {
 	}
 	models.ZM_Mysql.Create(serverLog)
 	models.NewApiResult(1).Json(c)
+}
+
+// @Summary 客户端部署成功回调
+// @Produce  json
+// @Accept  multipart/form-data
+// @Param server_id formData string true "客户端平台编号"
+// @Param device formData string true "客户端设备号"
+// @Param deploy_id formData string true "日志文本内容"
+// @Success 200 {object} models.ApiResult ""
+// @Router /clinet/DeployNotify [post]
+func DeployNotify(c *gin.Context) {
+	// TODO: 实现版本号的增长，用于剔除下次部署发布中此机器的版本号
+	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
+	device := c.PostForm("device")
+	zmlog.Info("%d,%s", serverId, device)
 }
