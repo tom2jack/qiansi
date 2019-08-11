@@ -88,7 +88,7 @@ func LogPush(c *gin.Context) {
 		Content:  content,
 	}
 	models.ZM_Mysql.Create(serverLog)
-	models.NewApiResult(1).Json(c)
+	models.NewApiResult(1, "成功", serverLog).Json(c)
 }
 
 // @Summary 客户端部署成功回调

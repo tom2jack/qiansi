@@ -39,7 +39,6 @@ func LoadRouter() {
 	/* ------ 后台模块 ------- */
 	admin_route := Router.Group("/admin")
 	{
-		admin_route.GET("/index", admin.AdminIndex)
 		// 获取图片验证码
 		admin_route.GET("/VerifyByImg", admin.VerifyByImg)
 		// 获取短信验证码

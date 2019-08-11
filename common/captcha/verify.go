@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
-	"qiansi/common/aliyun"
 	"qiansi/common/models"
+	"qiansi/common/zmlog"
 	"time"
 )
 
@@ -51,10 +51,11 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
-	result := aliyun.SendSmsVerify(phone, string(rnd))
+	/*result := aliyun.SendSmsVerify(phone, string(rnd))
 	if !result {
 		return fmt.Errorf("发送失败")
-	}
+	}*/
+	zmlog.Info("短信验证码：%s", rnd)
 	models.RedisSet(idkey, rnd, 30*60)
 	return nil
 }
@@ -84,5 +85,5 @@ func VerifyByImg(idkey string) (string, string) {
 
 // 验证码校验
 func VerifyCheck(idkey string, value string) bool {
-	return base64Captcha.VerifyCaptchaAndIsClear(idkey, value, true)
+	return base64Captcha.VerifyCaptchaAndIsClear(idkey, value, false)
 }

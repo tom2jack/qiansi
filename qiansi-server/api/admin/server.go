@@ -31,7 +31,6 @@ func ServerLists(c *gin.Context) {
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerDel [DELETE]
 func ServerDel(c *gin.Context) {
-
 	param := &api_req.ServerDelParam{}
 	if err := c.Bind(param); err != nil || param.ServerId == 0 {
 		models.NewApiResult(-4, "入参解析失败").Json(c)

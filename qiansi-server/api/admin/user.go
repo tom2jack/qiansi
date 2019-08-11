@@ -2,7 +2,6 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
-	"qiansi/common/captcha"
 	"qiansi/common/models"
 	"qiansi/common/models/api_req"
 	"qiansi/common/models/api_resp"
@@ -42,7 +41,7 @@ func UserSigin(c *gin.Context) {
 		return
 	}
 	member.Password = ""
-	token, err := utils.CreateToken(strconv.Itoa(member.Uid), 24*time.Hour)
+	token, err := utils.CreateToken(strconv.Itoa(member.Id), 24*time.Hour)
 	if err != nil {
 		models.NewApiResult(-5, "Token生成失败，无法登陆，请联系管理员").Json(c)
 		return
@@ -87,10 +86,10 @@ func UserSiginUp(c *gin.Context) {
 			return
 		}
 	}
-	if len(param.Code) < 4 || !captcha.VerifyCheck(captcha.VerifyBySMSIDKEY(param.Phone), param.Code) {
+	/*if len(param.Code) < 4 || !captcha.VerifyCheck(captcha.VerifyBySMSIDKEY(param.Phone), param.Code) {
 		models.NewApiResult(-4, "验证码错误").Json(c)
 		return
-	}
+	}*/
 	models.ZM_Mysql.Table("member").Where("phone=?", param.Phone).Count(&row)
 	if row > 0 {
 		models.NewApiResult(-5, "请勿重复注册").Json(c)
@@ -100,16 +99,15 @@ func UserSiginUp(c *gin.Context) {
 		Phone:      param.Phone,
 		Password:   utils.PasswordHash(param.Password),
 		InviterUid: param.InviterUid,
-		Status:     1,
 	}
-	models.ZM_Mysql.Create(member)
+	models.ZM_Mysql.Table("member").Create(member)
 	member.Password = ""
-	token, err := utils.CreateToken(strconv.Itoa(member.Uid), 24*time.Hour)
+	token, err := utils.CreateToken(strconv.Itoa(member.Id), 24*time.Hour)
 	if err != nil {
 		models.NewApiResult(-5, "Token生成失败，无法登陆，请联系管理员").Json(c)
 		return
 	}
-	if member.Uid > 0 {
+	if member.Id > 0 {
 		models.NewApiResult(1, "注册成功", api_resp.UserInfoVO{
 			*member,
 			token,
