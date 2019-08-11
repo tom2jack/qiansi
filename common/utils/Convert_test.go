@@ -20,6 +20,6 @@ func TestSuperConvert(t *testing.T) {
 		A1: "123",
 	}
 	b := B{}
-	SuperConvert(a, b)
+	SuperConvert(&a, &b)
 	fmt.Printf("%#v", b)
 }

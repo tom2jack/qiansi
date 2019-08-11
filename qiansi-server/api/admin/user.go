@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"qiansi/common/captcha"
 	"qiansi/common/models"
 	"qiansi/common/models/api_req"
 	"qiansi/common/models/api_resp"
@@ -86,10 +87,10 @@ func UserSiginUp(c *gin.Context) {
 			return
 		}
 	}
-	/*if len(param.Code) < 4 || !captcha.VerifyCheck(captcha.VerifyBySMSIDKEY(param.Phone), param.Code) {
+	if len(param.Code) < 4 || !captcha.VerifyCheck("phone:"+param.Phone, param.Code) {
 		models.NewApiResult(-4, "验证码错误").Json(c)
 		return
-	}*/
+	}
 	models.ZM_Mysql.Table("member").Where("phone=?", param.Phone).Count(&row)
 	if row > 0 {
 		models.NewApiResult(-5, "请勿重复注册").Json(c)
@@ -142,11 +143,11 @@ func UserResetPwd(c *gin.Context) {
 		return
 	}
 	member := &models.Member{}
-	models.ZM_Mysql.Table("member").Where("uid = ?", c.GetInt("UID")).First(member)
+	models.ZM_Mysql.Table("member").Where("id = ?", c.GetInt("UID")).First(member)
 	if !utils.PasswordVerify(member.Password, param.OldPassword) {
 		models.NewApiResult(-5, "密码错误").Json(c)
 		return
 	}
-	models.ZM_Mysql.Table("member").Where("uid = ?", c.GetInt("UID")).Update("password", utils.PasswordHash(param.NewPassword))
+	models.ZM_Mysql.Table("member").Where("id = ?", c.GetInt("UID")).Update("password", utils.PasswordHash(param.NewPassword))
 	models.NewApiResult(1, "修改成功").Json(c)
 }

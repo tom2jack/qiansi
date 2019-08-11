@@ -25,11 +25,14 @@
                 "summary": "删除部署服务",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "服务器ID",
-                        "name": "deploy_id",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.DeployDelParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -54,11 +57,14 @@
                 "summary": "启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "部署应用ID",
-                        "name": "deploy_id",
-                        "in": "query",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.DeployRelationParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -103,18 +109,14 @@
                 "summary": "部署应用关联服务器",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "部署应用ID",
-                        "name": "deploy_id",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "服务器ID",
-                        "name": "server_id",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.DeployRelationParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -139,101 +141,19 @@
                 "summary": "设置部署应用",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "应用ID",
-                        "name": "Id",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "后置命令",
-                        "name": "AfterCommand",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "前置命令",
-                        "name": "BeforeCommand",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "抓取分支",
-                        "name": "Branch",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "部署方式",
-                        "name": "DeployType",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "部署地址",
-                        "name": "LocalPath",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "资源地址",
-                        "name": "RemoteUrl",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "应用名称",
-                        "name": "Title",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.DeploySetParam"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/DeployUnRelationServer": {
-            "delete": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "部署应用取消关联服务器",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "部署应用ID",
-                        "name": "deploy_id",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "服务器ID",
-                        "name": "server_id",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"关联解除成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.ApiResult"
@@ -586,6 +506,73 @@
         }
     },
     "definitions": {
+        "api_req.DeployDelParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "api_req.DeployRelationParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                },
+                "relation": {
+                    "description": "关联操作 true-关联 false-取消",
+                    "type": "boolean"
+                },
+                "serverId": {
+                    "description": "服务器ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "api_req.DeploySetParam": {
+            "type": "object",
+            "properties": {
+                "afterCommand": {
+                    "description": "后置命令",
+                    "type": "string"
+                },
+                "beforeCommand": {
+                    "description": "前置命令",
+                    "type": "string"
+                },
+                "branch": {
+                    "description": "git分支",
+                    "type": "string"
+                },
+                "deployKeys": {
+                    "description": "部署私钥",
+                    "type": "string"
+                },
+                "deployType": {
+                    "description": "部署类型 0-本地 1-git 2-zip",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "应用唯一编号",
+                    "type": "integer"
+                },
+                "localPath": {
+                    "description": "本地部署地址",
+                    "type": "string"
+                },
+                "remoteUrl": {
+                    "description": "资源地址",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "应用名称",
+                    "type": "string"
+                }
+            }
+        },
         "api_req.ServerDelParam": {
             "type": "object",
             "properties": {

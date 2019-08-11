@@ -101,7 +101,10 @@ func LogPush(c *gin.Context) {
 // @Router /clinet/DeployNotify [post]
 func DeployNotify(c *gin.Context) {
 	// TODO: 实现版本号的增长，用于剔除下次部署发布中此机器的版本号
-	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
+	// serverId, _ := strconv.Atoi(c.PostForm("server_id"))
+	var serverId int
 	device := c.PostForm("device")
+
+	println(c.Bind(serverId).Error())
 	zmlog.Info("%d,%s", serverId, device)
 }

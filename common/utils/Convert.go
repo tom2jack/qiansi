@@ -2,19 +2,29 @@ package utils
 
 import "reflect"
 
-func SuperConvert(A interface{}, B interface{}) {
-	At := reflect.TypeOf(A)
-	Av := reflect.ValueOf(A)
-	Bt := reflect.TypeOf(B)
-	Bv := reflect.ValueOf(B)
-	for i := 0; i < Bt.NumField(); i++ {
-		println(Bt.Field(i).Name)
-		for m := 0; m < At.NumField(); m++ {
-			println(At.Field(m).Name)
-			if Bt.Field(i).Name == At.Field(m).Name {
-				Bv.Field(m).Set(Av.Field(i))
-				Bv.Field(m).Interface()
-			}
+// 使用反射，转换结构体
+func SuperConvert(sourceStruct interface{}, targetStruct interface{}) {
+	source := structToMap(sourceStruct)
+	targetV := reflect.ValueOf(targetStruct).Elem()
+	targetT := reflect.TypeOf(targetStruct).Elem()
+	for i := 0; i < targetV.NumField(); i++ {
+		fieldName := targetT.Field(i).Name
+		sourceVal := source[fieldName]
+		if !sourceVal.IsValid() {
+			continue
 		}
+		targetVal := targetV.Field(i)
+		targetVal.Set(sourceVal)
 	}
+}
+
+func structToMap(structName interface{}) map[string]reflect.Value {
+	t := reflect.TypeOf(structName).Elem()
+	v := reflect.ValueOf(structName).Elem()
+	fieldNum := t.NumField()
+	resMap := make(map[string]reflect.Value, fieldNum)
+	for i := 0; i < fieldNum; i++ {
+		resMap[t.Field(i).Name] = v.Field(i)
+	}
+	return resMap
 }

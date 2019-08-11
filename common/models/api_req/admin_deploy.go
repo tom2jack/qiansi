@@ -1,5 +1,6 @@
 package api_req
 
+// 部署应用操作入参
 type DeploySetParam struct {
 	// 应用唯一编号
 	Id int
@@ -19,4 +20,23 @@ type DeploySetParam struct {
 	BeforeCommand string
 	// 部署私钥
 	DeployKeys string
+}
+
+type DeployBase struct {
+	// 部署应用ID
+	DeployId int
+}
+
+type DeployDelParam struct {
+	DeployBase
+}
+type DeployDoParam struct {
+	DeployBase
+}
+type DeployRelationParam struct {
+	DeployBase
+	// 服务器ID
+	ServerId int
+	// 关联操作 true-关联 false-取消
+	Relation bool
 }

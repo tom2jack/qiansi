@@ -1,4 +1,52 @@
 definitions:
+  api_req.DeployDelParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+    type: object
+  api_req.DeployRelationParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+      relation:
+        description: 关联操作 true-关联 false-取消
+        type: boolean
+      serverId:
+        description: 服务器ID
+        type: integer
+    type: object
+  api_req.DeploySetParam:
+    properties:
+      afterCommand:
+        description: 后置命令
+        type: string
+      beforeCommand:
+        description: 前置命令
+        type: string
+      branch:
+        description: git分支
+        type: string
+      deployKeys:
+        description: 部署私钥
+        type: string
+      deployType:
+        description: 部署类型 0-本地 1-git 2-zip
+        type: integer
+      id:
+        description: 应用唯一编号
+        type: integer
+      localPath:
+        description: 本地部署地址
+        type: string
+      remoteUrl:
+        description: 资源地址
+        type: string
+      title:
+        description: 应用名称
+        type: string
+    type: object
   api_req.ServerDelParam:
     properties:
       serverId:
@@ -101,11 +149,13 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 服务器ID
-        in: formData
-        name: deploy_id
+      - description: 入参集合
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/api_req.DeployDelParam'
+          type: object
       produces:
       - application/json
       responses:
@@ -120,11 +170,13 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 部署应用ID
-        in: query
-        name: deploy_id
+      - description: 入参集合
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/api_req.DeployRelationParam'
+          type: object
       produces:
       - application/json
       responses:
@@ -155,16 +207,13 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 部署应用ID
-        in: formData
-        name: deploy_id
+      - description: 入参集合
+        in: body
+        name: body
         required: true
-        type: string
-      - description: 服务器ID
-        in: formData
-        name: server_id
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/api_req.DeployRelationParam'
+          type: object
       produces:
       - application/json
       responses:
@@ -179,46 +228,13 @@ paths:
       consumes:
       - application/json
       parameters:
-      - description: 应用ID
-        in: formData
-        name: Id
+      - description: 入参集合
+        in: body
+        name: body
         required: true
-        type: string
-      - description: 后置命令
-        in: formData
-        name: AfterCommand
-        required: true
-        type: string
-      - description: 前置命令
-        in: formData
-        name: BeforeCommand
-        required: true
-        type: string
-      - description: 抓取分支
-        in: formData
-        name: Branch
-        required: true
-        type: string
-      - description: 部署方式
-        in: formData
-        name: DeployType
-        required: true
-        type: integer
-      - description: 部署地址
-        in: formData
-        name: LocalPath
-        required: true
-        type: string
-      - description: 资源地址
-        in: formData
-        name: RemoteUrl
-        required: true
-        type: string
-      - description: 应用名称
-        in: formData
-        name: Title
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/api_req.DeploySetParam'
+          type: object
       produces:
       - application/json
       responses:
@@ -228,30 +244,6 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 设置部署应用
-  /admin/DeployUnRelationServer:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: 部署应用ID
-        in: formData
-        name: deploy_id
-        required: true
-        type: string
-      - description: 服务器ID
-        in: formData
-        name: server_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "关联解除成功","data": null}'
-          schema:
-            $ref: '#/definitions/models.ApiResult'
-            type: object
-      summary: 部署应用取消关联服务器
   /admin/ServerDel:
     delete:
       consumes:
