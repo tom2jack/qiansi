@@ -25,7 +25,7 @@ func NewApiResult(arg ...interface{}) *ApiResult {
 		}
 		if k == 1 {
 			if v2, ok := v.(string); ok {
-				result.setData(v2)
+				result.setMsg(v2)
 			}
 		}
 		if k == 2 && v != nil {

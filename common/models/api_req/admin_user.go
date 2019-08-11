@@ -1,13 +1,17 @@
 package api_req
 
 type UserSiginParam struct {
-	Phone    string
+	// 手机号
+	Phone string `json:"phone"`
+	// 密码
 	Password string
 }
 
 type UserSiginUpParam struct {
 	UserSiginParam
-	Code       string
+	// 短信验证码
+	Code string
+	// 邀请人
 	InviterUid int
 }
 

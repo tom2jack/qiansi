@@ -70,13 +70,13 @@ func VerifyByImg(idkey string) (string, string) {
 		150,
 		// DefaultLen Default number of digits in captcha solution.
 		// 默认数字验证长度6.
-		6,
+		1,
 		// MaxSkew max absolute skew factor of a single digit.
 		// 图像验证码的最大干扰洗漱.
-		4.5,
+		1, //4.5,
 		// DotCount Number of background circles.
 		// 图像验证码干扰圆点的数量.
-		30,
+		0, //30,
 	})
 	base64blob := base64Captcha.CaptchaWriteToBase64Encoding(captcaInterfaceInstance)
 	return idkey, base64blob

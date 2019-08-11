@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"qiansi/common/captcha"
 	"qiansi/common/models"
+	"qiansi/common/models/api_req"
 	"qiansi/common/utils"
 	"qiansi/common/zmlog"
 	"time"
@@ -30,21 +31,21 @@ func VerifyByImg(c *gin.Context) {
 
 // @Summary 获取短信验证码
 // @Produce json
-// @Accept  multipart/form-data
-// @Param phone formData string true "手机号"
-// @Param img_idkey formData string true "图片验证码句柄"
-// @Param img_code formData string true "图片验证码"
+// @Accept  application/json
+// @Param body body api_req.VerifyBySMSParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code":1,"msg":"发送成功","data":null}"
 // @Router /admin/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
-	phone := c.PostForm("phone")
-	img_idkey := c.PostForm("img_idkey")
-	img_code := c.PostForm("img_code")
-	if len(phone) != 11 {
+	param := &api_req.VerifyBySMSParam{}
+	if err := c.Bind(param); err != nil {
+		models.NewApiResult(-4, "入参解析失败"+err.Error()).Json(c)
+		return
+	}
+	if len(param.Phone) != 11 {
 		models.NewApiResult(-4, "手机号错误").Json(c)
 		return
 	}
-	if !captcha.VerifyCheck(img_idkey, img_code) {
+	if !captcha.VerifyCheck(param.ImgIdKey, param.ImgCode) {
 		models.NewApiResult(-5, "验证码无效").Json(c)
 		return
 	}
@@ -52,9 +53,9 @@ func VerifyBySMS(c *gin.Context) {
 		models.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
 		return
 	}
-	err := captcha.VerifyBySMS(phone)
+	err := captcha.VerifyBySMS(param.Phone)
 	if err != nil {
-		zmlog.Warn("[短信发送失败]：%s-%s", phone, err.Error())
+		zmlog.Warn("[短信发送失败]：%s-%s", param.Phone, err.Error())
 		models.NewApiResult(-5, "短信发送失败").Json(c)
 		return
 	}

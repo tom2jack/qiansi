@@ -253,11 +253,14 @@
                 "summary": "删除服务器",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "服务器ID",
-                        "name": "server_id",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.ServerDelParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -285,7 +288,7 @@
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"CreateTime\": \"2019-03-02T16:10:10+08:00\",\"DeviceId\": \"\",\"Domain\": \"127.0.0.1\",\"Id\": 1,\"ServerName\": \"纸喵5号机\",\"ServerRuleId\": 0,\"ServerStatus\": 0,\"Uid\": 2,\"UpdateTime\": \"2019-05-22T17:40:18+08:00\"}]}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/models.Server"
                         }
                     }
                 }
@@ -294,7 +297,7 @@
         "/admin/UserResetPwd": {
             "post": {
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -302,18 +305,14 @@
                 "summary": "修改密码",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "旧密码",
-                        "name": "old_password",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "新密码",
-                        "name": "new_password",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.UserResetPwdParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -330,7 +329,7 @@
         "/admin/UserSigin": {
             "post": {
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -338,18 +337,14 @@
                 "summary": "登录",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "手机号",
-                        "name": "phone",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "密码",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.UserSiginParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -366,7 +361,7 @@
         "/admin/UserSiginUp": {
             "post": {
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -374,31 +369,14 @@
                 "summary": "注册账号",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "手机号",
-                        "name": "phone",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "密码",
-                        "name": "password",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "短信验证码",
-                        "name": "code",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "邀请人UID",
-                        "name": "inviter_uid",
-                        "in": "formData"
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.UserSiginUpParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -406,7 +384,7 @@
                         "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/api_resp.UserInfoVO"
                         }
                     }
                 }
@@ -435,7 +413,7 @@
         "/admin/VerifyBySMS": {
             "post": {
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -443,25 +421,14 @@
                 "summary": "获取短信验证码",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "手机号",
-                        "name": "phone",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "图片验证码句柄",
-                        "name": "img_idkey",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "图片验证码",
-                        "name": "img_code",
-                        "in": "formData",
-                        "required": true
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/api_req.VerifyBySMSParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -531,6 +498,49 @@
                 }
             }
         },
+        "/clinet/DeployNotify": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "客户端部署成功回调",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "客户端平台编号",
+                        "name": "server_id",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "客户端设备号",
+                        "name": "device",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "日志文本内容",
+                        "name": "deploy_id",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
         "/clinet/LogPush": {
             "post": {
                 "consumes": [
@@ -576,6 +586,84 @@
         }
     },
     "definitions": {
+        "api_req.ServerDelParam": {
+            "type": "object",
+            "properties": {
+                "serverId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "api_req.UserResetPwdParam": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "type": "string"
+                },
+                "oldPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "api_req.UserSiginParam": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "api_req.UserSiginUpParam": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "短信验证码",
+                    "type": "string"
+                },
+                "inviterUid": {
+                    "description": "邀请人",
+                    "type": "integer"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "api_req.VerifyBySMSParam": {
+            "type": "object",
+            "properties": {
+                "imgCode": {
+                    "description": "验证码code",
+                    "type": "string"
+                },
+                "imgIdKey": {
+                    "description": "图片验证码id",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "api_resp.UserInfoVO": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ApiResult": {
             "type": "object",
             "properties": {
@@ -586,6 +674,41 @@
                     "type": "object"
                 },
                 "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Server": {
+            "type": "object",
+            "properties": {
+                "apiSecret": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deviceId": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "serverName": {
+                    "type": "string"
+                },
+                "serverRuleId": {
+                    "type": "integer"
+                },
+                "serverStatus": {
+                    "type": "integer"
+                },
+                "uid": {
+                    "type": "integer"
+                },
+                "updateTime": {
                     "type": "string"
                 }
             }
