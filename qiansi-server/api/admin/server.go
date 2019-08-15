@@ -41,5 +41,7 @@ func ServerDel(c *gin.Context) {
 		models.NewApiResult(-5, "删除失败", *db).Json(c)
 		return
 	}
+	// 删除关联
+	models.ZM_Mysql.Delete(models.DeployServerRelation{}, "server_id=?", param.ServerId)
 	models.NewApiResult(1, "操作成功", *db).Json(c)
 }

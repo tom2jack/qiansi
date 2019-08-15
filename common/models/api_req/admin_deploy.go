@@ -30,6 +30,11 @@ type DeployBase struct {
 type DeployDelParam struct {
 	DeployBase
 }
+
+type DeployServerParam struct {
+	DeployBase
+}
+
 type DeployDoParam struct {
 	DeployBase
 }

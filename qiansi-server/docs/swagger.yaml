@@ -223,6 +223,19 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 部署应用关联服务器
+  /admin/DeployServer:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回
+          schema:
+            $ref: '#/definitions/models.Server'
+            type: object
+      summary: 获取当前部署服务的服务器列表
   /admin/DeploySet:
     post:
       consumes:

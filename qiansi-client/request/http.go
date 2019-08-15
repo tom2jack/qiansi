@@ -25,7 +25,7 @@ var (
 	}
 )
 
-const BASE_URL = "http://localhost:8000"
+const BASE_URL = "http://localhost:1315"
 
 type ApiBody struct {
 	Code int

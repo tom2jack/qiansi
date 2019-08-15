@@ -130,6 +130,26 @@
                 }
             }
         },
+        "/admin/DeployServer": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取当前部署服务的服务器列表",
+                "responses": {
+                    "200": {
+                        "description": "返回",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Server"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeploySet": {
             "post": {
                 "consumes": [

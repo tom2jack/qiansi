@@ -12,6 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 	"qiansi/common/models"
 	"qiansi/common/models/api_req"
+	"qiansi/common/models/api_resp"
 	"qiansi/common/utils"
 	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
@@ -71,11 +72,13 @@ func DeployDel(c *gin.Context) {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	db := models.ZM_Mysql.Delete(models.Deploy{}, "id=? and uid=?", param.DeployId, c.GetInt("UID"))
+	db := models.ZM_Mysql.Delete(&models.Deploy{}, "id=? and uid=?", param.DeployId, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
 		models.NewApiResult(-5, "删除失败", *db).Json(c)
 		return
 	}
+	// 删除关联
+	models.ZM_Mysql.Delete(&models.DeployServerRelation{}, "deploy_id=?", param.DeployId)
 	models.NewApiResult(1, "操作成功", *db).Json(c)
 }
 
@@ -111,13 +114,30 @@ func DeployRelationServer(c *gin.Context) {
 			DeployId: param.DeployId,
 		})
 	} else {
-		db = models.ZM_Mysql.Delete(models.DeployServerRelation{}, "server_id=? and deploy_id=?", param.ServerId, param.DeployId)
+		db = models.ZM_Mysql.Delete(&models.DeployServerRelation{}, "server_id=? and deploy_id=?", param.ServerId, param.DeployId)
 	}
 	if db.Error != nil || db.RowsAffected != 1 {
-		models.NewApiResult(-5, "关联失败").Json(c)
+		models.NewApiResult(-5, "失败").Json(c)
 		return
 	}
-	models.NewApiResult(1, "关联成功").Json(c)
+	models.NewApiResult(1, "成功").Json(c)
+}
+
+// @Summary 获取当前部署服务的服务器列表
+// @Produce  json
+// @Accept  json
+// @Success 200 {object} models.Server "返回"
+// @Router /admin/DeployServer [post]
+func DeployServer(c *gin.Context) {
+	param := &api_req.DeployServerParam{}
+	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
+		models.NewApiResult(-4, "入参绑定失败").Json(c)
+		return
+	}
+	d := &[]api_resp.DeployServerVO{}
+	sql := "SELECT s.*,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
+	models.ZM_Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
+	models.NewApiResult(1, "读取成功", d).Json(c)
 }
 
 // @Summary 启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数
