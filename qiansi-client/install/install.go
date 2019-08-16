@@ -26,7 +26,7 @@ func Install() bool {
 func binUser() bool {
 	var UID string
 	for {
-		fmt.Print("请输入纸喵运维平台注册ID:")
+		fmt.Print("请输入千丝平台注册ID:")
 		num, err := fmt.Scanln(&UID)
 		if err != nil || num == 0 || UID == "" {
 			fmt.Println("数据读取失败，请重新输入！")

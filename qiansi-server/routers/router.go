@@ -27,13 +27,15 @@ func LoadRouter() {
 	{
 		// 客户端注册
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
-		// 客户端日志推送
-		client_route.POST("/LogPush", client.LogPush)
-		client_route.POST("/DeployNotify", client.DeployNotify)
 		// 客户端交互请求
 		client_route.Use(middleware.ClientAuth())
 		{
+			// 客户端日志推送
+			client_route.POST("/LogPush", client.ApiLogPush)
+			// 获取任务
 			client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
+			// 部署回调
+			client_route.GET("/ApiDeployNotify", client.ApiDeployNotify)
 		}
 	}
 

@@ -5,7 +5,6 @@ import (
 	"github.com/lifei6671/gorand"
 	"qiansi/common/models"
 	"qiansi/common/utils"
-	"qiansi/common/zmlog"
 	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
 )
@@ -16,7 +15,7 @@ import (
 // @Param uid query string true "用户UID"
 // @Param device query string true "客户端设备号"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
-// @Router /clinet/ApiRegServer [post]
+// @Router /clinet/ApiRegServer [get]
 func ApiRegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
 	if !(uid > 0) {
@@ -59,7 +58,6 @@ func ApiGetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
 	defer udp_service.Hook001.Deploy.DEL(strconv.Itoa(server_id))
 	deploy := &[]models.Deploy{}
-	// models.ZM_Mysql.Raw()
 	models.ZM_Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
 	models.NewApiResult(1, "读取成功", deploy).Encypt(c)
 }
@@ -72,7 +70,7 @@ func ApiGetDeployTask(c *gin.Context) {
 // @Param content formData string true "日志文本内容"
 // @Success 200 {object} models.ApiResult ""
 // @Router /clinet/LogPush [post]
-func LogPush(c *gin.Context) {
+func ApiLogPush(c *gin.Context) {
 	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
 	device := c.PostForm("device")
 	content := utils.MustUtf8(c.PostForm("content"))
@@ -93,18 +91,26 @@ func LogPush(c *gin.Context) {
 
 // @Summary 客户端部署成功回调
 // @Produce  json
-// @Accept  multipart/form-data
-// @Param server_id formData string true "客户端平台编号"
-// @Param device formData string true "客户端设备号"
-// @Param deploy_id formData string true "日志文本内容"
+// @Accept  json
+// @Param version query string true "版本号"
+// @Param deploy_id query string true "部署应用ID"
 // @Success 200 {object} models.ApiResult ""
-// @Router /clinet/DeployNotify [post]
-func DeployNotify(c *gin.Context) {
-	// TODO: 实现版本号的增长，用于剔除下次部署发布中此机器的版本号
-	// serverId, _ := strconv.Atoi(c.PostForm("server_id"))
-	var serverId int
-	device := c.PostForm("device")
-
-	println(c.Bind(serverId).Error())
-	zmlog.Info("%d,%s", serverId, device)
+// @Router /clinet/ApiDeployNotify [get]
+func ApiDeployNotify(c *gin.Context) {
+	serverId := c.GetInt("SERVER-ID")
+	version, _ := strconv.Atoi(c.Query("version"))
+	deployId, _ := strconv.Atoi(c.Query("deployId"))
+	uid := c.GetInt("SERVER-UID")
+	if version > 0 {
+		var nowVersion int
+		row := models.ZM_Mysql.Raw("select now_version from deploy where id=? and uid=?", deployId, uid).Row()
+		row.Scan(&nowVersion)
+		if nowVersion >= version {
+			if models.ZM_Mysql.Exec("update deploy_server_relation set deploy_version=? where deploy_id=? and server_id=?", version, deployId, serverId).RowsAffected > 0 {
+				models.NewApiResult(1).Json(c)
+				return
+			}
+		}
+	}
+	models.NewApiResult(1, "没改成功").Json(c)
 }

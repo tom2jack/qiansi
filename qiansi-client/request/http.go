@@ -46,6 +46,12 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	if client_id := conf.C.MustValue("zhimiao", "clientid"); client_id != "" {
 		req.Header.Add("SERVER-ID", client_id)
 	}
+	if device := conf.C.MustValue("zhimiao", "device"); device != "" {
+		req.Header.Add("SERVER-DEVICE", device)
+	}
+	if uid := conf.C.MustValue("zhimiao", "uid"); uid != "" {
+		req.Header.Add("SERVER-UID", uid)
+	}
 	if method == "POST" {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
@@ -120,4 +126,13 @@ func LogPush(log string) error {
 		return err
 	}
 	return nil
+}
+
+// 部署任务回调
+func DeployNotify(deploy *models.Deploy) {
+	url := fmt.Sprintf("/client/ApiDeployNotify?deployId=%s&version=%s", deploy.Id, deploy.NowVersion)
+	_, err := request("GET", url, nil)
+	if err != nil {
+		return
+	}
 }

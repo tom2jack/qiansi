@@ -3,11 +3,11 @@ package deploy
 import "testing"
 
 func TestRunShell(t *testing.T) {
-	RunShell("cs:\\", `
+	_ = RunShell("cs:\\", `
 piqng baidu.com
 
 `)
-	RunShell("c:\\", `
+	_ = RunShell("c:\\", `
 ping baidu.com
 `)
 

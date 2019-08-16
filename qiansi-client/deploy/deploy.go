@@ -54,6 +54,7 @@ func runTask(deploy models.Deploy) {
 	if deploy.AfterCommand != "" {
 		RunShell(deploy.LocalPath, deploy.AfterCommand)
 	}
+	request.DeployNotify(&deploy)
 	Task.DEL(strconv.Itoa(deploy.Id))
 }
 
