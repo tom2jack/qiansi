@@ -1,8 +1,9 @@
 package conf
 
 import (
-	"github.com/Unknwon/goconfig"
 	"os"
+
+	"github.com/Unknwon/goconfig"
 )
 
 var (

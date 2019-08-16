@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"qiansi/common/aliyun"
 	"qiansi/common/conf"
@@ -11,6 +9,9 @@ import (
 	"qiansi/qiansi-server/net_service"
 	"qiansi/qiansi-server/routers"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"golang.org/x/sync/errgroup"
 )
 
 var g errgroup.Group
@@ -46,19 +47,19 @@ func init() {
 func main() {
 	defer destroy()
 	gin.SetMode(conf.S.MustValue("server", "run_mode"))
-	http_listen := conf.S.MustValue("server", "http_listen")
+	httpListen := conf.S.MustValue("server", "http_listen")
 	readTimeout := time.Duration(conf.S.MustInt64("server", "read_timeout", 60)) * time.Second
 	writeTimeout := time.Duration(conf.S.MustInt64("server", "write_timeout", 60)) * time.Second
-	http_server := &http.Server{
-		Addr:           http_listen,
+	httpServer := &http.Server{
+		Addr:           httpListen,
 		Handler:        routers.Router,
 		ReadTimeout:    readTimeout,
 		WriteTimeout:   writeTimeout,
 		MaxHeaderBytes: 1 << 20,
 	}
 
-	zmlog.Info("Start HTTP Service Listening %s", http_listen)
-	http_server.ListenAndServe()
+	zmlog.Info("Start HTTP Service Listening %s", httpListen)
+	httpServer.ListenAndServe()
 }
 
 //Destroy 销毁资源

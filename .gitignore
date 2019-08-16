@@ -51,3 +51,4 @@ test/bin/
 vendor
 config.ini
 /*.log
+.vscode
