@@ -8,35 +8,36 @@
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 	"qiansi/common/models"
-	"qiansi/common/models/api_req"
-	"qiansi/common/models/api_resp"
+	"qiansi/common/models/zreq"
+	"qiansi/common/models/zresp"
 	"qiansi/common/utils"
 	"qiansi/qiansi-server/net_service/udp_service"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
-// @Summary 获取部署服务列表
+// @Summary 获取部署应用列表
 // @Produce  json
 // @Accept  json
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand": "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType": 1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title": "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}"
 // @Router /admin/DeployLists [get]
 func DeployLists(c *gin.Context) {
-	d := &[]models.Deploy{}
-	models.ZM_Mysql.Order("id desc").Find(d, "uid=?", c.GetInt("UID"))
-	models.NewApiResult(1, "读取成功", d).Json(c)
+	vo := []zresp.DeployVO{}
+	models.ZM_Mysql.Raw("select * from deploy where uid=? order by id desc", c.GetInt("UID")).Scan(&vo)
+	models.NewApiResult(1, "读取成功", vo).Json(c)
 }
 
 // @Summary 设置部署应用
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.DeploySetParam true "入参集合"
+// @Param body body zreq.DeploySetParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeploySet [POST]
 func DeploySet(c *gin.Context) {
-	param := &api_req.DeploySetParam{}
+	param := &zreq.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
@@ -60,36 +61,36 @@ func DeploySet(c *gin.Context) {
 	models.NewApiResult(0, "系统错误").Json(c)
 }
 
-// @Summary 删除部署服务
+// @Summary 删除部署应用
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.DeployDelParam true "入参集合"
+// @Param body body zreq.DeployDelParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeployDel [DELETE]
 func DeployDel(c *gin.Context) {
-	param := &api_req.DeployDelParam{}
+	param := &zreq.DeployDelParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
 	db := models.ZM_Mysql.Delete(&models.Deploy{}, "id=? and uid=?", param.DeployId, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		models.NewApiResult(-5, "删除失败", *db).Json(c)
+		models.NewApiResult(-5, "删除失败", db).Json(c)
 		return
 	}
 	// 删除关联
 	models.ZM_Mysql.Delete(&models.DeployServerRelation{}, "deploy_id=?", param.DeployId)
-	models.NewApiResult(1, "操作成功", *db).Json(c)
+	models.NewApiResult(1, "操作成功", db).Json(c)
 }
 
 // @Summary 部署应用关联服务器
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.DeployRelationParam true "入参集合"
+// @Param body body zreq.DeployRelationParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "关联成功","data": null}"
 // @Router /admin/DeployRelationServer [POST]
 func DeployRelationServer(c *gin.Context) {
-	param := &api_req.DeployRelationParam{}
+	param := &zreq.DeployRelationParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) || !(param.ServerId > 0) {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
@@ -123,18 +124,18 @@ func DeployRelationServer(c *gin.Context) {
 	models.NewApiResult(1, "成功").Json(c)
 }
 
-// @Summary 获取当前部署服务的服务器列表
+// @Summary 获取当前部署应用的服务器列表
 // @Produce  json
 // @Accept  json
 // @Success 200 {object} models.Server "返回"
 // @Router /admin/DeployServer [post]
 func DeployServer(c *gin.Context) {
-	param := &api_req.DeployServerParam{}
+	param := &zreq.DeployServerParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	d := &[]api_resp.DeployServerVO{}
+	d := &[]zresp.DeployServerVO{}
 	sql := "SELECT s.*,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
 	models.ZM_Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
 	models.NewApiResult(1, "读取成功", d).Json(c)
@@ -143,11 +144,11 @@ func DeployServer(c *gin.Context) {
 // @Summary 启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.DeployRelationParam true "入参集合"
+// @Param body body zreq.DeployDoParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
 // @Router /admin/DeployDo [GET]
 func DeployDo(c *gin.Context) {
-	param := &api_req.DeployDelParam{}
+	param := &zreq.DeployDoParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		models.NewApiResult(-4, "入参绑定失败").Json(c)
 		return

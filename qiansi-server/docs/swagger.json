@@ -22,7 +22,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "删除部署服务",
+                "summary": "删除部署应用",
                 "parameters": [
                     {
                         "description": "入参集合",
@@ -31,7 +31,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.DeployDelParam"
+                            "$ref": "#/definitions/zreq.DeployDelParam"
                         }
                     }
                 ],
@@ -63,7 +63,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.DeployRelationParam"
+                            "$ref": "#/definitions/zreq.DeployDoParam"
                         }
                     }
                 ],
@@ -86,7 +86,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取部署服务列表",
+                "summary": "获取部署应用列表",
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"AfterCommand\": \"324545\",\"BeforeCommand\": \"1232132132\",\"Branch\": \"123213\",\"CreateTime\": \"2019-02-28T10:24:41+08:00\",\"DeployType\": 1,\"Id\": 491,\"LocalPath\": \"123213\",\"NowVersion\": 0,\"RemoteUrl\": \"123213\",\"Title\": \"491-一号机器的修改241\",\"Uid\": 2,\"UpdateTime\": \"2019-02-28T10:25:17+08:00\"}]}",
@@ -115,7 +115,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.DeployRelationParam"
+                            "$ref": "#/definitions/zreq.DeployRelationParam"
                         }
                     }
                 ],
@@ -131,14 +131,14 @@
             }
         },
         "/admin/DeployServer": {
-            "get": {
+            "post": {
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "获取当前部署服务的服务器列表",
+                "summary": "获取当前部署应用的服务器列表",
                 "responses": {
                     "200": {
                         "description": "返回",
@@ -167,7 +167,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.DeploySetParam"
+                            "$ref": "#/definitions/zreq.DeploySetParam"
                         }
                     }
                 ],
@@ -199,7 +199,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.ServerDelParam"
+                            "$ref": "#/definitions/zreq.ServerDelParam"
                         }
                     }
                 ],
@@ -251,13 +251,13 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.UserResetPwdParam"
+                            "$ref": "#/definitions/zreq.UserResetPwdParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}}",
+                        "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.ApiResult"
@@ -283,7 +283,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.UserSiginParam"
+                            "$ref": "#/definitions/zreq.UserSiginParam"
                         }
                     }
                 ],
@@ -315,7 +315,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.UserSiginUpParam"
+                            "$ref": "#/definitions/zreq.UserSiginUpParam"
                         }
                     }
                 ],
@@ -324,7 +324,7 @@
                         "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_resp.UserInfoVO"
+                            "$ref": "#/definitions/zresp.UserInfoVO"
                         }
                     }
                 }
@@ -367,13 +367,49 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/api_req.VerifyBySMSParam"
+                            "$ref": "#/definitions/zreq.VerifyBySMSParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "{\"code\":1,\"msg\":\"发送成功\",\"data\":null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/clinet/ApiDeployNotify": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "客户端部署成功回调",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "版本号",
+                        "name": "version",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署应用ID",
+                        "name": "deploy_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.ApiResult"
@@ -403,7 +439,7 @@
             }
         },
         "/clinet/ApiRegServer": {
-            "post": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -430,49 +466,6 @@
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/DeployNotify": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "客户端部署成功回调",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "客户端平台编号",
-                        "name": "server_id",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "客户端设备号",
-                        "name": "device",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "日志文本内容",
-                        "name": "deploy_id",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.ApiResult"
@@ -526,151 +519,6 @@
         }
     },
     "definitions": {
-        "api_req.DeployDelParam": {
-            "type": "object",
-            "properties": {
-                "deployId": {
-                    "description": "部署应用ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "api_req.DeployRelationParam": {
-            "type": "object",
-            "properties": {
-                "deployId": {
-                    "description": "部署应用ID",
-                    "type": "integer"
-                },
-                "relation": {
-                    "description": "关联操作 true-关联 false-取消",
-                    "type": "boolean"
-                },
-                "serverId": {
-                    "description": "服务器ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "api_req.DeploySetParam": {
-            "type": "object",
-            "properties": {
-                "afterCommand": {
-                    "description": "后置命令",
-                    "type": "string"
-                },
-                "beforeCommand": {
-                    "description": "前置命令",
-                    "type": "string"
-                },
-                "branch": {
-                    "description": "git分支",
-                    "type": "string"
-                },
-                "deployKeys": {
-                    "description": "部署私钥",
-                    "type": "string"
-                },
-                "deployType": {
-                    "description": "部署类型 0-本地 1-git 2-zip",
-                    "type": "integer"
-                },
-                "id": {
-                    "description": "应用唯一编号",
-                    "type": "integer"
-                },
-                "localPath": {
-                    "description": "本地部署地址",
-                    "type": "string"
-                },
-                "remoteUrl": {
-                    "description": "资源地址",
-                    "type": "string"
-                },
-                "title": {
-                    "description": "应用名称",
-                    "type": "string"
-                }
-            }
-        },
-        "api_req.ServerDelParam": {
-            "type": "object",
-            "properties": {
-                "serverId": {
-                    "type": "integer"
-                }
-            }
-        },
-        "api_req.UserResetPwdParam": {
-            "type": "object",
-            "properties": {
-                "newPassword": {
-                    "type": "string"
-                },
-                "oldPassword": {
-                    "type": "string"
-                }
-            }
-        },
-        "api_req.UserSiginParam": {
-            "type": "object",
-            "properties": {
-                "password": {
-                    "description": "密码",
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "手机号",
-                    "type": "string"
-                }
-            }
-        },
-        "api_req.UserSiginUpParam": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "description": "短信验证码",
-                    "type": "string"
-                },
-                "inviterUid": {
-                    "description": "邀请人",
-                    "type": "integer"
-                },
-                "password": {
-                    "description": "密码",
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "手机号",
-                    "type": "string"
-                }
-            }
-        },
-        "api_req.VerifyBySMSParam": {
-            "type": "object",
-            "properties": {
-                "imgCode": {
-                    "description": "验证码code",
-                    "type": "string"
-                },
-                "imgIdKey": {
-                    "description": "图片验证码id",
-                    "type": "string"
-                },
-                "phone": {
-                    "description": "手机号",
-                    "type": "string"
-                }
-            }
-        },
-        "api_resp.UserInfoVO": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ApiResult": {
             "type": "object",
             "properties": {
@@ -716,6 +564,160 @@
                     "type": "integer"
                 },
                 "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "zreq.DeployDelParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.DeployDoParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.DeployRelationParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                },
+                "relation": {
+                    "description": "关联操作 true-关联 false-取消",
+                    "type": "boolean"
+                },
+                "serverId": {
+                    "description": "服务器ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.DeploySetParam": {
+            "type": "object",
+            "properties": {
+                "afterCommand": {
+                    "description": "后置命令",
+                    "type": "string"
+                },
+                "beforeCommand": {
+                    "description": "前置命令",
+                    "type": "string"
+                },
+                "branch": {
+                    "description": "git分支",
+                    "type": "string"
+                },
+                "deployKeys": {
+                    "description": "部署私钥",
+                    "type": "string"
+                },
+                "deployType": {
+                    "description": "部署类型 0-本地 1-git 2-zip",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "应用唯一编号",
+                    "type": "integer"
+                },
+                "localPath": {
+                    "description": "本地部署地址",
+                    "type": "string"
+                },
+                "remoteUrl": {
+                    "description": "资源地址",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "应用名称",
+                    "type": "string"
+                }
+            }
+        },
+        "zreq.ServerDelParam": {
+            "type": "object",
+            "properties": {
+                "serverId": {
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.UserResetPwdParam": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "type": "string"
+                },
+                "oldPassword": {
+                    "type": "string"
+                }
+            }
+        },
+        "zreq.UserSiginParam": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "zreq.UserSiginUpParam": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "短信验证码",
+                    "type": "string"
+                },
+                "inviterUid": {
+                    "description": "邀请人",
+                    "type": "integer"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "zreq.VerifyBySMSParam": {
+            "type": "object",
+            "properties": {
+                "imgCode": {
+                    "description": "验证码code",
+                    "type": "string"
+                },
+                "imgIdKey": {
+                    "description": "图片验证码id",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                }
+            }
+        },
+        "zresp.UserInfoVO": {
+            "type": "object",
+            "properties": {
+                "token": {
                     "type": "string"
                 }
             }

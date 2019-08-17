@@ -1,4 +1,4 @@
-package api_req
+package zreq
 
 // 部署应用操作入参
 type DeploySetParam struct {

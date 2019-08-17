@@ -1,105 +1,4 @@
 definitions:
-  api_req.DeployDelParam:
-    properties:
-      deployId:
-        description: 部署应用ID
-        type: integer
-    type: object
-  api_req.DeployRelationParam:
-    properties:
-      deployId:
-        description: 部署应用ID
-        type: integer
-      relation:
-        description: 关联操作 true-关联 false-取消
-        type: boolean
-      serverId:
-        description: 服务器ID
-        type: integer
-    type: object
-  api_req.DeploySetParam:
-    properties:
-      afterCommand:
-        description: 后置命令
-        type: string
-      beforeCommand:
-        description: 前置命令
-        type: string
-      branch:
-        description: git分支
-        type: string
-      deployKeys:
-        description: 部署私钥
-        type: string
-      deployType:
-        description: 部署类型 0-本地 1-git 2-zip
-        type: integer
-      id:
-        description: 应用唯一编号
-        type: integer
-      localPath:
-        description: 本地部署地址
-        type: string
-      remoteUrl:
-        description: 资源地址
-        type: string
-      title:
-        description: 应用名称
-        type: string
-    type: object
-  api_req.ServerDelParam:
-    properties:
-      serverId:
-        type: integer
-    type: object
-  api_req.UserResetPwdParam:
-    properties:
-      newPassword:
-        type: string
-      oldPassword:
-        type: string
-    type: object
-  api_req.UserSiginParam:
-    properties:
-      password:
-        description: 密码
-        type: string
-      phone:
-        description: 手机号
-        type: string
-    type: object
-  api_req.UserSiginUpParam:
-    properties:
-      code:
-        description: 短信验证码
-        type: string
-      inviterUid:
-        description: 邀请人
-        type: integer
-      password:
-        description: 密码
-        type: string
-      phone:
-        description: 手机号
-        type: string
-    type: object
-  api_req.VerifyBySMSParam:
-    properties:
-      imgCode:
-        description: 验证码code
-        type: string
-      imgIdKey:
-        description: 图片验证码id
-        type: string
-      phone:
-        description: 手机号
-        type: string
-    type: object
-  api_resp.UserInfoVO:
-    properties:
-      token:
-        type: string
-    type: object
   models.ApiResult:
     properties:
       code:
@@ -132,6 +31,113 @@ definitions:
       updateTime:
         type: string
     type: object
+  zreq.DeployDelParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+    type: object
+  zreq.DeployDoParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+    type: object
+  zreq.DeployRelationParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+      relation:
+        description: 关联操作 true-关联 false-取消
+        type: boolean
+      serverId:
+        description: 服务器ID
+        type: integer
+    type: object
+  zreq.DeploySetParam:
+    properties:
+      afterCommand:
+        description: 后置命令
+        type: string
+      beforeCommand:
+        description: 前置命令
+        type: string
+      branch:
+        description: git分支
+        type: string
+      deployKeys:
+        description: 部署私钥
+        type: string
+      deployType:
+        description: 部署类型 0-本地 1-git 2-zip
+        type: integer
+      id:
+        description: 应用唯一编号
+        type: integer
+      localPath:
+        description: 本地部署地址
+        type: string
+      remoteUrl:
+        description: 资源地址
+        type: string
+      title:
+        description: 应用名称
+        type: string
+    type: object
+  zreq.ServerDelParam:
+    properties:
+      serverId:
+        type: integer
+    type: object
+  zreq.UserResetPwdParam:
+    properties:
+      newPassword:
+        type: string
+      oldPassword:
+        type: string
+    type: object
+  zreq.UserSiginParam:
+    properties:
+      password:
+        description: 密码
+        type: string
+      phone:
+        description: 手机号
+        type: string
+    type: object
+  zreq.UserSiginUpParam:
+    properties:
+      code:
+        description: 短信验证码
+        type: string
+      inviterUid:
+        description: 邀请人
+        type: integer
+      password:
+        description: 密码
+        type: string
+      phone:
+        description: 手机号
+        type: string
+    type: object
+  zreq.VerifyBySMSParam:
+    properties:
+      imgCode:
+        description: 验证码code
+        type: string
+      imgIdKey:
+        description: 图片验证码id
+        type: string
+      phone:
+        description: 手机号
+        type: string
+    type: object
+  zresp.UserInfoVO:
+    properties:
+      token:
+        type: string
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -154,7 +160,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.DeployDelParam'
+          $ref: '#/definitions/zreq.DeployDelParam'
           type: object
       produces:
       - application/json
@@ -164,7 +170,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ApiResult'
             type: object
-      summary: 删除部署服务
+      summary: 删除部署应用
   /admin/DeployDo:
     get:
       consumes:
@@ -175,7 +181,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.DeployRelationParam'
+          $ref: '#/definitions/zreq.DeployDoParam'
           type: object
       produces:
       - application/json
@@ -201,7 +207,7 @@ paths:
           schema:
             $ref: '#/definitions/models.ApiResult'
             type: object
-      summary: 获取部署服务列表
+      summary: 获取部署应用列表
   /admin/DeployRelationServer:
     post:
       consumes:
@@ -212,7 +218,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.DeployRelationParam'
+          $ref: '#/definitions/zreq.DeployRelationParam'
           type: object
       produces:
       - application/json
@@ -224,7 +230,7 @@ paths:
             type: object
       summary: 部署应用关联服务器
   /admin/DeployServer:
-    get:
+    post:
       consumes:
       - application/json
       produces:
@@ -235,7 +241,7 @@ paths:
           schema:
             $ref: '#/definitions/models.Server'
             type: object
-      summary: 获取当前部署服务的服务器列表
+      summary: 获取当前部署应用的服务器列表
   /admin/DeploySet:
     post:
       consumes:
@@ -246,7 +252,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.DeploySetParam'
+          $ref: '#/definitions/zreq.DeploySetParam'
           type: object
       produces:
       - application/json
@@ -267,7 +273,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.ServerDelParam'
+          $ref: '#/definitions/zreq.ServerDelParam'
           type: object
       produces:
       - application/json
@@ -303,13 +309,13 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.UserResetPwdParam'
+          $ref: '#/definitions/zreq.UserResetPwdParam'
           type: object
       produces:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "修改成功", "data": null}}'
+          description: '{"code": 1,"msg": "修改成功", "data": null}'
           schema:
             $ref: '#/definitions/models.ApiResult'
             type: object
@@ -324,7 +330,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.UserSiginParam'
+          $ref: '#/definitions/zreq.UserSiginParam'
           type: object
       produces:
       - application/json
@@ -347,7 +353,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.UserSiginUpParam'
+          $ref: '#/definitions/zreq.UserSiginUpParam'
           type: object
       produces:
       - application/json
@@ -357,7 +363,7 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            $ref: '#/definitions/api_resp.UserInfoVO'
+            $ref: '#/definitions/zresp.UserInfoVO'
             type: object
       summary: 注册账号
   /admin/VerifyByImg:
@@ -383,7 +389,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/api_req.VerifyBySMSParam'
+          $ref: '#/definitions/zreq.VerifyBySMSParam'
           type: object
       produces:
       - application/json
@@ -394,6 +400,30 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 获取短信验证码
+  /clinet/ApiDeployNotify:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 版本号
+        in: query
+        name: version
+        required: true
+        type: string
+      - description: 部署应用ID
+        in: query
+        name: deploy_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ApiResult'
+            type: object
+      summary: 客户端部署成功回调
   /clinet/ApiGetDeployTask:
     get:
       consumes:
@@ -408,7 +438,7 @@ paths:
             type: object
       summary: 获取服务器部署任务清单
   /clinet/ApiRegServer:
-    post:
+    get:
       consumes:
       - application/json
       parameters:
@@ -433,35 +463,6 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 服务器注册
-  /clinet/DeployNotify:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: 客户端平台编号
-        in: formData
-        name: server_id
-        required: true
-        type: string
-      - description: 客户端设备号
-        in: formData
-        name: device
-        required: true
-        type: string
-      - description: 日志文本内容
-        in: formData
-        name: deploy_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.ApiResult'
-            type: object
-      summary: 客户端部署成功回调
   /clinet/LogPush:
     post:
       consumes:

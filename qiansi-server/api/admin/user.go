@@ -1,24 +1,32 @@
+/**
+ * 用户模块
+ * Created by 纸喵软件.
+ * User: 倒霉狐狸
+ * Date: 2019-8-17 18:31:41
+ */
+
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"qiansi/common/captcha"
 	"qiansi/common/models"
-	"qiansi/common/models/api_req"
-	"qiansi/common/models/api_resp"
+	"qiansi/common/models/zreq"
+	"qiansi/common/models/zresp"
 	"qiansi/common/utils"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary 登录
 // @Produce  json
 // @Accept json
-// @Param body body api_req.UserSiginParam true "入参集合"
+// @Param body body zreq.UserSiginParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSigin [post]
 func UserSigin(c *gin.Context) {
-	param := &api_req.UserSiginParam{}
+	param := &zreq.UserSiginParam{}
 	if err := c.Bind(param); err != nil {
 		models.NewApiResult(-4, "入参解析失败").Json(c)
 		return
@@ -47,22 +55,21 @@ func UserSigin(c *gin.Context) {
 		models.NewApiResult(-5, "Token生成失败，无法登陆，请联系管理员").Json(c)
 		return
 	}
-	u := &api_resp.UserInfoVO{
+	models.NewApiResult(1, "登陆成功", &zresp.UserInfoVO{
 		*member,
 		token,
-	}
-	models.NewApiResult(1, "登陆成功", u).Json(c)
+	}).Json(c)
 }
 
 // @Summary 注册账号
 // @Produce  json
 // @Accept json
-// @Param body body api_req.UserSiginUpParam true "入参集合"
-// @Success 200 {object} api_resp.UserInfoVO "{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Param body body zreq.UserSiginUpParam true "入参集合"
+// @Success 200 {object} zresp.UserInfoVO "{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSiginUp [post]
 func UserSiginUp(c *gin.Context) {
 	var row int
-	param := &api_req.UserSiginUpParam{}
+	param := &zreq.UserSiginUpParam{}
 	if err := c.Bind(param); err != nil {
 		models.NewApiResult(-4, "入参解析失败").Json(c)
 		return
@@ -109,7 +116,7 @@ func UserSiginUp(c *gin.Context) {
 		return
 	}
 	if member.Id > 0 {
-		models.NewApiResult(1, "注册成功", api_resp.UserInfoVO{
+		models.NewApiResult(1, "注册成功", &zresp.UserInfoVO{
 			*member,
 			token,
 		}).Json(c)
@@ -121,11 +128,11 @@ func UserSiginUp(c *gin.Context) {
 // @Summary 修改密码
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.UserResetPwdParam true "入参集合"
-// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "修改成功", "data": null}}"
+// @Param body body zreq.UserResetPwdParam true "入参集合"
+// @Success 200 {object} models.ApiResult "{"code": 1,"msg": "修改成功", "data": null}"
 // @Router /admin/UserResetPwd [post]
 func UserResetPwd(c *gin.Context) {
-	param := &api_req.UserResetPwdParam{}
+	param := &zreq.UserResetPwdParam{}
 	if err := c.Bind(param); err != nil {
 		models.NewApiResult(-4, "入参解析失败").Json(c)
 		return

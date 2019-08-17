@@ -1,4 +1,4 @@
-package api_req
+package zreq
 
 type VerifyBySMSParam struct {
 	// 手机号

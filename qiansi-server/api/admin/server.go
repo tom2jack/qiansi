@@ -8,9 +8,10 @@
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"qiansi/common/models"
-	"qiansi/common/models/api_req"
+	"qiansi/common/models/zreq"
+
+	"github.com/gin-gonic/gin"
 )
 
 // @Summary 获取服务器(客户端)列表
@@ -27,21 +28,21 @@ func ServerLists(c *gin.Context) {
 // @Summary 删除服务器
 // @Produce  json
 // @Accept  json
-// @Param body body api_req.ServerDelParam true "入参集合"
+// @Param body body zreq.ServerDelParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerDel [DELETE]
 func ServerDel(c *gin.Context) {
-	param := &api_req.ServerDelParam{}
+	param := &zreq.ServerDelParam{}
 	if err := c.Bind(param); err != nil || param.ServerId == 0 {
 		models.NewApiResult(-4, "入参解析失败").Json(c)
 		return
 	}
 	db := models.ZM_Mysql.Delete(models.Server{}, "id=? and uid=?", param.ServerId, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		models.NewApiResult(-5, "删除失败", *db).Json(c)
+		models.NewApiResult(-5, "删除失败", db).Json(c)
 		return
 	}
 	// 删除关联
 	models.ZM_Mysql.Delete(models.DeployServerRelation{}, "server_id=?", param.ServerId)
-	models.NewApiResult(1, "操作成功", *db).Json(c)
+	models.NewApiResult(1, "操作成功", db).Json(c)
 }

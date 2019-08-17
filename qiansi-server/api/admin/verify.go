@@ -1,13 +1,21 @@
+/**
+ * 校验模块
+ * Created by 纸喵软件.
+ * User: 倒霉狐狸
+ * Date: 2019-8-17 18:31:41
+ */
+
 package admin
 
 import (
-	"github.com/gin-gonic/gin"
 	"qiansi/common/captcha"
 	"qiansi/common/models"
-	"qiansi/common/models/api_req"
+	"qiansi/common/models/zreq"
 	"qiansi/common/utils"
 	"qiansi/common/zmlog"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 var ZM_LOCK = utils.NewLockTable()
@@ -32,11 +40,11 @@ func VerifyByImg(c *gin.Context) {
 // @Summary 获取短信验证码
 // @Produce json
 // @Accept  application/json
-// @Param body body api_req.VerifyBySMSParam true "入参集合"
+// @Param body body zreq.VerifyBySMSParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code":1,"msg":"发送成功","data":null}"
 // @Router /admin/VerifyBySMS [post]
 func VerifyBySMS(c *gin.Context) {
-	param := &api_req.VerifyBySMSParam{}
+	param := &zreq.VerifyBySMSParam{}
 	if err := c.Bind(param); err != nil {
 		models.NewApiResult(-4, "入参解析失败"+err.Error()).Json(c)
 		return

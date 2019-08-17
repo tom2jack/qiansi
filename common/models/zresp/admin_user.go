@@ -1,4 +1,4 @@
-package api_resp
+package zresp
 
 import "qiansi/common/models"
 
