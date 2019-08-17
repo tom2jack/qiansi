@@ -215,7 +215,7 @@
             }
         },
         "/admin/ServerLists": {
-            "post": {
+            "get": {
                 "consumes": [
                     "application/json"
                 ],
@@ -229,6 +229,38 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.Server"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/ServerSet": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "设置服务器信息",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/zreq.DeploySetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.ApiResult"
                         }
                     }
                 }

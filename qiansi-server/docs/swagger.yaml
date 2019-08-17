@@ -285,7 +285,7 @@ paths:
             type: object
       summary: 删除服务器
   /admin/ServerLists:
-    post:
+    get:
       consumes:
       - application/json
       produces:
@@ -299,6 +299,27 @@ paths:
             $ref: '#/definitions/models.Server'
             type: object
       summary: 获取服务器(客户端)列表
+  /admin/ServerSet:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/zreq.DeploySetParam'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/models.ApiResult'
+            type: object
+      summary: 设置服务器信息
   /admin/UserResetPwd:
     post:
       consumes:

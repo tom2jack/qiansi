@@ -57,6 +57,7 @@ func LoadRouter() {
 		{
 			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
 			admin_route.GET("/ServerLists", admin.ServerLists)
+			admin_route.POST("/ServerSet", admin.ServerSet)
 			admin_route.DELETE("/ServerDel", admin.ServerDel)
 			admin_route.GET("/DeployLists", admin.DeployLists)
 			admin_route.DELETE("/DeployDel", admin.DeployDel)
