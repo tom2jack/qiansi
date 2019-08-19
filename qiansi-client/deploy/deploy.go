@@ -64,6 +64,8 @@ func LogPush(format string, v ...interface{}) {
 		fname = runtime.FuncForPC(pc).Name()
 	}
 	zmlog.Info("("+fname+") "+format, v...)
+
+	// fname = strings.ReplaceAll(fname, "qiansi/qiansi-client/deploy.", "")
 	// 反向推送日志到千丝平台
 	request.LogPush(fmt.Sprintf("("+fname+") "+format, v...))
 }
