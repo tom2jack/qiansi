@@ -58,7 +58,7 @@ func runTask(deploy models.Deploy) {
 	Task.DEL(strconv.Itoa(deploy.Id))
 }
 
-func LogPush(format string, v ...interface{}) {
+func LogPush(deploy *models.Deploy, format string, v ...interface{}) {
 	var fname = "default"
 	if pc, _, _, ok := runtime.Caller(1); ok {
 		fname = runtime.FuncForPC(pc).Name()
