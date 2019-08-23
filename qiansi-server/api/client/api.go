@@ -65,28 +65,35 @@ func ApiGetDeployTask(c *gin.Context) {
 // @Summary 客户端日志推送
 // @Produce  json
 // @Accept  multipart/form-data
-// @Param server_id formData string true "客户端平台编号"
-// @Param device formData string true "客户端设备号"
+// @Param deployId formData string true "部署应用ID"
+// @Param version formData string true "部署版本号"
 // @Param content formData string true "日志文本内容"
 // @Success 200 {object} models.ApiResult ""
-// @Router /clinet/LogPush [post]
-func ApiLogPush(c *gin.Context) {
-	serverId, _ := strconv.Atoi(c.PostForm("server_id"))
-	device := c.PostForm("device")
+// @Router /clinet/ApiDeployLog [post]
+func ApiDeployLog(c *gin.Context) {
+	serverId := c.GetInt("SERVER-ID")
+	uid := c.GetInt("SERVER-UID")
+	deviceId := c.GetString("SERVER-DEVICE")
+	deployId, _ := strconv.Atoi(c.PostForm("deployId"))
+	version, _ := strconv.Atoi(c.PostForm("version"))
 	content := utils.MustUtf8(c.PostForm("content"))
 	var row int
-	models.ZM_Mysql.Table("server").Where("id=? and device_id=?", serverId, device).Count(&row)
+	models.ZM_Mysql.Table("server").Where("id=? and uid=? and device_id=?", serverId, uid, deviceId).Count(&row)
 	if row == 0 {
 		c.Status(403)
 		return
 	}
-	serverLog := &models.ServerLog{
-		ServerId: serverId,
-		DeviceId: device,
-		Content:  content,
+	deployLog := &models.DeployLog{
+		Uid:           uid,
+		DeployId:      deployId,
+		ServerId:      serverId,
+		DeviceId:      deviceId,
+		DeployVersion: version,
+		Content:       content,
+		ClientIp:      c.ClientIP(),
 	}
-	models.ZM_Mysql.Create(serverLog)
-	models.NewApiResult(1, "成功", serverLog).Json(c)
+	models.ZM_Mysql.Create(deployLog)
+	models.NewApiResult(1).Json(c)
 }
 
 // @Summary 客户端部署成功回调

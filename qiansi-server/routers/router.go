@@ -30,8 +30,8 @@ func LoadRouter() {
 		// 客户端交互请求
 		client_route.Use(middleware.ClientAuth())
 		{
-			// 客户端日志推送
-			client_route.POST("/LogPush", client.ApiLogPush)
+			// 客户端部署日志推送
+			client_route.POST("/ApiDeployLog", client.ApiDeployLog)
 			// 获取任务
 			client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
 			// 部署回调

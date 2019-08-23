@@ -32,30 +32,30 @@ func Run(data string) {
 	// 此处请求只有一次机会
 	_ = request.GetDeployTask(&TaskList)
 	for _, v := range TaskList {
-		go runTask(v)
+		go runTask(&v)
 	}
 }
 
-func runTask(deploy models.Deploy) {
+func runTask(deploy *models.Deploy) {
 	if !Task.SETNX(strconv.Itoa(deploy.Id), strconv.FormatInt(time.Now().Unix(), 36)) {
 		zmlog.Warn("%d号部署任务未完成，拒绝执行", deploy.Id)
 		return
 	}
+	defer Task.DEL(strconv.Itoa(deploy.Id))
 	// 执行前置命令
 	if deploy.BeforeCommand != "" {
-		RunShell(deploy.LocalPath, deploy.BeforeCommand)
+		RunShell(deploy, deploy.BeforeCommand)
 	}
 	// 选择部署操作
 	switch deploy.DeployType {
 	case 1:
-		Git(&deploy)
+		Git(deploy)
 	}
 	// 执行后置命令
 	if deploy.AfterCommand != "" {
-		RunShell(deploy.LocalPath, deploy.AfterCommand)
+		RunShell(deploy, deploy.AfterCommand)
 	}
-	request.DeployNotify(&deploy)
-	Task.DEL(strconv.Itoa(deploy.Id))
+	request.DeployNotify(deploy)
 }
 
 func LogPush(deploy *models.Deploy, format string, v ...interface{}) {
@@ -64,13 +64,12 @@ func LogPush(deploy *models.Deploy, format string, v ...interface{}) {
 		fname = runtime.FuncForPC(pc).Name()
 	}
 	zmlog.Info("("+fname+") "+format, v...)
-
 	// fname = strings.ReplaceAll(fname, "qiansi/qiansi-client/deploy.", "")
 	// 反向推送日志到千丝平台
-	request.LogPush(fmt.Sprintf("("+fname+") "+format, v...))
+	request.LogPush(deploy, fmt.Sprintf("("+fname+") "+format, v...))
 }
 
-func RunShell(work_path, cmd string) error {
+func RunShell(deploy *models.Deploy, cmd string) error {
 	defer shell.ErrExit()
 	if runtime.GOOS == "windows" {
 		shell.Shell = []string{"cmd", "/c"}
@@ -83,14 +82,14 @@ func RunShell(work_path, cmd string) error {
 			continue
 		}
 		res := shell.Cmd(v)
-		res.SetWorkDir(work_path)
+		res.SetWorkDir(deploy.LocalPath)
 		o := res.Run()
 		o.Wait()
 		out := o.String()
 		if !utf8.ValidString(out) {
 			out = utils.ConvertToString(out, "gbk", "utf8")
 		}
-		LogPush("正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, out, o.Error().Error())
+		LogPush(deploy, "正在执行命令: %s, \n结果输出:\n %s\n错误输出:\n %s", v, out, o.Error().Error())
 	}
 	return nil
 }

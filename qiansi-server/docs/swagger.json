@@ -12,7 +12,7 @@
         "license": {},
         "version": "1.0"
     },
-    "host": "localhost:8000",
+    "host": "localhost:1315",
     "paths": {
         "/admin/DeployDel": {
             "delete": {
@@ -414,6 +414,49 @@
                 }
             }
         },
+        "/clinet/ApiDeployLog": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "客户端日志推送",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "部署应用ID",
+                        "name": "deployId",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "部署版本号",
+                        "name": "version",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "日志文本内容",
+                        "name": "content",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
         "/clinet/ApiDeployNotify": {
             "get": {
                 "consumes": [
@@ -498,49 +541,6 @@
                 "responses": {
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/LogPush": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "客户端日志推送",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "客户端平台编号",
-                        "name": "server_id",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "客户端设备号",
-                        "name": "device",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "日志文本内容",
-                        "name": "content",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/models.ApiResult"

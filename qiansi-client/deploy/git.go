@@ -24,7 +24,7 @@ func Git(deploy *models.Deploy) error {
 	repository, err := git.PlainOpen(deploy.LocalPath)
 	if err != nil {
 		if err.Error() == "repository does not exist" {
-			LogPush("正在尝试初始化..%s", deploy.LocalPath)
+			LogPush(deploy, "正在尝试初始化..%s", deploy.LocalPath)
 			//克隆项目
 			repository, err = git.PlainClone(deploy.LocalPath, false, &git.CloneOptions{
 				Auth: auth,
@@ -45,7 +45,7 @@ func Git(deploy *models.Deploy) error {
 	if err != nil {
 		return err
 	}
-	LogPush("成功抓取仓库分支图，正在执行当前工作区清理...")
+	LogPush(deploy, "成功抓取仓库分支图，正在执行当前工作区清理...")
 	err = tree.Clean(&git.CleanOptions{Dir: true})
 	if err != nil {
 		return err
@@ -59,9 +59,9 @@ func Git(deploy *models.Deploy) error {
 	}
 	// 获取远程分支信息
 	remote, err := repository.Storer.Reference(plumbing.NewRemoteReferenceName(git.DefaultRemoteName, deploy.Branch))
-	LogPush("当前分支: %s(%s), 部署分支: %s, 部署版本：%s", head.Name().Short(), head.Hash(), deploy.Branch, remote.Hash())
+	LogPush(deploy, "当前分支: %s(%s), 部署分支: %s, 部署版本：%s", head.Name().Short(), head.Hash(), deploy.Branch, remote.Hash())
 	if head.Name().Short() != deploy.Branch {
-		LogPush("分支数据不相同，正在尝试切换分支...")
+		LogPush(deploy, "分支数据不相同，正在尝试切换分支...")
 		b, err := repository.Branches()
 		if err != nil {
 			return nil
@@ -74,14 +74,14 @@ func Git(deploy *models.Deploy) error {
 			return nil
 		})
 		if needCreate {
-			LogPush("本地未找到部署分支，正在创建并切换...")
+			LogPush(deploy, "本地未找到部署分支，正在创建并切换...")
 			err = repository.CreateBranch(&config.Branch{
 				Name:   deploy.Branch,
 				Remote: git.DefaultRemoteName,
 				Merge:  plumbing.NewBranchReferenceName(deploy.Branch),
 			})
 			if err != nil {
-				LogPush("创建分支报错: %v", err)
+				LogPush(deploy, "创建分支报错: %v", err)
 				return err
 			}
 			err = tree.Checkout(&git.CheckoutOptions{
@@ -94,7 +94,7 @@ func Git(deploy *models.Deploy) error {
 				return err
 			}
 		} else {
-			LogPush("本地寻址成功，正在切换分支到: %s, Hash:%s", deploy.Branch, remote.Hash())
+			LogPush(deploy, "本地寻址成功，正在切换分支到: %s, Hash:%s", deploy.Branch, remote.Hash())
 			err = tree.Checkout(&git.CheckoutOptions{
 				Create: false,
 				Force:  true,
@@ -104,13 +104,13 @@ func Git(deploy *models.Deploy) error {
 				return err
 			}
 		}
-		LogPush("分支切换完毕，正在刷新工作区信息数据...")
+		LogPush(deploy, "分支切换完毕，正在刷新工作区信息数据...")
 		head, err = repository.Head()
 		if err != nil {
 			return err
 		}
 	}
-	LogPush("正在拉取远程最新数据...")
+	LogPush(deploy, "正在拉取远程最新数据...")
 	err = tree.Pull(&git.PullOptions{
 		// Name of the remote to be pulled. If empty, uses the default.
 		RemoteName: git.DefaultRemoteName,
@@ -124,9 +124,9 @@ func Git(deploy *models.Deploy) error {
 		if err.Error() != git.NoErrAlreadyUpToDate.Error() {
 			return err
 		}
-		LogPush("没啥可更新的，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
+		LogPush(deploy, "没啥可更新的，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
 	} else {
-		LogPush("数据更新完毕，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
+		LogPush(deploy, "数据更新完毕，当前版本:%s, 当前分支:%s", head.Hash().String(), head.Name().Short())
 	}
 	return nil
 }

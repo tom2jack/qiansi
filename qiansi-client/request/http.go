@@ -12,6 +12,7 @@ import (
 	"qiansi/common/models"
 	"qiansi/common/utils"
 	"qiansi/common/zmlog"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -115,13 +116,13 @@ func GetDeployTask(task *[]models.Deploy) error {
 }
 
 // 推送日志
-func LogPush(log string) error {
+func LogPush(deploy *models.Deploy, log string) error {
 	body := url.Values{
-		"server_id": {conf.C.MustValue("zhimiao", "clientid")},
-		"device":    {conf.C.MustValue("zhimiao", "device")},
-		"content":   {log},
+		"deployId": {strconv.Itoa(deploy.Id)},
+		"version":  {strconv.Itoa(deploy.NowVersion)},
+		"content":  {log},
 	}
-	_, err := request("POST", "/client/LogPush", strings.NewReader(body.Encode()))
+	_, err := request("POST", "/client/ApiDeployLog", strings.NewReader(body.Encode()))
 	if err != nil {
 		return err
 	}
@@ -130,7 +131,7 @@ func LogPush(log string) error {
 
 // 部署任务回调
 func DeployNotify(deploy *models.Deploy) {
-	url := fmt.Sprintf("/client/ApiDeployNotify?deployId=%s&version=%s", deploy.Id, deploy.NowVersion)
+	url := fmt.Sprintf("/client/ApiDeployNotify?deployId=%d&version=%d", deploy.Id, deploy.NowVersion)
 	_, err := request("GET", url, nil)
 	if err != nil {
 		return

@@ -42,7 +42,7 @@ func init() {
 // @contact.url http://tools.zhimiao.org
 // @contact.email mail@xiaoliu.org
 
-// @host localhost:8000
+// @host localhost:1315
 // @BasePath
 func main() {
 	defer destroy()
