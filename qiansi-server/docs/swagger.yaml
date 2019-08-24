@@ -90,6 +90,20 @@ definitions:
       serverId:
         type: integer
     type: object
+  zreq.ServerSetParam:
+    properties:
+      id:
+        type: integer
+      serverName:
+        description: 服务器备注名
+        type: string
+      serverRuleId:
+        description: 服务器规则id
+        type: integer
+      serverStatus:
+        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
+        type: integer
+    type: object
   zreq.UserResetPwdParam:
     properties:
       newPassword:
@@ -309,7 +323,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeploySetParam'
+          $ref: '#/definitions/zreq.ServerSetParam'
           type: object
       produces:
       - application/json

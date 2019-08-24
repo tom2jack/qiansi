@@ -29,7 +29,7 @@ func ServerLists(c *gin.Context) {
 // @Summary 设置服务器信息
 // @Produce  json
 // @Accept  json
-// @Param body body zreq.DeploySetParam true "入参集合"
+// @Param body body zreq.ServerSetParam true "入参集合"
 // @Success 200 {object} models.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerSet [POST]
 func ServerSet(c *gin.Context) {
