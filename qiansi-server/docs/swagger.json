@@ -130,6 +130,43 @@
                 }
             }
         },
+        "/admin/DeployRunLog": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "summary": "获取当前部署应用指定服务器的运行日志",
+                "responses": {
+                    "200": {
+                        "description": "返回",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.DeployLog"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/DeployRunLogTab": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡",
+                "responses": {
+                    "200": {
+                        "description": "返回",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/models.Server"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeployServer": {
             "post": {
                 "consumes": [
@@ -562,6 +599,38 @@
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "models.DeployLog": {
+            "type": "object",
+            "properties": {
+                "clientIp": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deployId": {
+                    "type": "integer"
+                },
+                "deployVersion": {
+                    "type": "integer"
+                },
+                "deviceId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "serverId": {
+                    "type": "integer"
+                },
+                "uid": {
+                    "type": "integer"
                 }
             }
         },

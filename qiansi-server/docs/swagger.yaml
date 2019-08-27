@@ -8,6 +8,27 @@ definitions:
       msg:
         type: string
     type: object
+  models.DeployLog:
+    properties:
+      clientIp:
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      deployId:
+        type: integer
+      deployVersion:
+        type: integer
+      deviceId:
+        type: string
+      id:
+        type: integer
+      serverId:
+        type: integer
+      uid:
+        type: integer
+    type: object
   models.Server:
     properties:
       apiSecret:
@@ -243,6 +264,30 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 部署应用关联服务器
+  /admin/DeployRunLog:
+    get:
+      consumes:
+      - application/json
+      responses:
+        "200":
+          description: 返回
+          schema:
+            $ref: '#/definitions/models.DeployLog'
+            type: object
+      summary: 获取当前部署应用指定服务器的运行日志
+  /admin/DeployRunLogTab:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回
+          schema:
+            $ref: '#/definitions/models.Server'
+            type: object
+      summary: 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
   /admin/DeployServer:
     post:
       consumes:

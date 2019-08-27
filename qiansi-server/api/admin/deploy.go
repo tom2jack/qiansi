@@ -141,6 +141,39 @@ func DeployServer(c *gin.Context) {
 	models.NewApiResult(1, "读取成功", d).Json(c)
 }
 
+// @Summary 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
+// @Produce  json
+// @Accept  json
+// @Success 200 {object} models.Server "返回"
+// @Router /admin/DeployRunLogTab [get]
+func DeployRunLogTab(c *gin.Context) {
+	param := &zreq.DeployServerParam{}
+	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
+		models.NewApiResult(-4, "入参绑定失败").Json(c)
+		return
+	}
+	d := &[]zresp.DeployServerVO{}
+	sql := "SELECT s.id, s.server_name,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
+	models.ZM_Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
+	models.NewApiResult(1, "读取成功", d).Json(c)
+}
+
+// @Summary 获取当前部署应用指定服务器的运行日志
+// // @Produce  json
+// @Accept  json
+// @Success 200 {object} models.DeployLog "返回"
+// @Router /admin/DeployRunLog [get]
+func DeployRunLog(c *gin.Context) {
+	param := &zreq.DeployRunLogParam{}
+	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
+		models.NewApiResult(-4, "入参绑定失败").Json(c)
+		return
+	}
+	deployLogs := &[]models.DeployLog{}
+	models.ZM_Mysql.Where("uid=? and deploy_id=? and server_id=? and deploy_version=?", c.GetInt("UID"), param.DeployId, param.ServerId, param.Version).Find(deployLogs)
+	models.NewApiResult(1, "读取成功", deployLogs).Json(c)
+}
+
 // @Summary 启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数
 // @Produce  json
 // @Accept  json
