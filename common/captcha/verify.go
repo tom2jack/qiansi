@@ -18,7 +18,7 @@ type VerifyStore struct {
 func init() {
 	// init redis store
 	customeStore := &VerifyStore{
-		"ZMT:verify:",
+		"QIANSI:verify:",
 		30 * 60,
 	}
 	base64Captcha.SetCustomStore(customeStore)
@@ -40,7 +40,7 @@ func (s *VerifyStore) Get(id string, clear bool) string {
 
 // 获取手机短信验证码的idkey
 func VerifyBySMSIDKEY(phone string) string {
-	return "ZMT:verify:phone:" + phone
+	return "QIANSI:verify:phone:" + phone
 }
 
 // 短信验证码发送

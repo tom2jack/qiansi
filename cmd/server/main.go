@@ -42,6 +42,9 @@ func init() {
 // @contact.url http://tools.zhimiao.org
 // @contact.email mail@xiaoliu.org
 
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
 // @host localhost:1315
 // @BasePath
 func main() {

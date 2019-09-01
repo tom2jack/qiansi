@@ -144,6 +144,7 @@ func DeployServer(c *gin.Context) {
 // @Summary 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
 // @Produce  json
 // @Accept  json
+// @Param body body zreq.DeployServerParam true "入参集合"
 // @Success 200 {object} models.Server "返回"
 // @Router /admin/DeployRunLogTab [get]
 func DeployRunLogTab(c *gin.Context) {
@@ -159,8 +160,9 @@ func DeployRunLogTab(c *gin.Context) {
 }
 
 // @Summary 获取当前部署应用指定服务器的运行日志
-// // @Produce  json
+// @Produce  json
 // @Accept  json
+// @Param body body zreq.DeployRunLogParam true "入参集合"
 // @Success 200 {object} models.DeployLog "返回"
 // @Router /admin/DeployRunLog [get]
 func DeployRunLog(c *gin.Context) {

@@ -9,7 +9,10 @@
             "url": "http://tools.zhimiao.org",
             "email": "mail@xiaoliu.org"
         },
-        "license": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
         "version": "1.0"
     },
     "host": "localhost:1315",
@@ -135,7 +138,22 @@
                 "consumes": [
                     "application/json"
                 ],
+                "produces": [
+                    "application/json"
+                ],
                 "summary": "获取当前部署应用指定服务器的运行日志",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/zreq.DeployRunLogParam"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "返回",
@@ -156,6 +174,18 @@
                     "application/json"
                 ],
                 "summary": "获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/zreq.DeployServerParam"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "返回",
@@ -700,6 +730,31 @@
                 },
                 "serverId": {
                     "description": "服务器ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.DeployRunLogParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                },
+                "serverId": {
+                    "description": "服务器ID",
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "zreq.DeployServerParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
                     "type": "integer"
                 }
             }

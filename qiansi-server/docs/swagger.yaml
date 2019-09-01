@@ -76,6 +76,23 @@ definitions:
         description: 服务器ID
         type: integer
     type: object
+  zreq.DeployRunLogParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+      serverId:
+        description: 服务器ID
+        type: integer
+      version:
+        type: integer
+    type: object
+  zreq.DeployServerParam:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+    type: object
   zreq.DeploySetParam:
     properties:
       afterCommand:
@@ -180,7 +197,9 @@ info:
     name: API Support
     url: http://tools.zhimiao.org
   description: 纸喵软件系列之服务端
-  license: {}
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://zhimiao.org
   title: 纸喵 qiansi API
   version: "1.0"
@@ -268,6 +287,16 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/zreq.DeployRunLogParam'
+          type: object
+      produces:
+      - application/json
       responses:
         "200":
           description: 返回
@@ -279,6 +308,14 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/zreq.DeployServerParam'
+          type: object
       produces:
       - application/json
       responses:
