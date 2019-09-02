@@ -45,8 +45,9 @@ func init() {
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:1315
-// @BasePath
+// @host http://localhost:1315
+// @basepath /
+
 func main() {
 	defer destroy()
 	gin.SetMode(conf.S.MustValue("server", "run_mode"))

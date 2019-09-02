@@ -15,7 +15,8 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:1315",
+    "host": "http://localhost:1315",
+    "basePath": "/",
     "paths": {
         "/admin/DeployDel": {
             "delete": {

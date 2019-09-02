@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   models.ApiResult:
     properties:
@@ -190,7 +191,7 @@ definitions:
       token:
         type: string
     type: object
-host: localhost:1315
+host: http://localhost:1315
 info:
   contact:
     email: mail@xiaoliu.org
