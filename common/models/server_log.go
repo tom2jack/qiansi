@@ -5,10 +5,10 @@ import (
 )
 
 type ServerLog struct {
-	Id         int       `xorm:"not null pk autoincr INT(11)"`
-	ServerId   int       `xorm:"not null comment('服务器ID') INT(11)"`
-	DeviceId   string    `xorm:"not null comment('服务器唯一设备号') CHAR(36)"`
-	Content    string    `xorm:"not null default '' comment('日志内容') TEXT"`
-	ClientIp   string    `xorm:"not null comment('客户端IP') varchar(50)"`
-	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+	ClientIp   string    `xorm:"default '0.0.0.0' comment('客户端IP') VARCHAR(50)"`
+	Content    string    `xorm:"comment('日志内容') TEXT"`
+	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' comment('创建时间') DATETIME"`
+	DeviceId   string    `xorm:"not null default '' comment('设备号') CHAR(36)"`
+	Id         int64     `xorm:"pk autoincr BIGINT(20)"`
+	ServerId   int       `xorm:"not null default 0 comment('服务器编号') INT(11)"`
 }

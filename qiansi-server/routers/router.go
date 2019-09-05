@@ -14,7 +14,7 @@ var (
 	Router *gin.Engine = gin.Default()
 )
 
-func LoadRouter() {
+func init() {
 	/* ------ 文档模块 ------- */
 	Router.GET("/docs/*any", ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 

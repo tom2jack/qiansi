@@ -1,37 +1,16 @@
 package main
 
 import (
-	"net/http"
-	"qiansi/common/aliyun"
-	"qiansi/common/conf"
-	"qiansi/common/models"
-	"qiansi/common/zmlog"
-	"qiansi/qiansi-server/net_service"
-	"qiansi/qiansi-server/routers"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
+	"net/http"
+	"qiansi/common/conf"
+	"qiansi/common/zmlog"
+	"qiansi/qiansi-server/routers"
+	"time"
 )
 
 var g errgroup.Group
-
-func init() {
-	//加载配置
-	conf.S = conf.LoadConfig("assets/config/server.ini")
-	// 配置日志记录方式
-	zmlog.InitLog("server.log")
-	//加载路由
-	routers.LoadRouter()
-	//启动服务
-	net_service.LoadService()
-	//初始化Redis
-	models.LoadRedis()
-	//初始化MySQL
-	models.LoadMysql()
-	// 加载阿里云SDK
-	aliyun.LoadAliyunSDK()
-}
 
 // @title 纸喵 qiansi API
 // @version 1.0
@@ -68,5 +47,5 @@ func main() {
 
 //Destroy 销毁资源
 func destroy() {
-	models.ZM_Mysql.Close()
+
 }

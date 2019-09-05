@@ -52,3 +52,4 @@ vendor
 config.ini
 /*.log
 .vscode
+/models

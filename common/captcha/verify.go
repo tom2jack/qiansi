@@ -26,14 +26,14 @@ func init() {
 
 // customizeRdsStore implementing Set method of  Store interface
 func (s *VerifyStore) Set(id string, value string) {
-	models.RedisSet(s.prefix+id, value, s.expiration)
+	models.ZM_Redis.Set(s.prefix+id, value, s.expiration)
 }
 
 // customizeRdsStore implementing Get method of  Store interface
 func (s *VerifyStore) Get(id string, clear bool) string {
-	reply, _ := models.RedisGet(s.prefix + id)
+	reply, _ := models.ZM_Redis.Get(s.prefix + id)
 	if clear {
-		models.RedisDelete(s.prefix + id)
+		models.ZM_Redis.Del(s.prefix + id)
 	}
 	return string(reply)
 }
@@ -46,7 +46,7 @@ func VerifyBySMSIDKEY(phone string) string {
 // 短信验证码发送
 func VerifyBySMS(phone string) error {
 	idkey := VerifyBySMSIDKEY(phone)
-	lock := models.RedisExists(idkey)
+	lock := models.ZM_Redis.Exists(idkey)
 	if lock {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
@@ -56,7 +56,7 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("发送失败")
 	}*/
 	zmlog.Info("短信验证码：%s", rnd)
-	models.RedisSet(idkey, rnd, 30*60)
+	models.ZM_Redis.Set(idkey, rnd, 30*60)
 	return nil
 }
 

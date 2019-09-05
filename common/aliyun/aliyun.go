@@ -10,7 +10,7 @@ var (
 	ZM_Clinet *sdk.Client
 )
 
-func LoadAliyunSDK() {
+func init() {
 	var err error
 	ZM_Clinet, err = sdk.NewClientWithAccessKey(
 		conf.S.MustValue("Aliyun", "RegionId"),

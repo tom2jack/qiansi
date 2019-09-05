@@ -2,13 +2,12 @@ package conf
 
 import (
 	"os"
-
 	"github.com/Unknwon/goconfig"
 )
 
 var (
-	S   *ZMCfg
-	C   *ZMCfg
+	S   *ZMCfg = LoadConfig("assets/config/server.ini")
+	C   *ZMCfg = LoadConfig("config.ini")
 	err error
 )
 
@@ -24,11 +23,10 @@ func (cfg *ZMCfg) Save() error {
 func LoadConfig(path string) *ZMCfg {
 	_, err = os.Stat(path)
 	if err != nil {
-		file, err := os.Create(path)
-		if err != nil {
-			panic("文件无法写入")
+		return &ZMCfg{
+			ConfigFile: goconfig.ConfigFile{},
+			FilePath:   "",
 		}
-		file.Close()
 	}
 	cfg, err := goconfig.LoadConfigFile(path)
 	if err != nil {

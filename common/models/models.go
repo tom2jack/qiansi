@@ -11,44 +11,73 @@ import (
 )
 
 var (
-	ZM_Redis *redis.Pool
+	ZM_Redis *Redis
 	ZM_Mysql *gorm.DB
 )
 
+type Redis struct {
+	redis.Pool
+}
+
+type CommonMap map[string]interface{}
+
+type PageParam struct {
+	LastId int
+	Page int
+	PageSize int
+}
+type PageInfo struct {
+	Page int
+	PageSize int
+	TotalSize int
+	Rows []interface{}
+}
+
 type ModelBase1 struct {
-	ID         int `gorm:"primary_key" json:"id"`
-	CreateTime int `json:"created_time"`
-	UpdateTime int `json:"update_time"`
+	Id         int       `xorm:"not null pk autoincr INT(11)"`
+	UpdateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+}
+
+func init()  {
+	loadRedis()
+	loadMysql()
+}
+
+func (p *PageParam) Offset() int {
+	return (p.Page - 1) * p.PageSize
 }
 
 // Setup Initialize the Redis instance
-func LoadRedis() {
-	ZM_Redis = &redis.Pool{
-		MaxIdle:     conf.S.MustInt("redis", "max_idle"),
-		MaxActive:   conf.S.MustInt("redis", "max_active"),
-		IdleTimeout: time.Duration(conf.S.MustInt("redis", "idle_timeout")) * time.Second,
-		Dial: func() (redis.Conn, error) {
-			c, err := redis.Dial("tcp", conf.S.MustValue("redis", "host"))
-			if err != nil {
-				return nil, err
-			}
-			if conf.S.MustValue("redis", "auth") != "" {
-				if _, err := c.Do("AUTH", conf.S.MustValue("redis", "auth")); err != nil {
-					c.Close()
+func loadRedis() {
+	ZM_Redis = &Redis{
+		redis.Pool{
+			MaxIdle:     conf.S.MustInt("redis", "max_idle"),
+			MaxActive:   conf.S.MustInt("redis", "max_active"),
+			IdleTimeout: time.Duration(conf.S.MustInt("redis", "idle_timeout")) * time.Second,
+			Dial: func() (redis.Conn, error) {
+				c, err := redis.Dial("tcp", conf.S.MustValue("redis", "host"))
+				if err != nil {
 					return nil, err
 				}
-			}
-			return c, err
-		},
-		TestOnBorrow: func(c redis.Conn, t time.Time) error {
-			_, err := c.Do("PING")
-			return err
+				if conf.S.MustValue("redis", "auth") != "" {
+					if _, err := c.Do("AUTH", conf.S.MustValue("redis", "auth")); err != nil {
+						c.Close()
+						return nil, err
+					}
+				}
+				return c, err
+			},
+			TestOnBorrow: func(c redis.Conn, t time.Time) error {
+				_, err := c.Do("PING")
+				return err
+			},
 		},
 	}
 }
 
 // Setup Initialize the Mysql instance
-func LoadMysql() {
+func loadMysql() {
 	var err error
 	ZM_Mysql, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		conf.S.MustValue("mysql", "user"),
@@ -92,8 +121,8 @@ func LoadMysql() {
 }
 
 // Set a key/value
-func RedisSet(key string, value string, time int) error {
-	conn := ZM_Redis.Get()
+func (r *Redis) Set(key string, value string, time int) error {
+	conn := r.Pool.Get()
 	defer conn.Close()
 	_, err := conn.Do("SET", key, value)
 	if err != nil {
@@ -109,8 +138,8 @@ func RedisSet(key string, value string, time int) error {
 }
 
 // Exists check a key
-func RedisExists(key string) bool {
-	conn := ZM_Redis.Get()
+func (r *Redis) Exists(key string) bool {
+	conn := r.Pool.Get()
 	defer conn.Close()
 
 	exists, err := redis.Bool(conn.Do("EXISTS", key))
@@ -122,8 +151,8 @@ func RedisExists(key string) bool {
 }
 
 // Get get a key
-func RedisGet(key string) (string, error) {
-	conn := ZM_Redis.Get()
+func (r *Redis) Get(key string) (string, error) {
+	conn := r.Pool.Get()
 	defer conn.Close()
 
 	reply, err := redis.String(conn.Do("GET", key))
@@ -135,9 +164,8 @@ func RedisGet(key string) (string, error) {
 }
 
 // Delete delete a kye
-func RedisDelete(key string) (bool, error) {
-	conn := ZM_Redis.Get()
+func (r *Redis) Del(key string) (bool, error) {
+	conn := r.Pool.Get()
 	defer conn.Close()
-
 	return redis.Bool(conn.Do("DEL", key))
 }

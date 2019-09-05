@@ -8,15 +8,21 @@ import (
 	"time"
 )
 
-func InitLog(logfile string) {
+var logFile  = "qiansi.log"
+
+func init() {
 	// 禁用控制台颜色，将日志写入文件时不需要控制台颜色。
 	//gin.DisableConsoleColor()
-	if logfile != "" {
+	_, err := os.Stat(logFile)
+	var f *os.File
+	if err != nil {
 		// 记录到文件。
-		f, _ := os.Create(logfile)
-		// 如果需要同时将日志写入文件和控制台，请使用以下代码。
-		gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
+		f , _ = os.Create(logFile)
+	} else {
+		f, _ = os.Open(logFile)
 	}
+	// 如果需要同时将日志写入文件和控制台，请使用以下代码。
+	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
 }
 
 func logDo(stat string, format string, v ...interface{}) {

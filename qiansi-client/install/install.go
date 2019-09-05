@@ -41,11 +41,16 @@ func binUser() bool {
 	server, err := request.RegServer(UID, conf.C.MustValue("zhimiao", "device"))
 	if err != nil {
 		fmt.Println("注册失败了")
+		return false
 	}
 	conf.C.SetValue("zhimiao", "uid", UID)
 	conf.C.SetValue("zhimiao", "apisecret", server.ApiSecret)
 	conf.C.SetValue("zhimiao", "clientid", strconv.Itoa(server.Id))
-	conf.C.Save()
+	err = conf.C.Save()
+	if err != nil {
+		fmt.Println("配置文件写入失败，请检查写入权限")
+		return false
+	}
 	fmt.Println("Bind User Successful！")
 	return true
 }
