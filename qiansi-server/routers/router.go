@@ -66,6 +66,7 @@ func init() {
 			admin_route.GET("/DeployRunLogTab", admin.DeployRunLogTab)
 			admin_route.GET("/DeployRunLog", admin.DeployRunLog)
 			admin_route.POST("/DeployServer", admin.DeployServer)
+			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
 		}
 	}
 

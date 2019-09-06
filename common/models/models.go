@@ -23,14 +23,14 @@ type CommonMap map[string]interface{}
 
 type PageParam struct {
 	LastId int
-	Page int
-	PageSize int
+	Page int `binding:"min=1"`
+	PageSize int `binding:"min=1,max=50"`
 }
 type PageInfo struct {
 	Page int
 	PageSize int
 	TotalSize int
-	Rows []interface{}
+	Rows interface{}
 }
 
 type ModelBase1 struct {

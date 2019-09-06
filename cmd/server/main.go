@@ -24,7 +24,7 @@ var g errgroup.Group
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host http://localhost:1315
+// @host localhost:1315
 // @basepath /
 
 func main() {

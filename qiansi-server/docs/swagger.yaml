@@ -30,6 +30,26 @@ definitions:
       uid:
         type: integer
     type: object
+  models.PageInfo:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      rows:
+        type: object
+      totalSize:
+        type: integer
+    type: object
+  models.PageParam:
+    properties:
+      lastId:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    type: object
   models.Server:
     properties:
       apiSecret:
@@ -191,7 +211,7 @@ definitions:
       token:
         type: string
     type: object
-host: http://localhost:1315
+host: localhost:1315
 info:
   contact:
     email: mail@xiaoliu.org
@@ -360,6 +380,27 @@ paths:
             $ref: '#/definitions/models.ApiResult'
             type: object
       summary: 设置部署应用
+  /admin/ScheduleLists:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/models.PageParam'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.PageInfo'
+            type: object
+      summary: 获取计划任务列表
   /admin/ServerDel:
     delete:
       consumes:

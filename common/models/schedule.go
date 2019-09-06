@@ -19,13 +19,12 @@ type Schedule struct {
 
 func (m *Schedule) List(param *PageParam) (PageInfo, error) {
 	data := []Schedule{}
-	ZM_Mysql.Where("uid=?", m.Uid).Offset(param.Offset()).Limit(param.PageSize).Find(&data)
-	// ZM_Mysql.Where("uid=?", m.Uid).
-	// ZM_Mysql.Find()
+	rows := 0
+	ZM_Mysql.Where("uid=?", m.Uid).Offset(param.Offset()).Limit(param.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return PageInfo{
 		Page: param.Page,
 		PageSize: param.PageSize,
-		TotalSize: 0,
-		Rows: data,
+		TotalSize: rows,
+		Rows:data,
 	}, nil
 }
