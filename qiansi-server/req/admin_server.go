@@ -1,4 +1,4 @@
-package zreq
+package req
 
 type ServerDelParam struct {
 	ServerId int

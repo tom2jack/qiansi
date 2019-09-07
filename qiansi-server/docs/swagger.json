@@ -35,7 +35,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeployDelParam"
+                            "$ref": "#/definitions/req.DeployDelParam"
                         }
                     }
                 ],
@@ -44,7 +44,7 @@
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -67,7 +67,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeployDoParam"
+                            "$ref": "#/definitions/req.DeployDoParam"
                         }
                     }
                 ],
@@ -76,7 +76,7 @@
                         "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -96,7 +96,7 @@
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"AfterCommand\": \"324545\",\"BeforeCommand\": \"1232132132\",\"Branch\": \"123213\",\"CreateTime\": \"2019-02-28T10:24:41+08:00\",\"DeployType\": 1,\"Id\": 491,\"LocalPath\": \"123213\",\"NowVersion\": 0,\"RemoteUrl\": \"123213\",\"Title\": \"491-一号机器的修改241\",\"Uid\": 2,\"UpdateTime\": \"2019-02-28T10:25:17+08:00\"}]}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -119,7 +119,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeployRelationParam"
+                            "$ref": "#/definitions/req.DeployRelationParam"
                         }
                     }
                 ],
@@ -128,7 +128,7 @@
                         "description": "{\"code\": 1,\"msg\": \"关联成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -151,7 +151,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeployRunLogParam"
+                            "$ref": "#/definitions/req.DeployRunLogParam"
                         }
                     }
                 ],
@@ -183,7 +183,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeployServerParam"
+                            "$ref": "#/definitions/req.DeployServerParam"
                         }
                     }
                 ],
@@ -207,6 +207,18 @@
                     "application/json"
                 ],
                 "summary": "获取当前部署应用的服务器列表",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.DeployServerParam"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "返回",
@@ -235,7 +247,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.DeploySetParam"
+                            "$ref": "#/definitions/req.DeploySetParam"
                         }
                     }
                 ],
@@ -244,7 +256,7 @@
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -267,7 +279,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.PageParam"
+                            "$ref": "#/definitions/req.PageParam"
                         }
                     }
                 ],
@@ -276,7 +288,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.PageInfo"
+                            "$ref": "#/definitions/resp.PageInfo"
                         }
                     }
                 }
@@ -299,7 +311,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.ServerDelParam"
+                            "$ref": "#/definitions/req.ServerDelParam"
                         }
                     }
                 ],
@@ -308,7 +320,7 @@
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -351,7 +363,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.ServerSetParam"
+                            "$ref": "#/definitions/req.ServerSetParam"
                         }
                     }
                 ],
@@ -360,7 +372,7 @@
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -383,7 +395,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.UserResetPwdParam"
+                            "$ref": "#/definitions/req.UserResetPwdParam"
                         }
                     }
                 ],
@@ -392,7 +404,7 @@
                         "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -415,7 +427,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.UserSiginParam"
+                            "$ref": "#/definitions/req.UserSiginParam"
                         }
                     }
                 ],
@@ -424,7 +436,7 @@
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -447,7 +459,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.UserSiginUpParam"
+                            "$ref": "#/definitions/req.UserSiginUpParam"
                         }
                     }
                 ],
@@ -456,7 +468,7 @@
                         "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zresp.UserInfoVO"
+                            "$ref": "#/definitions/resp.UserInfoVO"
                         }
                     }
                 }
@@ -476,7 +488,7 @@
                         "description": "{\"code\":1,\"msg\":\"\",\"data\":{\"idkey\":\"ckFbFAcMo7sy7qGyonAd\",\"img\":\"data:image/png;base64,iVBORw0...\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -499,7 +511,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/zreq.VerifyBySMSParam"
+                            "$ref": "#/definitions/req.VerifyBySMSParam"
                         }
                     }
                 ],
@@ -508,7 +520,7 @@
                         "description": "{\"code\":1,\"msg\":\"发送成功\",\"data\":null}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -551,7 +563,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -587,7 +599,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -607,7 +619,7 @@
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -643,7 +655,7 @@
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.ApiResult"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -651,20 +663,6 @@
         }
     },
     "definitions": {
-        "models.ApiResult": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
-                },
-                "data": {
-                    "type": "object"
-                },
-                "msg": {
-                    "type": "string"
-                }
-            }
-        },
         "models.DeployLog": {
             "type": "object",
             "properties": {
@@ -693,37 +691,6 @@
                     "type": "integer"
                 },
                 "uid": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.PageInfo": {
-            "type": "object",
-            "properties": {
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "rows": {
-                    "type": "object"
-                },
-                "totalSize": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.PageParam": {
-            "type": "object",
-            "properties": {
-                "lastId": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
                     "type": "integer"
                 }
             }
@@ -763,7 +730,7 @@
                 }
             }
         },
-        "zreq.DeployDelParam": {
+        "req.DeployDelParam": {
             "type": "object",
             "properties": {
                 "deployId": {
@@ -772,7 +739,7 @@
                 }
             }
         },
-        "zreq.DeployDoParam": {
+        "req.DeployDoParam": {
             "type": "object",
             "properties": {
                 "deployId": {
@@ -781,7 +748,7 @@
                 }
             }
         },
-        "zreq.DeployRelationParam": {
+        "req.DeployRelationParam": {
             "type": "object",
             "properties": {
                 "deployId": {
@@ -798,7 +765,7 @@
                 }
             }
         },
-        "zreq.DeployRunLogParam": {
+        "req.DeployRunLogParam": {
             "type": "object",
             "properties": {
                 "deployId": {
@@ -814,7 +781,7 @@
                 }
             }
         },
-        "zreq.DeployServerParam": {
+        "req.DeployServerParam": {
             "type": "object",
             "properties": {
                 "deployId": {
@@ -823,7 +790,7 @@
                 }
             }
         },
-        "zreq.DeploySetParam": {
+        "req.DeploySetParam": {
             "type": "object",
             "properties": {
                 "afterCommand": {
@@ -864,7 +831,21 @@
                 }
             }
         },
-        "zreq.ServerDelParam": {
+        "req.PageParam": {
+            "type": "object",
+            "properties": {
+                "lastId": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                }
+            }
+        },
+        "req.ServerDelParam": {
             "type": "object",
             "properties": {
                 "serverId": {
@@ -872,7 +853,7 @@
                 }
             }
         },
-        "zreq.ServerSetParam": {
+        "req.ServerSetParam": {
             "type": "object",
             "properties": {
                 "id": {
@@ -892,7 +873,7 @@
                 }
             }
         },
-        "zreq.UserResetPwdParam": {
+        "req.UserResetPwdParam": {
             "type": "object",
             "properties": {
                 "newPassword": {
@@ -903,7 +884,7 @@
                 }
             }
         },
-        "zreq.UserSiginParam": {
+        "req.UserSiginParam": {
             "type": "object",
             "properties": {
                 "password": {
@@ -916,7 +897,7 @@
                 }
             }
         },
-        "zreq.UserSiginUpParam": {
+        "req.UserSiginUpParam": {
             "type": "object",
             "properties": {
                 "code": {
@@ -937,7 +918,7 @@
                 }
             }
         },
-        "zreq.VerifyBySMSParam": {
+        "req.VerifyBySMSParam": {
             "type": "object",
             "properties": {
                 "imgCode": {
@@ -954,7 +935,38 @@
                 }
             }
         },
-        "zresp.UserInfoVO": {
+        "resp.ApiResult": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "type": "object"
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "resp.PageInfo": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "rows": {
+                    "type": "object"
+                },
+                "totalSize": {
+                    "type": "integer"
+                }
+            }
+        },
+        "resp.UserInfoVO": {
             "type": "object",
             "properties": {
                 "token": {

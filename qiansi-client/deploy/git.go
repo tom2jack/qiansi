@@ -6,10 +6,10 @@ import (
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	"qiansi/common/models"
+	"qiansi/common/dto"
 )
 
-func Git(deploy *models.Deploy) error {
+func Git(deploy *dto.DeployDTO) error {
 	signer, err := ssh.ParsePrivateKey([]byte(deploy.DeployKeys))
 	if err != nil {
 		return err

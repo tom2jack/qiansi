@@ -7,7 +7,7 @@ import (
 	"github.com/jakecoffman/cron"
 	"io/ioutil"
 	"net/http"
-	"qiansi/common/models"
+	"qiansi/qiansi-server/models"
 	"strconv"
 	"sync"
 	"time"
@@ -69,7 +69,7 @@ func (st *SafeTask) delMap(key string) {
 }
 
 func newRedisPool() *redis.Pool {
-	return models.ZM_Redis
+	return models.Redis
 }
 
 func storage_init() {

@@ -17,14 +17,25 @@ type Schedule struct {
 	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 }
 
-func (m *Schedule) List(param *PageParam) (PageInfo, error) {
+// List 获取任务列表
+func (m *Schedule) List(offset int, limit int) ([]Schedule, int) {
 	data := []Schedule{}
 	rows := 0
-	ZM_Mysql.Where("uid=?", m.Uid).Offset(param.Offset()).Limit(param.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
-	return PageInfo{
-		Page: param.Page,
-		PageSize: param.PageSize,
-		TotalSize: rows,
-		Rows:data,
-	}, nil
+	Mysql.Where("uid=?", m.Uid).Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	return data, rows
+}
+
+// Create 创建任务
+func (m *Schedule) Create() bool {
+	if m.Uid <= 0 {
+		return false
+	}
+	db := Mysql.Save(m)
+	return db.Error == nil && db.RowsAffected > 0
+}
+
+// Del 删除计划任务
+func (m *Schedule) Del() bool {
+	db := Mysql.Delete(m, "id=? and uid=?", m.Id, m.Uid)
+	return db.Error == nil && db.RowsAffected > 0
 }

@@ -3,9 +3,9 @@ package deploy
 import (
 	"fmt"
 	"github.com/progrium/go-shell"
-	"qiansi/common/models"
+	"qiansi/common/dto"
 	"qiansi/common/utils"
-	"qiansi/common/zmlog"
+	"qiansi/common/logger"
 	"qiansi/qiansi-client/request"
 	"runtime"
 	"strconv"
@@ -28,7 +28,7 @@ func init() {
 }
 
 func Run(data string) {
-	TaskList := []models.Deploy{}
+	TaskList := []dto.DeployDTO{}
 	// 此处请求只有一次机会
 	_ = request.GetDeployTask(&TaskList)
 	for _, v := range TaskList {
@@ -36,9 +36,9 @@ func Run(data string) {
 	}
 }
 
-func runTask(deploy *models.Deploy) {
+func runTask(deploy *dto.DeployDTO) {
 	if !Task.SETNX(strconv.Itoa(deploy.Id), strconv.FormatInt(time.Now().Unix(), 36)) {
-		zmlog.Warn("%d号部署任务未完成，拒绝执行", deploy.Id)
+		logger.Warn("%d号部署任务未完成，拒绝执行", deploy.Id)
 		return
 	}
 	defer Task.DEL(strconv.Itoa(deploy.Id))
@@ -58,18 +58,18 @@ func runTask(deploy *models.Deploy) {
 	request.DeployNotify(deploy)
 }
 
-func LogPush(deploy *models.Deploy, format string, v ...interface{}) {
+func LogPush(deploy *dto.DeployDTO, format string, v ...interface{}) {
 	var fname = "default"
 	if pc, _, _, ok := runtime.Caller(1); ok {
 		fname = runtime.FuncForPC(pc).Name()
 	}
-	zmlog.Info("("+fname+") "+format, v...)
+	logger.Info("("+fname+") "+format, v...)
 	// fname = strings.ReplaceAll(fname, "qiansi/qiansi-client/deploy.", "")
 	// 反向推送日志到千丝平台
 	request.LogPush(deploy, fmt.Sprintf("("+fname+") "+format, v...))
 }
 
-func RunShell(deploy *models.Deploy, cmd string) error {
+func RunShell(deploy *dto.DeployDTO, cmd string) error {
 	defer shell.ErrExit()
 	if runtime.GOOS == "windows" {
 		shell.Shell = []string{"cmd", "/c"}

@@ -1,4 +1,4 @@
-package zreq
+package req
 
 type UserSiginParam struct {
 	// 手机号

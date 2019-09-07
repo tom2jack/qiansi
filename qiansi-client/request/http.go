@@ -9,9 +9,10 @@ import (
 	"net/http"
 	"net/url"
 	"qiansi/common/conf"
-	"qiansi/common/models"
+	"qiansi/common/dto"
 	"qiansi/common/utils"
-	"qiansi/common/zmlog"
+	"qiansi/common/logger"
+	"qiansi/qiansi-server/models"
 	"strconv"
 	"strings"
 	"time"
@@ -88,7 +89,7 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	} else {
 		raw = nil
 	}
-	zmlog.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, BASE_URL+url, string(raw))
+	logger.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, BASE_URL+url, string(raw))
 	return raw, nil
 }
 
@@ -104,7 +105,7 @@ func RegServer(uid string, device string) (models.Server, error) {
 	return server, nil
 }
 
-func GetDeployTask(task *[]models.Deploy) error {
+func GetDeployTask(task *[]dto.DeployDTO) error {
 	raw, err := request("GET", "/client/ApiGetDeployTask", nil)
 	if err != nil {
 		return err
@@ -116,7 +117,7 @@ func GetDeployTask(task *[]models.Deploy) error {
 }
 
 // 推送日志
-func LogPush(deploy *models.Deploy, log string) error {
+func LogPush(deploy *dto.DeployDTO, log string) error {
 	body := url.Values{
 		"deployId": {strconv.Itoa(deploy.Id)},
 		"version":  {strconv.Itoa(deploy.NowVersion)},
@@ -130,7 +131,7 @@ func LogPush(deploy *models.Deploy, log string) error {
 }
 
 // 部署任务回调
-func DeployNotify(deploy *models.Deploy) {
+func DeployNotify(deploy *dto.DeployDTO) {
 	url := fmt.Sprintf("/client/ApiDeployNotify?deployId=%d&version=%d", deploy.Id, deploy.NowVersion)
 	_, err := request("GET", url, nil)
 	if err != nil {

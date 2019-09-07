@@ -1,7 +1,7 @@
-package zresp
+package resp
 
 import (
-	"qiansi/common/models"
+	"qiansi/qiansi-server/models"
 )
 
 type DeployServerVO struct {
@@ -21,6 +21,6 @@ type DeployVO struct {
 	RemoteUrl     string
 	Title         string
 	Uid           int
-	CreateTime    models.JsonTimeDate
-	UpdateTime    models.JsonTimeDate
+	CreateTime    JsonTimeDate
+	UpdateTime    JsonTimeDate
 }

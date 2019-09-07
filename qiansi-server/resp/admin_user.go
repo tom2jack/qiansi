@@ -1,6 +1,6 @@
-package zresp
+package resp
 
-import "qiansi/common/models"
+import "qiansi/qiansi-server/models"
 
 type UserInfoVO struct {
 	models.Member

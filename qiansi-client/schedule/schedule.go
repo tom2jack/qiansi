@@ -6,7 +6,7 @@ import (
 	"github.com/jakecoffman/cron"
 	"net"
 	"qiansi/common/conf"
-	"qiansi/common/models/udp_hook"
+	"qiansi/common/dto"
 	"qiansi/qiansi-client/deploy"
 	"time"
 )
@@ -36,7 +36,7 @@ func TaskLoop() {
 	}
 	resultBuf := bytes.NewBuffer(r[:n])
 
-	var result = &udp_hook.Hook001DTO{}
+	var result = &dto.Hook001DTO{}
 	dec := gob.NewDecoder(resultBuf)
 	dec.Decode(result)
 	// 判断是否含有部署数据

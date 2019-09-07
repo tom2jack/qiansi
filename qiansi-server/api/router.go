@@ -1,4 +1,4 @@
-package routers
+package api
 
 import (
 	"github.com/gin-gonic/gin"
@@ -10,11 +10,10 @@ import (
 	"qiansi/qiansi-server/middleware"
 )
 
-var (
-	Router *gin.Engine = gin.Default()
-)
+var Router *gin.Engine
 
 func init() {
+	Router = gin.Default()
 	/* ------ 文档模块 ------- */
 	Router.GET("/docs/*any", ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "NAME_OF_ENV_VARIABLE"))
 

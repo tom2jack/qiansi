@@ -1,14 +1,5 @@
 basePath: /
 definitions:
-  models.ApiResult:
-    properties:
-      code:
-        type: integer
-      data:
-        type: object
-      msg:
-        type: string
-    type: object
   models.DeployLog:
     properties:
       clientIp:
@@ -28,26 +19,6 @@ definitions:
       serverId:
         type: integer
       uid:
-        type: integer
-    type: object
-  models.PageInfo:
-    properties:
-      page:
-        type: integer
-      pageSize:
-        type: integer
-      rows:
-        type: object
-      totalSize:
-        type: integer
-    type: object
-  models.PageParam:
-    properties:
-      lastId:
-        type: integer
-      page:
-        type: integer
-      pageSize:
         type: integer
     type: object
   models.Server:
@@ -73,19 +44,19 @@ definitions:
       updateTime:
         type: string
     type: object
-  zreq.DeployDelParam:
+  req.DeployDelParam:
     properties:
       deployId:
         description: 部署应用ID
         type: integer
     type: object
-  zreq.DeployDoParam:
+  req.DeployDoParam:
     properties:
       deployId:
         description: 部署应用ID
         type: integer
     type: object
-  zreq.DeployRelationParam:
+  req.DeployRelationParam:
     properties:
       deployId:
         description: 部署应用ID
@@ -97,7 +68,7 @@ definitions:
         description: 服务器ID
         type: integer
     type: object
-  zreq.DeployRunLogParam:
+  req.DeployRunLogParam:
     properties:
       deployId:
         description: 部署应用ID
@@ -108,13 +79,13 @@ definitions:
       version:
         type: integer
     type: object
-  zreq.DeployServerParam:
+  req.DeployServerParam:
     properties:
       deployId:
         description: 部署应用ID
         type: integer
     type: object
-  zreq.DeploySetParam:
+  req.DeploySetParam:
     properties:
       afterCommand:
         description: 后置命令
@@ -144,12 +115,21 @@ definitions:
         description: 应用名称
         type: string
     type: object
-  zreq.ServerDelParam:
+  req.PageParam:
+    properties:
+      lastId:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+    type: object
+  req.ServerDelParam:
     properties:
       serverId:
         type: integer
     type: object
-  zreq.ServerSetParam:
+  req.ServerSetParam:
     properties:
       id:
         type: integer
@@ -163,14 +143,14 @@ definitions:
         description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
         type: integer
     type: object
-  zreq.UserResetPwdParam:
+  req.UserResetPwdParam:
     properties:
       newPassword:
         type: string
       oldPassword:
         type: string
     type: object
-  zreq.UserSiginParam:
+  req.UserSiginParam:
     properties:
       password:
         description: 密码
@@ -179,7 +159,7 @@ definitions:
         description: 手机号
         type: string
     type: object
-  zreq.UserSiginUpParam:
+  req.UserSiginUpParam:
     properties:
       code:
         description: 短信验证码
@@ -194,7 +174,7 @@ definitions:
         description: 手机号
         type: string
     type: object
-  zreq.VerifyBySMSParam:
+  req.VerifyBySMSParam:
     properties:
       imgCode:
         description: 验证码code
@@ -206,7 +186,27 @@ definitions:
         description: 手机号
         type: string
     type: object
-  zresp.UserInfoVO:
+  resp.ApiResult:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+  resp.PageInfo:
+    properties:
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      rows:
+        type: object
+      totalSize:
+        type: integer
+    type: object
+  resp.UserInfoVO:
     properties:
       token:
         type: string
@@ -235,7 +235,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeployDelParam'
+          $ref: '#/definitions/req.DeployDelParam'
           type: object
       produces:
       - application/json
@@ -243,7 +243,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 删除部署应用
   /admin/DeployDo:
@@ -256,7 +256,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeployDoParam'
+          $ref: '#/definitions/req.DeployDoParam'
           type: object
       produces:
       - application/json
@@ -264,7 +264,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "启动成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: '启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数'
   /admin/DeployLists:
@@ -280,7 +280,7 @@ paths:
             1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title":
             "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 获取部署应用列表
   /admin/DeployRelationServer:
@@ -293,7 +293,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeployRelationParam'
+          $ref: '#/definitions/req.DeployRelationParam'
           type: object
       produces:
       - application/json
@@ -301,7 +301,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "关联成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 部署应用关联服务器
   /admin/DeployRunLog:
@@ -314,7 +314,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeployRunLogParam'
+          $ref: '#/definitions/req.DeployRunLogParam'
           type: object
       produces:
       - application/json
@@ -335,7 +335,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeployServerParam'
+          $ref: '#/definitions/req.DeployServerParam'
           type: object
       produces:
       - application/json
@@ -350,6 +350,14 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeployServerParam'
+          type: object
       produces:
       - application/json
       responses:
@@ -369,7 +377,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.DeploySetParam'
+          $ref: '#/definitions/req.DeploySetParam'
           type: object
       produces:
       - application/json
@@ -377,7 +385,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 设置部署应用
   /admin/ScheduleLists:
@@ -390,7 +398,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/models.PageParam'
+          $ref: '#/definitions/req.PageParam'
           type: object
       produces:
       - application/json
@@ -398,7 +406,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.PageInfo'
+            $ref: '#/definitions/resp.PageInfo'
             type: object
       summary: 获取计划任务列表
   /admin/ServerDel:
@@ -411,7 +419,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.ServerDelParam'
+          $ref: '#/definitions/req.ServerDelParam'
           type: object
       produces:
       - application/json
@@ -419,7 +427,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 删除服务器
   /admin/ServerLists:
@@ -447,7 +455,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.ServerSetParam'
+          $ref: '#/definitions/req.ServerSetParam'
           type: object
       produces:
       - application/json
@@ -455,7 +463,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 设置服务器信息
   /admin/UserResetPwd:
@@ -468,7 +476,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.UserResetPwdParam'
+          $ref: '#/definitions/req.UserResetPwdParam'
           type: object
       produces:
       - application/json
@@ -476,7 +484,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "修改成功", "data": null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 修改密码
   /admin/UserSigin:
@@ -489,7 +497,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.UserSiginParam'
+          $ref: '#/definitions/req.UserSiginParam'
           type: object
       produces:
       - application/json
@@ -499,7 +507,7 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 登录
   /admin/UserSiginUp:
@@ -512,7 +520,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.UserSiginUpParam'
+          $ref: '#/definitions/req.UserSiginUpParam'
           type: object
       produces:
       - application/json
@@ -522,7 +530,7 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            $ref: '#/definitions/zresp.UserInfoVO'
+            $ref: '#/definitions/resp.UserInfoVO'
             type: object
       summary: 注册账号
   /admin/VerifyByImg:
@@ -535,7 +543,7 @@ paths:
         "200":
           description: '{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 获取图片验证码
   /admin/VerifyBySMS:
@@ -548,7 +556,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/zreq.VerifyBySMSParam'
+          $ref: '#/definitions/req.VerifyBySMSParam'
           type: object
       produces:
       - application/json
@@ -556,7 +564,7 @@ paths:
         "200":
           description: '{"code":1,"msg":"发送成功","data":null}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 获取短信验证码
   /clinet/ApiDeployLog:
@@ -585,7 +593,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 客户端日志推送
   /clinet/ApiDeployNotify:
@@ -609,7 +617,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 客户端部署成功回调
   /clinet/ApiGetDeployTask:
@@ -622,7 +630,7 @@ paths:
         "200":
           description: '{"code": 1,"msg": "读取成功","data": [deploy]}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 获取服务器部署任务清单
   /clinet/ApiRegServer:
@@ -648,7 +656,7 @@ paths:
             0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
             "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
           schema:
-            $ref: '#/definitions/models.ApiResult'
+            $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 服务器注册
 swagger: "2.0"

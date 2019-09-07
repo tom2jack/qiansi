@@ -2,15 +2,12 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"qiansi/common/conf"
-	"qiansi/common/zmlog"
-	"qiansi/qiansi-server/routers"
+	"qiansi/common/logger"
+	"qiansi/qiansi-server/api"
 	"time"
 )
-
-var g errgroup.Group
 
 // @title 纸喵 qiansi API
 // @version 1.0
@@ -28,24 +25,15 @@ var g errgroup.Group
 // @basepath /
 
 func main() {
-	defer destroy()
 	gin.SetMode(conf.S.MustValue("server", "run_mode"))
 	httpListen := conf.S.MustValue("server", "http_listen")
-	readTimeout := time.Duration(conf.S.MustInt64("server", "read_timeout", 60)) * time.Second
-	writeTimeout := time.Duration(conf.S.MustInt64("server", "write_timeout", 60)) * time.Second
 	httpServer := &http.Server{
 		Addr:           httpListen,
-		Handler:        routers.Router,
-		ReadTimeout:    readTimeout,
-		WriteTimeout:   writeTimeout,
+		Handler:        api.Router,
+		ReadTimeout:    time.Duration(conf.S.MustInt64("server", "read_timeout", 60)) * time.Second,
+		WriteTimeout:   time.Duration(conf.S.MustInt64("server", "write_timeout", 60)) * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-
-	zmlog.Info("Start HTTP Service Listening %s", httpListen)
+	logger.Info("Start HTTP Service Listening %s", httpListen)
 	httpServer.ListenAndServe()
-}
-
-//Destroy 销毁资源
-func destroy() {
-
 }

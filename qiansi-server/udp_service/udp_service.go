@@ -4,22 +4,24 @@ import (
 	"net"
 	"os"
 	"qiansi/common/conf"
-	"qiansi/common/zmlog"
+	"qiansi/common/logger"
 )
 
+// 初始化启动监听
+func init() { go Start() }
 func Start() {
 	listen := conf.S.MustValue("server", "udp_listen", ":8081")
 	addr, err := net.ResolveUDPAddr("udp", listen)
 	if err != nil {
-		zmlog.Error("Can't resolve address: %v", err)
+		logger.Error("Can't resolve address: %v", err)
 		os.Exit(1)
 	}
 	conn, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		zmlog.Error("Error listening: %v", err)
+		logger.Error("Error listening: %v", err)
 	}
 	defer conn.Close()
-	zmlog.Info("Start UDP Service Listening %s", listen)
+	logger.Info("Start UDP Service Listening %s", listen)
 	for {
 		data := make([]byte, 255)
 		n, remoteAddr, err := conn.ReadFromUDP(data)

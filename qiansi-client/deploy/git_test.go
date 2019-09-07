@@ -1,12 +1,12 @@
 package deploy
 
 import (
-	"qiansi/common/models"
+	"qiansi/common/dto"
 	"testing"
 )
 
 func TestGit(t *testing.T) {
-	config := &models.Deploy{
+	config := &dto.DeployDTO{
 		Id:         4,
 		Uid:        2,
 		Title:      "纸喵应用",

@@ -11,27 +11,15 @@ import (
 )
 
 var (
-	ZM_Redis *Redis
-	ZM_Mysql *gorm.DB
+	Redis *zmRedis
+	Mysql *gorm.DB
 )
 
-type Redis struct {
+type zmRedis struct {
 	redis.Pool
 }
 
 type CommonMap map[string]interface{}
-
-type PageParam struct {
-	LastId int
-	Page int `binding:"min=1"`
-	PageSize int `binding:"min=1,max=50"`
-}
-type PageInfo struct {
-	Page int
-	PageSize int
-	TotalSize int
-	Rows interface{}
-}
 
 type ModelBase1 struct {
 	Id         int       `xorm:"not null pk autoincr INT(11)"`
@@ -44,13 +32,9 @@ func init()  {
 	loadMysql()
 }
 
-func (p *PageParam) Offset() int {
-	return (p.Page - 1) * p.PageSize
-}
-
 // Setup Initialize the Redis instance
 func loadRedis() {
-	ZM_Redis = &Redis{
+	Redis = &zmRedis{
 		redis.Pool{
 			MaxIdle:     conf.S.MustInt("redis", "max_idle"),
 			MaxActive:   conf.S.MustInt("redis", "max_active"),
@@ -79,7 +63,7 @@ func loadRedis() {
 // Setup Initialize the Mysql instance
 func loadMysql() {
 	var err error
-	ZM_Mysql, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	Mysql, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		conf.S.MustValue("mysql", "user"),
 		conf.S.MustValue("mysql", "password"),
 		conf.S.MustValue("mysql", "host"),
@@ -93,12 +77,12 @@ func loadMysql() {
 		return conf.S.MustValue("mysql", "table_prefix") + defaultTableName
 	}
 
-	ZM_Mysql.LogMode(true)
-	ZM_Mysql.SingularTable(true)
-	ZM_Mysql.DB().SetMaxIdleConns(10)
-	ZM_Mysql.DB().SetMaxOpenConns(100)
+	Mysql.LogMode(true)
+	Mysql.SingularTable(true)
+	Mysql.DB().SetMaxIdleConns(10)
+	Mysql.DB().SetMaxOpenConns(100)
 
-	ZM_Mysql.Callback().Create().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
+	Mysql.Callback().Create().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
 		if !scope.HasError() {
 			if createTimeField, ok := scope.FieldByName("CreateTime"); ok {
 				if createTimeField.IsBlank {
@@ -113,7 +97,7 @@ func loadMysql() {
 			}
 		}
 	})
-	ZM_Mysql.Callback().Update().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
+	Mysql.Callback().Update().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
 		if _, ok := scope.Get("gorm:update_column"); !ok {
 			scope.SetColumn("UpdateTime", time.Now())
 		}
@@ -121,7 +105,7 @@ func loadMysql() {
 }
 
 // Set a key/value
-func (r *Redis) Set(key string, value string, time int) error {
+func (r *zmRedis) Set(key string, value string, time int) error {
 	conn := r.Pool.Get()
 	defer conn.Close()
 	_, err := conn.Do("SET", key, value)
@@ -138,7 +122,7 @@ func (r *Redis) Set(key string, value string, time int) error {
 }
 
 // Exists check a key
-func (r *Redis) Exists(key string) bool {
+func (r *zmRedis) Exists(key string) bool {
 	conn := r.Pool.Get()
 	defer conn.Close()
 
@@ -151,7 +135,7 @@ func (r *Redis) Exists(key string) bool {
 }
 
 // Get get a key
-func (r *Redis) Get(key string) (string, error) {
+func (r *zmRedis) Get(key string) (string, error) {
 	conn := r.Pool.Get()
 	defer conn.Close()
 
@@ -164,7 +148,7 @@ func (r *Redis) Get(key string) (string, error) {
 }
 
 // Delete delete a kye
-func (r *Redis) Del(key string) (bool, error) {
+func (r *zmRedis) Del(key string) (bool, error) {
 	conn := r.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("DEL", key))

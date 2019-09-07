@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
-	"qiansi/common/models"
-	"qiansi/common/zmlog"
+	"qiansi/common/logger"
+	"qiansi/qiansi-server/models"
 	"time"
 )
 
@@ -26,14 +26,14 @@ func init() {
 
 // customizeRdsStore implementing Set method of  Store interface
 func (s *VerifyStore) Set(id string, value string) {
-	models.ZM_Redis.Set(s.prefix+id, value, s.expiration)
+	models.Redis.Set(s.prefix+id, value, s.expiration)
 }
 
 // customizeRdsStore implementing Get method of  Store interface
 func (s *VerifyStore) Get(id string, clear bool) string {
-	reply, _ := models.ZM_Redis.Get(s.prefix + id)
+	reply, _ := models.Redis.Get(s.prefix + id)
 	if clear {
-		models.ZM_Redis.Del(s.prefix + id)
+		models.Redis.Del(s.prefix + id)
 	}
 	return string(reply)
 }
@@ -46,17 +46,17 @@ func VerifyBySMSIDKEY(phone string) string {
 // 短信验证码发送
 func VerifyBySMS(phone string) error {
 	idkey := VerifyBySMSIDKEY(phone)
-	lock := models.ZM_Redis.Exists(idkey)
+	lock := models.Redis.Exists(idkey)
 	if lock {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
-	/*result := aliyun.SendSmsVerify(phone, string(rnd))
+	/*result := sdk.Aliyun.SendSmsVerify(phone, string(rnd))
 	if !result {
 		return fmt.Errorf("发送失败")
 	}*/
-	zmlog.Info("短信验证码：%s", rnd)
-	models.ZM_Redis.Set(idkey, rnd, 30*60)
+	logger.Info("短信验证码：%s", rnd)
+	models.Redis.Set(idkey, rnd, 30*60)
 	return nil
 }
 

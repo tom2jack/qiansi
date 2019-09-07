@@ -1,10 +1,11 @@
-package models
+package resp
 
 import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"qiansi/common/utils"
+	"qiansi/qiansi-server/models"
 	"time"
 )
 
@@ -12,6 +13,13 @@ type ApiResult struct {
 	Code int         `json:"code"`
 	Data interface{} `json:"data"`
 	Msg  string      `json:"msg"`
+}
+
+type PageInfo struct {
+	Page int
+	PageSize int
+	TotalSize int
+	Rows interface{}
 }
 
 func NewApiResult(arg ...interface{}) *ApiResult {
@@ -63,8 +71,8 @@ func (r *ApiResult) Encypt(c *gin.Context) {
 		return
 	}
 	server_id := c.GetInt("SERVER-ID")
-	server := &Server{}
-	ZM_Mysql.Select("api_secret").Limit(1).Find(server, server_id)
+	server := &models.Server{}
+	models.Mysql.Select("api_secret").Limit(1).Find(server, server_id)
 	result := utils.EncyptogAES(string(json_str), server.ApiSecret)
 	// result = base64.StdEncoding.EncodeToString([]byte(result))
 	c.Header("ZHIMIAO-Encypt", "1")

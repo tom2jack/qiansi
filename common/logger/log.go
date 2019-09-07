@@ -1,4 +1,4 @@
-package zmlog
+package logger
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ func init() {
 		// 记录到文件。
 		f , _ = os.Create(logFile)
 	} else {
-		f, _ = os.Open(logFile)
+		f, _ = os.OpenFile(logFile, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0644)
 	}
 	// 如果需要同时将日志写入文件和控制台，请使用以下代码。
 	gin.DefaultWriter = io.MultiWriter(f, os.Stdout)
