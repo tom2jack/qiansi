@@ -35,5 +35,6 @@ require (
 	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
 	golang.org/x/tools v0.0.0-20190816200558-6889da9d5479 // indirect
+	gopkg.in/go-playground/validator.v8 v8.18.2
 	gopkg.in/src-d/go-git.v4 v4.12.0
 )

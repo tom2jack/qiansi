@@ -21,7 +21,11 @@ type Schedule struct {
 func (m *Schedule) List(offset int, limit int) ([]Schedule, int) {
 	data := []Schedule{}
 	rows := 0
-	Mysql.Where("uid=?", m.Uid).Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	db := Mysql.Where("uid=?", m.Uid)
+	if m.Title != "" {
+		db = db.Where("title like ?", "%"+m.Title+"%")
+	}
+	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
 }
 

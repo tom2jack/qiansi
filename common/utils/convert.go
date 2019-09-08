@@ -1,20 +1,27 @@
 package utils
 
-import "reflect"
+import (
+	"reflect"
+)
 
-// 使用反射，转换结构体
-func SuperConvert(sourceStruct interface{}, targetStruct interface{}) {
-	source := structToMap(sourceStruct)
-	targetV := reflect.ValueOf(targetStruct).Elem()
-	targetT := reflect.TypeOf(targetStruct).Elem()
-	for i := 0; i < targetV.NumField(); i++ {
-		fieldName := targetT.Field(i).Name
-		sourceVal := source[fieldName]
-		if !sourceVal.IsValid() {
-			continue
+// 使用反射，转换结构体 仅支持单层级
+func SuperConvert(fromStruct interface{}, toStruct interface{}) {
+	fromStructMap := structToMap(fromStruct)
+	toStructV := reflect.ValueOf(toStruct).Elem()
+	toStructT := reflect.TypeOf(toStruct).Elem()
+	for i := 0; i < toStructV.NumField(); i++ {
+		fieldName := toStructT.Field(i).Name
+		if sourceVal, ok := fromStructMap[fieldName]; ok {
+			if !sourceVal.IsValid() {
+				continue
+			}
+			toStructVal := toStructV.Field(i)
+			if toStructVal.CanSet() {
+				if sourceVal.Type().PkgPath()+sourceVal.Type().Name() == toStructVal.Type().PkgPath()+toStructVal.Type().Name() {
+					toStructVal.Set(sourceVal)
+				}
+			}
 		}
-		targetVal := targetV.Field(i)
-		targetVal.Set(sourceVal)
 	}
 }
 

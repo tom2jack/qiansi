@@ -26,6 +26,12 @@ type DeployBase struct {
 	// 部署应用ID
 	DeployId int
 }
+
+type DeployListParam struct {
+	PageParam
+	Title string
+}
+
 type DeployRunLogParam struct {
 	DeployBase
 	// 服务器ID

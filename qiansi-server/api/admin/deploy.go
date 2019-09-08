@@ -22,12 +22,32 @@ import (
 // @Summary 获取部署应用列表
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand": "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType": 1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title": "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}"
+// @Param body body req.DeployListParam true "入参集合"
+// @Success 200 {object} resp.ApiResult ""
 // @Router /admin/DeployLists [get]
 func DeployLists(c *gin.Context) {
-	vo := []resp.DeployVO{}
-	models.Mysql.Raw("select * from deploy where uid=? order by id desc", c.GetInt("UID")).Scan(&vo)
-	resp.NewApiResult(1, "读取成功", vo).Json(c)
+	param := &req.DeployListParam{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		return
+	}
+	s := &models.Deploy{
+		Uid:   c.GetInt("UID"),
+		Title: param.Title,
+	}
+	lists, rows := s.List(param.Offset(), param.PageSize)
+	vo := make([]resp.DeployVO, rows)
+	for k, v := range lists {
+		utils.SuperConvert(&v, &vo[k])
+		vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
+		vo[k].UpdateTime = resp.JsonTimeDate(v.UpdateTime)
+	}
+	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+		Page:      param.Page,
+		PageSize:  param.PageSize,
+		TotalSize: rows,
+		Rows:      vo,
+	}).Json(c)
 }
 
 // @Summary 设置部署应用
@@ -58,7 +78,7 @@ func DeploySet(c *gin.Context) {
 			return
 		}
 	}
-	resp.NewApiResult(0, "系统错误").Json(c)
+	resp.NewApiResult(1).Json(c)
 }
 
 // @Summary 删除部署应用
@@ -90,38 +110,42 @@ func DeployDel(c *gin.Context) {
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "关联成功","data": null}"
 // @Router /admin/DeployRelationServer [POST]
 func DeployRelationServer(c *gin.Context) {
-	param := &req.DeployRelationParam{}
-	if c.ShouldBind(param) != nil || !(param.DeployId > 0) || !(param.ServerId > 0) {
+	param := &[]req.DeployRelationParam{}
+	if c.ShouldBind(param) != nil || len(*param) == 0 {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
 	var (
-		num int
-		db  *gorm.DB
+		max       = len(*param)
+		serverIds = make([]int, max)
+		deployIds = make([]int, max)
+		result    = make([]bool, max)
 	)
-	db = models.Mysql.Table("server").Where("id=? and uid=?", param.ServerId, c.GetInt("UID")).Count(&num)
-	if db.Error != nil || num == 0 {
-		resp.NewApiResult(-5, "服务器不存在").Json(c)
+	for k, e := range *param {
+		serverIds[k] = e.ServerId
+		deployIds[k] = e.DeployId
+	}
+	server := &models.Server{
+		Uid: c.GetInt("UID"),
+	}
+	if !server.BatchCheck(serverIds) {
+		resp.NewApiResult(-5, "含有非法服务器绑定").Json(c)
 		return
 	}
-	db = models.Mysql.Table("deploy").Where("id=? and uid=?", param.DeployId, c.GetInt("UID")).Count(&num)
-	if db.Error != nil || num == 0 {
-		resp.NewApiResult(-5, "部署服务不存在").Json(c)
+	deploy := &models.Deploy{
+		Uid: c.GetInt("UID"),
+	}
+	if !deploy.BatchCheck(deployIds) {
+		resp.NewApiResult(-5, "含有非法应用绑定").Json(c)
 		return
 	}
-	if param.Relation {
-		db = models.Mysql.Save(&models.DeployServerRelation{
-			ServerId: param.ServerId,
-			DeployId: param.DeployId,
-		})
-	} else {
-		db = models.Mysql.Delete(&models.DeployServerRelation{}, "server_id=? and deploy_id=?", param.ServerId, param.DeployId)
+	relation := &models.DeployServerRelation{}
+	for k, e := range *param {
+		relation.DeployId = e.DeployId
+		relation.ServerId = e.ServerId
+		result[k] = relation.Relation(e.Relation)
 	}
-	if db.Error != nil || db.RowsAffected != 1 {
-		resp.NewApiResult(-5, "失败").Json(c)
-		return
-	}
-	resp.NewApiResult(1, "成功").Json(c)
+	resp.NewApiResult(1, "成功", result).Json(c)
 }
 
 // @Summary 获取当前部署应用的服务器列表
@@ -136,10 +160,30 @@ func DeployServer(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	d := &[]resp.DeployServerVO{}
-	sql := "SELECT s.*,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
-	models.Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
-	resp.NewApiResult(1, "读取成功", d).Json(c)
+	server := &models.Server{
+		Uid: c.GetInt("UID"),
+	}
+	serverList := server.ListByUser()
+	relation := &models.DeployServerRelation{
+		DeployId: param.DeployId,
+	}
+	relationList := relation.ListByDeployId()
+	relationMap := make(map[int]models.DeployServerRelation)
+	for _, e := range relationList {
+		relationMap[e.ServerId] = e
+	}
+	len := len(serverList)
+	list := make([]resp.DeployServerVO, len)
+	for _, v := range serverList {
+		d := resp.DeployServerVO{}
+		len--
+		utils.SuperConvert(&v, &d)
+		if r, ok := relationMap[v.Id]; ok {
+			utils.SuperConvert(&r, &d)
+		}
+		list[len] = d
+	}
+	resp.NewApiResult(1, "读取成功", list).Json(c)
 }
 
 // @Summary 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡

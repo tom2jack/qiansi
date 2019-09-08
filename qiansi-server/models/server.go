@@ -1,6 +1,7 @@
 package models
 
 import (
+	"qiansi/common/utils"
 	"time"
 )
 
@@ -15,4 +16,18 @@ type Server struct {
 	ServerStatus int       `xorm:"not null default 0 comment('服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定') TINYINT(1)"`
 	Uid          int       `xorm:"not null comment('用户ID') index INT(10)"`
 	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+}
+
+func (m *Server) ListByUser() []Server {
+	data := &[]Server{}
+	Mysql.Where("uid = ?", m.Uid).Find(data)
+	return *data
+}
+
+// BatchCheck 批量检测是否是当前用户服务器
+func (m *Server) BatchCheck(ids []int) bool {
+	ids = utils.IdsFitter(ids)
+	var count = 0
+	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, m.Uid).Count(&count)
+	return db.Error == nil && count == len(ids)
 }

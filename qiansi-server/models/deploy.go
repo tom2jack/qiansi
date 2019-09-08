@@ -1,6 +1,7 @@
 package models
 
 import (
+	"qiansi/common/utils"
 	"time"
 )
 
@@ -18,4 +19,24 @@ type Deploy struct {
 	Title         string    `xorm:"not null default '' comment('应用名称') VARCHAR(120)"`
 	Uid           int       `xorm:"not null comment('创建用户UID') index(IX_UID) INT(11)"`
 	UpdateTime    time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+}
+
+// List 获取应用列表
+func (m *Deploy) List(offset int, limit int) ([]Deploy, int) {
+	data := []Deploy{}
+	rows := 0
+	db := Mysql.Where("uid=?", m.Uid)
+	if m.Title != "" {
+		db = db.Where("title like ?", "%"+m.Title+"%")
+	}
+	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	return data, rows
+}
+
+// BatchCheck 批量检测是否是当前用户应用
+func (m *Deploy) BatchCheck(ids []int) bool {
+	ids = utils.IdsFitter(ids)
+	var count = 0
+	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, m.Uid).Count(&count)
+	return db.Error == nil && count == len(ids)
 }

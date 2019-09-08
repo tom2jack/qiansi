@@ -56,6 +56,17 @@ definitions:
         description: 部署应用ID
         type: integer
     type: object
+  req.DeployListParam:
+    properties:
+      lastId:
+        type: integer
+      page:
+        type: integer
+      pageSize:
+        type: integer
+      title:
+        type: string
+    type: object
   req.DeployRelationParam:
     properties:
       deployId:
@@ -271,14 +282,19 @@ paths:
     get:
       consumes:
       - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeployListParam'
+          type: object
       produces:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "读取成功","data": [{"AfterCommand": "324545","BeforeCommand":
-            "1232132132","Branch": "123213","CreateTime": "2019-02-28T10:24:41+08:00","DeployType":
-            1,"Id": 491,"LocalPath": "123213","NowVersion": 0,"RemoteUrl": "123213","Title":
-            "491-一号机器的修改241","Uid": 2,"UpdateTime": "2019-02-28T10:25:17+08:00"}]}'
+          description: OK
           schema:
             $ref: '#/definitions/resp.ApiResult'
             type: object
