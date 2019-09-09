@@ -27,7 +27,7 @@ func ScheduleLists(c *gin.Context) {
 	lists, rows := s.List(param.Offset(), param.PageSize)
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
-		PageSize:  param.PageSize,
+		PageSize:  len(lists),
 		TotalSize: rows,
 		Rows:      lists,
 	}).Json(c)
