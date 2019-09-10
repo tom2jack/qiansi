@@ -18,7 +18,6 @@ require (
 	github.com/gomodule/redigo v2.0.0+incompatible
 	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
 	github.com/jinzhu/gorm v1.9.10
-	github.com/kr/pty v1.1.8 // indirect
 	github.com/lifei6671/gorand v0.1.0
 	github.com/mailru/easyjson v0.0.0-20190626092158-b2ccc519800e // indirect
 	github.com/mojocn/base64Captcha v0.0.0-20190704032542-ca78896fe901
@@ -29,10 +28,8 @@ require (
 	github.com/swaggo/gin-swagger v1.2.0
 	github.com/swaggo/swag v1.6.2
 	github.com/unrolled/secure v1.0.0
-	github.com/urfave/cli v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 	golang.org/x/net v0.0.0-20190813141303-74dc4d7220e7
-	golang.org/x/sync v0.0.0-20190423024810-112230192c58
 	golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // indirect
 	golang.org/x/tools v0.0.0-20190816200558-6889da9d5479 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2
