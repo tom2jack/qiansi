@@ -18,6 +18,18 @@ type Server struct {
 	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 }
 
+// List 获取应用列表
+func (m *Server) List(offset int, limit int) ([]Server, int) {
+	data := []Server{}
+	rows := 0
+	db := Mysql.Where("uid=?", m.Uid).Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
+	if m.ServerName != "" {
+		db = db.Where("title like ?", "%"+m.ServerName+"%")
+	}
+	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	return data, rows
+}
+
 func (m *Server) ListByUser() []Server {
 	data := &[]Server{}
 	Mysql.Where("uid = ?", m.Uid).Find(data)

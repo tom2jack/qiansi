@@ -36,7 +36,7 @@ func DeployLists(c *gin.Context) {
 		Title: param.Title,
 	}
 	lists, rows := s.List(param.Offset(), param.PageSize)
-	vo := make([]resp.DeployVO, rows)
+	vo := make([]resp.DeployVO, len(lists))
 	for k, v := range lists {
 		utils.SuperConvert(&v, &vo[k])
 		vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
@@ -44,7 +44,7 @@ func DeployLists(c *gin.Context) {
 	}
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
-		PageSize:  len(lists),
+		PageSize:  param.PageSize,
 		TotalSize: rows,
 		Rows:      vo,
 	}).Json(c)

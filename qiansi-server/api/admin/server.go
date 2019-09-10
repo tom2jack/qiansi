@@ -19,12 +19,32 @@ import (
 // @Summary 获取服务器(客户端)列表
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} models.Server "{"code": 1,"msg": "读取成功","data": [{"CreateTime": "2019-03-02T16:10:10+08:00","DeviceId": "","Domain": "127.0.0.1","Id": 1,"ServerName": "纸喵5号机","ServerRuleId": 0,"ServerStatus": 0,"Uid": 2,"UpdateTime": "2019-05-22T17:40:18+08:00"}]}"
+// @Param body body req.ServerListParam true "入参集合"
+// @Success 200 {object} resp.ApiResult ""
 // @Router /admin/ServerLists [get]
 func ServerLists(c *gin.Context) {
-	s := &[]models.Server{}
-	models.Mysql.Raw("select id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time from `server` where uid=?", c.GetInt("UID")).Scan(s)
-	resp.NewApiResult(1, "读取成功", s).Json(c)
+	param := &req.ServerListParam{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		return
+	}
+	s := &models.Server{
+		Uid:   c.GetInt("UID"),
+		ServerName: param.ServerName,
+	}
+	lists, rows := s.List(param.Offset(), param.PageSize)
+	vo := make([]resp.ServerVO, len(lists))
+	for k, v := range lists {
+		utils.SuperConvert(&v, &vo[k])
+		vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
+		vo[k].UpdateTime = resp.JsonTimeDate(v.UpdateTime)
+	}
+	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+		Page:      param.Page,
+		PageSize:  param.PageSize,
+		TotalSize: rows,
+		Rows:      vo,
+	}).Json(c)
 }
 
 // @Summary 设置服务器信息

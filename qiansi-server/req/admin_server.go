@@ -1,5 +1,10 @@
 package req
 
+type ServerListParam struct {
+	PageParam
+	ServerName string
+}
+
 type ServerDelParam struct {
 	ServerId int
 }
