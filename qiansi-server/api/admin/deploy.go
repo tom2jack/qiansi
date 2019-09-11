@@ -264,7 +264,7 @@ func DeployLog(c *gin.Context) {
 	}).Json(c)
 }
 
-// @Summary 启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数
+// @Summary 启动部署
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployDoParam true "入参集合"

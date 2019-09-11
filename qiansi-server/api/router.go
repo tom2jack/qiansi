@@ -49,8 +49,6 @@ func init() {
 		admin_route.POST("/UserSigin", admin.UserSigin)
 		// 注册
 		admin_route.POST("/UserSiginUp", admin.UserSiginUp)
-		// 启动部署
-		admin_route.GET("/DeployDo", admin.DeployDo)
 		// 需要登陆的部分
 		admin_route.Use(middleware.JWT())
 		{
@@ -67,6 +65,7 @@ func init() {
 			admin_route.GET("/DeployLog", admin.DeployLog)
 			admin_route.POST("/DeployServer", admin.DeployServer)
 			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
+			admin_route.GET("/DeployDo", admin.DeployDo)
 		}
 	}
 
