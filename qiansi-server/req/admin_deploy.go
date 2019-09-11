@@ -1,5 +1,7 @@
 package req
 
+import "time"
+
 // 部署应用操作入参
 type DeploySetParam struct {
 	// 应用唯一编号
@@ -38,6 +40,22 @@ type DeployRunLogParam struct {
 	ServerId int
 	Version  int
 }
+
+// DeployLogParam 部署日志接口入参
+type DeployLogParam struct {
+	PageParam
+	// 开始时间
+	StartTime time.Time
+	// 结束时间
+	EndTime time.Time
+	// 应用ID
+	DeployId int
+	// 版本
+	DeployVersion int
+	// 服务器
+	ServerId int
+}
+
 type DeployDelParam struct {
 	DeployBase
 }

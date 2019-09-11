@@ -14,6 +14,7 @@ import (
 	"qiansi/qiansi-server/resp"
 	"qiansi/qiansi-server/udp_service"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -219,6 +220,48 @@ func DeployRunLog(c *gin.Context) {
 	deployLogs := &[]models.DeployLog{}
 	models.Mysql.Where("uid=? and deploy_id=? and server_id=? and deploy_version=?", c.GetInt("UID"), param.DeployId, param.ServerId, param.Version).Find(deployLogs)
 	resp.NewApiResult(1, "读取成功", deployLogs).Json(c)
+}
+
+// @Summary 获取部署日志
+// @Produce  json
+// @Accept  json
+// @Param body body req.DeployLogParam true "入参集合"
+// @Success 200 {array} resp.DeployLogVO "返回"
+// @Router /admin/DeployLog [get]
+func DeployLog(c *gin.Context) {
+	param := &req.DeployLogParam{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		return
+	}
+	s := &models.DeployLog{
+		Uid:           c.GetInt("UID"),
+		DeployId:      param.DeployId,
+		DeployVersion: param.DeployVersion,
+		ServerId:      param.ServerId,
+	}
+	if param.StartTime.IsZero() {
+		param.StartTime = time.Now().Add(-time.Hour * 24 * 30)
+	}
+	if param.EndTime.IsZero() {
+		param.EndTime = time.Now()
+	}
+	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30 {
+		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
+		return
+	}
+	lists, rows := s.List(param.StartTime, param.EndTime, param.Offset(), param.PageSize)
+	vo := make([]resp.DeployLogVO, len(lists))
+	for k, v := range lists {
+		utils.SuperConvert(&v, &vo[k])
+		// vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
+	}
+	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+		Page:      param.Page,
+		PageSize:  param.PageSize,
+		TotalSize: rows,
+		Rows:      vo,
+	}).Json(c)
 }
 
 // @Summary 启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数

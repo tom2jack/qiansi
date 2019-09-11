@@ -1,19 +1,17 @@
 package resp
 
-import (
-	"time"
-)
+import "time"
 
 type DeployServerVO struct {
-	CreateTime    time.Time
-	DeviceId      string
-	Domain        string
-	Id            int
-	ServerName    string
-	ServerRuleId  int
-	ServerStatus  int
-	Uid           int
-	UpdateTime    time.Time
+	// CreateTime    JsonTimeDate
+	DeviceId     string
+	Domain       string
+	Id           int
+	ServerName   string
+	ServerRuleId int
+	ServerStatus int
+	Uid          int
+	// UpdateTime    JsonTimeDate
 	DeployId      int
 	DeployVersion int
 	ServerId      int
@@ -33,4 +31,16 @@ type DeployVO struct {
 	Uid           int
 	CreateTime    JsonTimeDate
 	UpdateTime    JsonTimeDate
+}
+
+type DeployLogVO struct {
+	ClientIp      string
+	Content       string
+	DeployId      int
+	DeployVersion int
+	DeviceId      string
+	Id            int64
+	ServerId      int
+	Uid           int
+	CreateTime    time.Time
 }

@@ -114,6 +114,40 @@
                 }
             }
         },
+        "/admin/DeployLog": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取部署日志",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.DeployLogParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.DeployLogVO"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeployRelationServer": {
             "post": {
                 "consumes": [
@@ -347,12 +381,24 @@
                     "application/json"
                 ],
                 "summary": "获取服务器(客户端)列表",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [{\"CreateTime\": \"2019-03-02T16:10:10+08:00\",\"DeviceId\": \"\",\"Domain\": \"127.0.0.1\",\"Id\": 1,\"ServerName\": \"纸喵5号机\",\"ServerRuleId\": 0,\"ServerStatus\": 0,\"Uid\": 2,\"UpdateTime\": \"2019-05-22T17:40:18+08:00\"}]}",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/models.Server"
+                            "$ref": "#/definitions/req.ServerListParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -777,6 +823,40 @@
                 }
             }
         },
+        "req.DeployLogParam": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "应用ID",
+                    "type": "integer"
+                },
+                "deployVersion": {
+                    "description": "版本",
+                    "type": "integer"
+                },
+                "endTime": {
+                    "description": "结束时间",
+                    "type": "string"
+                },
+                "lastId": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "serverId": {
+                    "description": "服务器",
+                    "type": "integer"
+                },
+                "startTime": {
+                    "description": "开始时间",
+                    "type": "string"
+                }
+            }
+        },
         "req.DeployRelationParam": {
             "type": "object",
             "properties": {
@@ -882,6 +962,23 @@
                 }
             }
         },
+        "req.ServerListParam": {
+            "type": "object",
+            "properties": {
+                "lastId": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "type": "integer"
+                },
+                "serverName": {
+                    "type": "string"
+                }
+            }
+        },
         "req.ServerSetParam": {
             "type": "object",
             "properties": {
@@ -975,6 +1072,38 @@
                 },
                 "msg": {
                     "type": "string"
+                }
+            }
+        },
+        "resp.DeployLogVO": {
+            "type": "object",
+            "properties": {
+                "clientIp": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deployId": {
+                    "type": "integer"
+                },
+                "deployVersion": {
+                    "type": "integer"
+                },
+                "deviceId": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "serverId": {
+                    "type": "integer"
+                },
+                "uid": {
+                    "type": "integer"
                 }
             }
         },

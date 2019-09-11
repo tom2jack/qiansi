@@ -15,3 +15,21 @@ type DeployLog struct {
 	ServerId      int       `xorm:"not null default 0 comment('服务器ID') index(IX_search) INT(11)"`
 	Uid           int       `xorm:"not null default 0 comment('用户ID') index(IX_search) INT(10)"`
 }
+
+// List 获取应用列表
+func (m *DeployLog) List(start time.Time, end time.Time, offset int, limit int) ([]DeployLog, int) {
+	data := []DeployLog{}
+	rows := 0
+	db := Mysql.Where("uid=? and (create_time between ? and ?)", m.Uid, start, end)
+	if m.DeployId > 0 {
+		db = db.Where("deploy_id=?", m.DeployId)
+	}
+	if m.DeployVersion > 0 {
+		db = db.Where("deploy_version=?", m.DeployVersion)
+	}
+	if m.ServerId > 0 {
+		db = db.Where("server_id=?", m.ServerId)
+	}
+	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	return data, rows
+}
