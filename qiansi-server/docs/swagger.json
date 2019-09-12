@@ -58,7 +58,7 @@
                 "produces": [
                     "application/json"
                 ],
-                "summary": "启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数",
+                "summary": "启动部署",
                 "parameters": [
                     {
                         "description": "入参集合",
@@ -107,8 +107,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.DeployVO"
+                            }
                         }
                     }
                 }
@@ -237,8 +239,10 @@
                     "200": {
                         "description": "返回",
                         "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.Server"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.DeployRunLogTabVO"
+                            }
                         }
                     }
                 }
@@ -397,8 +401,10 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.ServerVO"
+                            }
                         }
                     }
                 }
@@ -1107,6 +1113,64 @@
                 }
             }
         },
+        "resp.DeployRunLogTabVO": {
+            "type": "object",
+            "properties": {
+                "deployVersion": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "serverName": {
+                    "type": "string"
+                }
+            }
+        },
+        "resp.DeployVO": {
+            "type": "object",
+            "properties": {
+                "afterCommand": {
+                    "type": "string"
+                },
+                "beforeCommand": {
+                    "type": "string"
+                },
+                "branch": {
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deployKeys": {
+                    "type": "string"
+                },
+                "deployType": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "localPath": {
+                    "type": "string"
+                },
+                "nowVersion": {
+                    "type": "integer"
+                },
+                "remoteUrl": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
         "resp.PageInfo": {
             "type": "object",
             "properties": {
@@ -1121,6 +1185,35 @@
                 },
                 "totalSize": {
                     "type": "integer"
+                }
+            }
+        },
+        "resp.ServerVO": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "deviceId": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "serverName": {
+                    "type": "string"
+                },
+                "serverRuleId": {
+                    "type": "integer"
+                },
+                "serverStatus": {
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
                 }
             }
         },

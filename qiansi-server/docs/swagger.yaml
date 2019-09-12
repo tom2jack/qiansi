@@ -262,6 +262,44 @@ definitions:
       uid:
         type: integer
     type: object
+  resp.DeployRunLogTabVO:
+    properties:
+      deployVersion:
+        type: integer
+      id:
+        type: integer
+      serverName:
+        type: string
+    type: object
+  resp.DeployVO:
+    properties:
+      afterCommand:
+        type: string
+      beforeCommand:
+        type: string
+      branch:
+        type: string
+      createTime:
+        type: string
+      deployKeys:
+        type: string
+      deployType:
+        type: integer
+      id:
+        type: integer
+      localPath:
+        type: string
+      nowVersion:
+        type: integer
+      remoteUrl:
+        type: string
+      title:
+        type: string
+      uid:
+        type: integer
+      updateTime:
+        type: string
+    type: object
   resp.PageInfo:
     properties:
       page:
@@ -272,6 +310,25 @@ definitions:
         type: object
       totalSize:
         type: integer
+    type: object
+  resp.ServerVO:
+    properties:
+      createTime:
+        type: string
+      deviceId:
+        type: string
+      domain:
+        type: string
+      id:
+        type: integer
+      serverName:
+        type: string
+      serverRuleId:
+        type: integer
+      serverStatus:
+        type: integer
+      updateTime:
+        type: string
     type: object
   resp.UserInfoVO:
     properties:
@@ -333,7 +390,7 @@ paths:
           schema:
             $ref: '#/definitions/resp.ApiResult'
             type: object
-      summary: '启动部署 TODO: 后期关闭此接口的开放特性，新增外部接口，通过不可枚举key作为部署参数'
+      summary: 启动部署
   /admin/DeployLists:
     get:
       consumes:
@@ -352,8 +409,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/resp.ApiResult'
-            type: object
+            items:
+              $ref: '#/definitions/resp.DeployVO'
+            type: array
       summary: 获取部署应用列表
   /admin/DeployLog:
     get:
@@ -437,8 +495,9 @@ paths:
         "200":
           description: 返回
           schema:
-            $ref: '#/definitions/models.Server'
-            type: object
+            items:
+              $ref: '#/definitions/resp.DeployRunLogTabVO'
+            type: array
       summary: 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
   /admin/DeployServer:
     post:
@@ -542,8 +601,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/resp.ApiResult'
-            type: object
+            items:
+              $ref: '#/definitions/resp.ServerVO'
+            type: array
       summary: 获取服务器(客户端)列表
   /admin/ServerSet:
     post:

@@ -1,14 +1,14 @@
 package resp
 
+import "time"
+
 type ServerVO struct {
-	ApiSecret    string
-	CreateTime   JsonTimeDate
+	CreateTime   time.Time
 	DeviceId     string
 	Domain       string
 	Id           int
 	ServerName   string
 	ServerRuleId int
 	ServerStatus int
-	Uid          int
-	UpdateTime   JsonTimeDate
+	UpdateTime   time.Time
 }

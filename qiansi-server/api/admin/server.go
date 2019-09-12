@@ -20,7 +20,7 @@ import (
 // @Produce  json
 // @Accept  json
 // @Param body body req.ServerListParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200 {array} resp.ServerVO ""
 // @Router /admin/ServerLists [get]
 func ServerLists(c *gin.Context) {
 	param := &req.ServerListParam{}
@@ -29,15 +29,13 @@ func ServerLists(c *gin.Context) {
 		return
 	}
 	s := &models.Server{
-		Uid:   c.GetInt("UID"),
+		Uid:        c.GetInt("UID"),
 		ServerName: param.ServerName,
 	}
 	lists, rows := s.List(param.Offset(), param.PageSize)
 	vo := make([]resp.ServerVO, len(lists))
 	for k, v := range lists {
 		utils.SuperConvert(&v, &vo[k])
-		vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
-		vo[k].UpdateTime = resp.JsonTimeDate(v.UpdateTime)
 	}
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,

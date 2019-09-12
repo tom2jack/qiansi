@@ -2,19 +2,24 @@ package resp
 
 import "time"
 
+// 部署服务器
 type DeployServerVO struct {
-	// CreateTime    JsonTimeDate
-	DeviceId     string
-	Domain       string
-	Id           int
-	ServerName   string
-	ServerRuleId int
-	ServerStatus int
-	Uid          int
-	// UpdateTime    JsonTimeDate
+	DeviceId      string
+	Domain        string
+	Id            int
+	ServerName    string
+	ServerRuleId  int
+	ServerStatus  int
+	Uid           int
 	DeployId      int
 	DeployVersion int
 	ServerId      int
+}
+
+type DeployRunLogTabVO struct {
+	Id            int
+	ServerName    string
+	DeployVersion int
 }
 
 type DeployVO struct {
@@ -29,8 +34,8 @@ type DeployVO struct {
 	RemoteUrl     string
 	Title         string
 	Uid           int
-	CreateTime    JsonTimeDate
-	UpdateTime    JsonTimeDate
+	CreateTime    time.Time
+	UpdateTime    time.Time
 }
 
 type DeployLogVO struct {

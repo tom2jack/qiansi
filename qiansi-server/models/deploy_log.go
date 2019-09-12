@@ -30,6 +30,6 @@ func (m *DeployLog) List(start time.Time, end time.Time, offset int, limit int) 
 	if m.ServerId > 0 {
 		db = db.Where("server_id=?", m.ServerId)
 	}
-	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	db.Offset(offset).Limit(limit).Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
 }

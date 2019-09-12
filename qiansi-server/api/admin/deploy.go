@@ -17,14 +17,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/gorm"
 )
 
 // @Summary 获取部署应用列表
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployListParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200 {array} resp.DeployVO ""
 // @Router /admin/DeployLists [get]
 func DeployLists(c *gin.Context) {
 	param := &req.DeployListParam{}
@@ -40,8 +39,6 @@ func DeployLists(c *gin.Context) {
 	vo := make([]resp.DeployVO, len(lists))
 	for k, v := range lists {
 		utils.SuperConvert(&v, &vo[k])
-		vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
-		vo[k].UpdateTime = resp.JsonTimeDate(v.UpdateTime)
 	}
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
@@ -191,7 +188,7 @@ func DeployServer(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployServerParam true "入参集合"
-// @Success 200 {object} models.Server "返回"
+// @Success 200 {array} resp.DeployRunLogTabVO "返回"
 // @Router /admin/DeployRunLogTab [get]
 func DeployRunLogTab(c *gin.Context) {
 	param := &req.DeployServerParam{}
@@ -199,7 +196,7 @@ func DeployRunLogTab(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	d := &[]resp.DeployServerVO{}
+	d := &[]resp.DeployRunLogTabVO{}
 	sql := "SELECT s.id, s.server_name,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
 	models.Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
 	resp.NewApiResult(1, "读取成功", d).Json(c)
@@ -276,10 +273,7 @@ func DeployDo(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	var (
-		db *gorm.DB
-	)
-	db = models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", param.DeployId)
+	db := models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", param.DeployId)
 	if db.Error != nil || db.RowsAffected != 1 {
 		resp.NewApiResult(-5, "部署服务不存在").Json(c)
 		return

@@ -24,7 +24,7 @@ func (m *Server) List(offset int, limit int) ([]Server, int) {
 	rows := 0
 	db := Mysql.Where("uid=?", m.Uid).Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
 	if m.ServerName != "" {
-		db = db.Where("title like ?", "%"+m.ServerName+"%")
+		db = db.Where("server_name like ?", "%"+m.ServerName+"%")
 	}
 	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
