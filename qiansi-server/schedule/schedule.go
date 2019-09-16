@@ -7,48 +7,45 @@ import (
 	"github.com/jakecoffman/cron"
 	"io/ioutil"
 	"net/http"
+	"qiansi/common/logger"
 	"qiansi/qiansi-server/models"
 	"strconv"
-	"sync"
 	"time"
 )
 
-type storageData struct {
-	Cron   string
-	Url    string
-	Pay_id string
-	Num    int
+type task struct {
+	Cron *cron.Cron
 }
 
-var (
-	Cron *cron.Cron
-)
+var Task task
 
 func init() {
-	Cron = cron.New()
-	Cron.Start()
+	Task = task{Cron: cron.New()}
+	Task.Cron.Start()
+	logger.Info("开始初始化定时任务")
+	scheduleModel := new(models.Schedule)
+	taskNum := 0
+	lastId := 0
+	for {
+		taskList, count := scheduleModel.ExportList(lastId, 1)
+		if count == 0 {
+			break
+		}
+		for _, item := range taskList {
+			Task.Add(item)
+		}
+		taskNum += count
+		lastId = taskList[count-1].Id
+	}
+	logger.Info("定时任务初始化完成, 共%d个定时任务添加到调度器", taskNum)
 }
 
-func storage_init() {
-	schedule := &models.Schedule{
-		ScheduleType: 1,
-	}
-	data, _ := schedule.List(1, 100)
+func (t *task) Add(m models.Schedule) {
 
-	for i, j := 0, 1; j < len(data); i, j = i+2, j+2 {
-		sd := &storageData{}
-		xdata, _ := redis.String(data[j], nil)
-		err := json.Unmarshal([]byte(xdata), &sd)
-		if err != nil {
-			fmt.Println("任务解析失败，跳出", xdata)
-			continue
-		}
-		Cron.AddFunc(sd.Cron, func() {
-			RequestJob(sd.Url, sd.Pay_id)
-		}, sd.Pay_id)
-		fmt.Println("成功添加任务：[" + sd.Cron + "]:" + sd.Url)
-	}
-	fmt.Println("数据导入完毕")
+}
+
+func (t *task) Remove(m models.Schedule) {
+
 }
 
 //RequestJob
