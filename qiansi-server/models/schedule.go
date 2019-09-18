@@ -9,6 +9,8 @@ type Schedule struct {
 	CreateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 	Crontab      string    `xorm:"not null comment('规则') VARCHAR(50)"`
 	Id           int       `xorm:"not null pk autoincr INT(10)"`
+	NextTime     time.Time `xorm:"comment('下次执行时间') DATETIME"`
+	PrevTime     time.Time `xorm:"comment('上次执行时间') DATETIME"`
 	Remain       int       `xorm:"not null default -1 comment('剩余执行次数 -1无限 0-停止') INT(11)"`
 	ScheduleType int       `xorm:"not null default 1 comment('调度类型 1-serverhttp 2-clientShell') TINYINT(1)"`
 	Timeout      int       `xorm:"not null default 30 comment('超时时间s') INT(10)"`
@@ -29,12 +31,36 @@ func (m *Schedule) List(offset int, limit int) ([]Schedule, int) {
 	return data, rows
 }
 
+func (m *Schedule) Save() bool {
+	db := Mysql.Save(m)
+	return db.Error == nil && db.RowsAffected > 0
+}
+
+func (m *Schedule) RunCallBack() bool {
+	db := Mysql.Model(m).Select("prev_time, next_time").Where("id=?", m.Id)
+	if m.Remain > 0 {
+		db = db.Select("remain")
+		m.Remain--
+	}
+	m.PrevTime = time.Now()
+	db = db.Update(m)
+	return db.Error == nil && db.RowsAffected > 0
+}
+
+func (m *Schedule) Get() bool {
+	db := Mysql.Where("id=? and uid=?", m.Id, m.Uid).First(m)
+	return db.Error == nil && db.RowsAffected > 0
+}
+
 // ExportList 数据输出
 func (m *Schedule) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
 	data := []Schedule{}
 	db := Mysql
 	if lastId > 0 {
 		db = db.Where("id > ?", lastId)
+	}
+	if scheduleType > 0 {
+		db = db.Where("ScheduleType = ?", scheduleType)
 	}
 	db.Limit(1000).Order("id asc").Find(&data)
 	return data, len(data)
@@ -45,7 +71,7 @@ func (m *Schedule) Create() bool {
 	if m.Uid <= 0 {
 		return false
 	}
-	db := Mysql.Save(m)
+	db := Mysql.Create(m)
 	return db.Error == nil && db.RowsAffected > 0
 }
 
