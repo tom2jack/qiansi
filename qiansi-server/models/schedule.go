@@ -13,6 +13,7 @@ type Schedule struct {
 	PrevTime     time.Time `xorm:"comment('上次执行时间') DATETIME"`
 	Remain       int       `xorm:"not null default -1 comment('剩余执行次数 -1无限 0-停止') INT(11)"`
 	ScheduleType int       `xorm:"not null default 1 comment('调度类型 1-serverhttp 2-clientShell') TINYINT(1)"`
+	ServerId     int       `xorm:"not null default 0 comment('服务器ID') INT(10)"`
 	Timeout      int       `xorm:"not null default 30 comment('超时时间s') INT(10)"`
 	Title        string    `xorm:"not null comment('标题') VARCHAR(60)"`
 	Uid          int       `xorm:"not null default 0 comment('用户ID') INT(10)"`

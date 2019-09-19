@@ -39,7 +39,7 @@ func ScheduleLists(c *gin.Context) {
 // @Accept  json
 // @Param body body req.ScheduleCreateParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
-// @Router /admin/ScheduleCreate [get]
+// @Router /admin/ScheduleCreate [POST]
 func ScheduleCreate(c *gin.Context) {
 	param := &req.ScheduleCreateParam{}
 	if err := c.ShouldBind(param); err != nil {
@@ -82,7 +82,7 @@ func ScheduleDel(c *gin.Context) {
 // @Accept  json
 // @Param body body req.ScheduleDoParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
-// @Router /admin/ScheduleDel [DELETE]
+// @Router /admin/ScheduleDel [get]
 func ScheduleDo(c *gin.Context) {
 	param := &req.ScheduleDoParam{}
 	if err := c.ShouldBind(param); err != nil {

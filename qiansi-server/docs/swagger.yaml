@@ -150,7 +150,41 @@ definitions:
         description: 应用名称
         type: string
     type: object
-  req.PageParam:
+  req.ScheduleCreateParam:
+    properties:
+      command:
+        description: 执行命令
+        type: string
+      crontab:
+        description: 表达式
+        type: string
+      remain:
+        description: 执行次数-1-无限
+        type: integer
+      scheduleType:
+        description: 1-http 2-shell
+        type: integer
+      serverId:
+        description: 执行服务器ID，云服务器id为0
+        type: integer
+      timeout:
+        description: 执行超时时间
+        type: integer
+      title:
+        description: 标题
+        type: string
+    type: object
+  req.ScheduleDelParam:
+    properties:
+      id:
+        type: integer
+    type: object
+  req.ScheduleDoParam:
+    properties:
+      id:
+        type: integer
+    type: object
+  req.ScheduleListParam:
     properties:
       lastId:
         type: integer
@@ -158,6 +192,8 @@ definitions:
         type: integer
       pageSize:
         type: integer
+      title:
+        type: string
     type: object
   req.ServerDelParam:
     properties:
@@ -541,6 +577,68 @@ paths:
             $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 设置部署应用
+  /admin/ScheduleCreate:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.ScheduleCreateParam'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+            type: object
+      summary: 创建计划任务
+  /admin/ScheduleDel:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.ScheduleDelParam'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+            type: object
+      summary: 删除计划任务
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.ScheduleDoParam'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+            type: object
+      summary: 执行计划任务
   /admin/ScheduleLists:
     get:
       consumes:
@@ -551,7 +649,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/req.PageParam'
+          $ref: '#/definitions/req.ScheduleListParam'
           type: object
       produces:
       - application/json

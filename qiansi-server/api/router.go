@@ -64,8 +64,11 @@ func init() {
 			admin_route.GET("/DeployRunLog", admin.DeployRunLog)
 			admin_route.GET("/DeployLog", admin.DeployLog)
 			admin_route.POST("/DeployServer", admin.DeployServer)
-			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
 			admin_route.GET("/DeployDo", admin.DeployDo)
+			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
+			admin_route.POST("/ScheduleCreate", admin.ScheduleCreate)
+			admin_route.DELETE("/ScheduleDel", admin.ScheduleDel)
+			admin_route.GET("/ScheduleDo", admin.ScheduleDo)
 		}
 	}
 

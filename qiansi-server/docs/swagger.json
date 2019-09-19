@@ -312,6 +312,100 @@
                 }
             }
         },
+        "/admin/ScheduleCreate": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建计划任务",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.ScheduleCreateParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/ScheduleDel": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "执行计划任务",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.ScheduleDoParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "删除计划任务",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.ScheduleDelParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/ScheduleLists": {
             "get": {
                 "consumes": [
@@ -329,7 +423,7 @@
                         "required": true,
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/req.PageParam"
+                            "$ref": "#/definitions/req.ScheduleListParam"
                         }
                     }
                 ],
@@ -946,7 +1040,56 @@
                 }
             }
         },
-        "req.PageParam": {
+        "req.ScheduleCreateParam": {
+            "type": "object",
+            "properties": {
+                "command": {
+                    "description": "执行命令",
+                    "type": "string"
+                },
+                "crontab": {
+                    "description": "表达式",
+                    "type": "string"
+                },
+                "remain": {
+                    "description": "执行次数-1-无限",
+                    "type": "integer"
+                },
+                "scheduleType": {
+                    "description": "1-http 2-shell",
+                    "type": "integer"
+                },
+                "serverId": {
+                    "description": "执行服务器ID，云服务器id为0",
+                    "type": "integer"
+                },
+                "timeout": {
+                    "description": "执行超时时间",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "标题",
+                    "type": "string"
+                }
+            }
+        },
+        "req.ScheduleDelParam": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "req.ScheduleDoParam": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "req.ScheduleListParam": {
             "type": "object",
             "properties": {
                 "lastId": {
@@ -957,6 +1100,9 @@
                 },
                 "pageSize": {
                     "type": "integer"
+                },
+                "title": {
+                    "type": "string"
                 }
             }
         },
