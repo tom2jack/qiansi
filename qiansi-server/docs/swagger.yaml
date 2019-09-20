@@ -619,6 +619,7 @@ paths:
             $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 删除计划任务
+  /admin/ScheduleDo:
     get:
       consumes:
       - application/json

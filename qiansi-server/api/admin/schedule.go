@@ -7,6 +7,7 @@ import (
 	"qiansi/qiansi-server/req"
 	"qiansi/qiansi-server/resp"
 	"qiansi/qiansi-server/schedule"
+	"time"
 )
 
 // @Summary 获取计划任务列表
@@ -49,6 +50,9 @@ func ScheduleCreate(c *gin.Context) {
 	po := &models.Schedule{}
 	utils.SuperConvert(param, po)
 	po.Uid = c.GetInt("UID")
+	t, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
+	po.PrevTime = t
+	po.NextTime = t
 	if po.Create() {
 		schedule.Task.Add(po)
 	}
@@ -82,7 +86,7 @@ func ScheduleDel(c *gin.Context) {
 // @Accept  json
 // @Param body body req.ScheduleDoParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
-// @Router /admin/ScheduleDel [get]
+// @Router /admin/ScheduleDo [get]
 func ScheduleDo(c *gin.Context) {
 	param := &req.ScheduleDoParam{}
 	if err := c.ShouldBind(param); err != nil {

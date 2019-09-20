@@ -6,6 +6,8 @@ import (
 	"qiansi/common/conf"
 	"qiansi/common/logger"
 	"qiansi/qiansi-server/api"
+	_ "qiansi/qiansi-server/schedule"
+	_ "qiansi/qiansi-server/udp_service"
 	"time"
 )
 

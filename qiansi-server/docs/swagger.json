@@ -345,36 +345,6 @@
             }
         },
         "/admin/ScheduleDel": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "执行计划任务",
-                "parameters": [
-                    {
-                        "description": "入参集合",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/req.ScheduleDoParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            },
             "delete": {
                 "consumes": [
                     "application/json"
@@ -392,6 +362,38 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/req.ScheduleDelParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/ScheduleDo": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "执行计划任务",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.ScheduleDoParam"
                         }
                     }
                 ],

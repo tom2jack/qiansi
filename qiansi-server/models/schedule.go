@@ -9,8 +9,8 @@ type Schedule struct {
 	CreateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 	Crontab      string    `xorm:"not null comment('规则') VARCHAR(50)"`
 	Id           int       `xorm:"not null pk autoincr INT(10)"`
-	NextTime     time.Time `xorm:"comment('下次执行时间') DATETIME"`
-	PrevTime     time.Time `xorm:"comment('上次执行时间') DATETIME"`
+	NextTime     time.Time `xorm:"default null comment('下次执行时间') DATETIME"`
+	PrevTime     time.Time `xorm:"default null comment('上次执行时间') DATETIME"`
 	Remain       int       `xorm:"not null default -1 comment('剩余执行次数 -1无限 0-停止') INT(11)"`
 	ScheduleType int       `xorm:"not null default 1 comment('调度类型 1-serverhttp 2-clientShell') TINYINT(1)"`
 	ServerId     int       `xorm:"not null default 0 comment('服务器ID') INT(10)"`
@@ -38,13 +38,11 @@ func (m *Schedule) Save() bool {
 }
 
 func (m *Schedule) RunCallBack() bool {
-	db := Mysql.Model(m).Select("prev_time, next_time").Where("id=?", m.Id)
 	if m.Remain > 0 {
-		db = db.Select("remain")
 		m.Remain--
 	}
-	m.PrevTime = time.Now()
-	db = db.Update(m)
+	db := Mysql.Model(m).Where("id=?", m.Id)
+	db = db.Updates(CommonMap{"prev_time": m.PrevTime, "next_time": m.NextTime, "remain": m.Remain})
 	return db.Error == nil && db.RowsAffected > 0
 }
 
@@ -61,7 +59,7 @@ func (m *Schedule) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
 		db = db.Where("id > ?", lastId)
 	}
 	if scheduleType > 0 {
-		db = db.Where("ScheduleType = ?", scheduleType)
+		db = db.Where("schedule_type = ?", scheduleType)
 	}
 	db.Limit(1000).Order("id asc").Find(&data)
 	return data, len(data)

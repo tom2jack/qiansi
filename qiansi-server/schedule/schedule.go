@@ -99,6 +99,7 @@ func createJob(m *models.Schedule) cron.FuncJob {
 }
 
 func beforeExecJob(m *models.Schedule) {
+	m.PrevTime = time.Now().Local()
 	m.NextTime = cron.Parse(m.Crontab).Next(time.Now().Local())
 	// 数据库回调
 	m.RunCallBack()
