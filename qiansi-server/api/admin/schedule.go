@@ -7,6 +7,7 @@ import (
 	"qiansi/qiansi-server/req"
 	"qiansi/qiansi-server/resp"
 	"qiansi/qiansi-server/schedule"
+	"strings"
 	"time"
 )
 
@@ -47,12 +48,18 @@ func ScheduleCreate(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
+
 	po := &models.Schedule{}
 	utils.SuperConvert(param, po)
 	po.Uid = c.GetInt("UID")
 	t, _ := time.Parse("2006-01-02 15:04:05", "2006-01-02 15:04:05")
 	po.PrevTime = t
 	po.NextTime = t
+	fields := strings.Fields(po.Crontab)
+	if len(fields) != 5 && len(fields) != 6 {
+		resp.NewApiResult(-4, "表达式错误").Json(c)
+		return
+	}
 	if po.Create() {
 		schedule.Task.Add(po)
 	}

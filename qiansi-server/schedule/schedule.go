@@ -57,7 +57,7 @@ func init() {
 func (t *task) Add(m *models.Schedule) {
 	taskFunc := createJob(*m)
 	if taskFunc == nil {
-		logger.Error("创建任务处理Job失败,不支持的任务协议#", m.ScheduleType)
+		logger.Warn("创建任务处理Job失败,不支持的任务协议#", m.ScheduleType)
 		return
 	}
 	cronName := strconv.Itoa(m.Id)
@@ -65,7 +65,7 @@ func (t *task) Add(m *models.Schedule) {
 		Task.Cron.AddFunc(m.Crontab, taskFunc, cronName)
 	})
 	if err != nil {
-		logger.Error("添加任务到调度器失败#", err)
+		logger.Warn("添加任务到调度器失败#", err)
 	}
 }
 
