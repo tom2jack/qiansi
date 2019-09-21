@@ -41,8 +41,7 @@ func (m *Schedule) RunCallBack() bool {
 	if m.Remain > 0 {
 		m.Remain--
 	}
-	db := Mysql.Model(m).Where("id=?", m.Id)
-	db = db.Updates(CommonMap{"prev_time": m.PrevTime, "next_time": m.NextTime, "remain": m.Remain})
+	db := Mysql.Model(m).Updates(CommonMap{"prev_time": m.PrevTime, "next_time": m.NextTime, "remain": m.Remain})
 	return db.Error == nil && db.RowsAffected > 0
 }
 

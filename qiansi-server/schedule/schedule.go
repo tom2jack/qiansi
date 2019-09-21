@@ -55,7 +55,7 @@ func init() {
 
 // Add 添加任务
 func (t *task) Add(m *models.Schedule) {
-	taskFunc := createJob(m)
+	taskFunc := createJob(*m)
 	if taskFunc == nil {
 		logger.Error("创建任务处理Job失败,不支持的任务协议#", m.ScheduleType)
 		return
@@ -71,7 +71,7 @@ func (t *task) Add(m *models.Schedule) {
 
 // 直接运行任务
 func (t *task) Run(m *models.Schedule) {
-	go createJob(m)()
+	go createJob(*m)()
 }
 
 // Remove 移除任务
@@ -79,8 +79,8 @@ func (t *task) Remove(m *models.Schedule) {
 	Task.Cron.RemoveJob(strconv.Itoa(m.Id))
 }
 
-func createJob(m *models.Schedule) cron.FuncJob {
-	handler := createHandler(m)
+func createJob(m models.Schedule) cron.FuncJob {
+	handler := createHandler(&m)
 	if handler == nil {
 		return nil
 	}
@@ -88,12 +88,10 @@ func createJob(m *models.Schedule) cron.FuncJob {
 		Task.RunQueue.Add()
 		defer Task.RunQueue.Done()
 		// 前置操作
-		beforeExecJob(m)
+		beforeExecJob(&m)
 		logger.Info("开始执行任务#%s#命令-%s", m.Title, m.Command)
-		taskResult := execJob(handler, m)
+		taskResult := execJob(handler, &m)
 		logger.Info("任务完成#%s#命令-%s \n 结果: %#v", m.Title, m.Command, taskResult)
-		// 后置操作
-		afterExecJob(m)
 	}
 	return taskFunc
 }
@@ -134,8 +132,4 @@ func execJob(handler Handler, m *models.Schedule) TaskResult {
 		}
 	}
 	return TaskResult{Result: output, Err: err, RetryTimes: i}
-}
-
-func afterExecJob(m *models.Schedule) {
-
 }
