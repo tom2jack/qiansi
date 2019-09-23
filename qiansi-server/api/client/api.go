@@ -41,10 +41,11 @@ func ApiRegServer(c *gin.Context) {
 	}
 	api_secret := string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL))
 	server := &models.Server{
-		Uid:       uid,
-		ApiSecret: api_secret,
-		DeviceId:  device,
-		Domain:    c.ClientIP(),
+		Uid:          uid,
+		ApiSecret:    api_secret,
+		DeviceId:     device,
+		ServerStatus: 1,
+		Domain:       c.ClientIP(),
 	}
 	models.Mysql.Create(server)
 	resp.NewApiResult(1, "成功", server).Json(c)

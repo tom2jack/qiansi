@@ -45,6 +45,10 @@ func init() {
 			break
 		}
 		for _, item := range taskList {
+			if item.Remain == 0 {
+				taskNum--
+				continue
+			}
 			Task.Add(&item)
 		}
 		taskNum += count
@@ -70,8 +74,13 @@ func (t *task) Add(m *models.Schedule) {
 }
 
 // 直接运行任务
-func (t *task) Run(m *models.Schedule) {
-	go createJob(*m)()
+func (t *task) Run(m *models.Schedule) bool {
+	f := createJob(*m)
+	if f == nil {
+		return false
+	}
+	f()
+	return true
 }
 
 // Remove 移除任务

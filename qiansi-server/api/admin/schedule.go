@@ -105,6 +105,9 @@ func ScheduleDo(c *gin.Context) {
 		Uid: c.GetInt("UID"),
 	}
 	po.Get()
-	schedule.Task.Run(po)
+	if !schedule.Task.Run(po) {
+		resp.NewApiResult(-5, "任务异常，无法执行").Json(c)
+		return
+	}
 	resp.NewApiResult(1).Json(c)
 }
