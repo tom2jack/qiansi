@@ -10,9 +10,8 @@ import (
 	"net/url"
 	"qiansi/common/conf"
 	"qiansi/common/dto"
-	"qiansi/common/utils"
 	"qiansi/common/logger"
-	"qiansi/qiansi-server/models"
+	"qiansi/common/utils"
 	"strconv"
 	"strings"
 	"time"
@@ -27,7 +26,7 @@ var (
 	}
 )
 
-const BASE_URL = "http://localhost:1315"
+const BASE_URL = ""
 
 type ApiBody struct {
 	Code int
@@ -40,7 +39,7 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	if real_metod == "RAW" {
 		real_metod = "POST"
 	}
-	req, err := http.NewRequest(real_metod, BASE_URL+url, body)
+	req, err := http.NewRequest(real_metod, conf.API_URL+url, body)
 	if err != nil {
 		return nil, err
 	}
@@ -89,15 +88,15 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	} else {
 		raw = nil
 	}
-	logger.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, BASE_URL+url, string(raw))
+	logger.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, conf.API_URL+url, string(raw))
 	return raw, nil
 }
 
 // 注册当前客户端
-func RegServer(uid string, device string) (models.Server, error) {
+func RegServer(uid string, device string) (dto.ServerDTO, error) {
 	url := fmt.Sprintf("/client/ApiRegServer?uid=%s&device=%s", uid, device)
 	raw, err := request("GET", url, nil)
-	server := models.Server{}
+	server := dto.ServerDTO{}
 	if err != nil {
 		return server, err
 	}

@@ -1044,6 +1044,14 @@
         },
         "req.ScheduleCreateParam": {
             "type": "object",
+            "required": [
+                "command",
+                "crontab",
+                "remain",
+                "scheduleType",
+                "timeout",
+                "title"
+            ],
             "properties": {
                 "command": {
                     "description": "执行命令",

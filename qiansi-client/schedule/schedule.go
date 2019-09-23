@@ -20,7 +20,7 @@ func LoadSchedule() {
 }
 
 func TaskLoop() {
-	conn, err := net.Dial("udp", "127.0.0.1:1315")
+	conn, err := net.Dial("udp", conf.UDP_HOST)
 	if err != nil {
 		return
 	}

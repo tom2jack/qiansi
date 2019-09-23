@@ -27,7 +27,7 @@ type ModelBase1 struct {
 	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 }
 
-func init()  {
+func init() {
 	loadRedis()
 	loadMysql()
 }

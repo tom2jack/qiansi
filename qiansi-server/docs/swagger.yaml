@@ -173,6 +173,13 @@ definitions:
       title:
         description: 标题
         type: string
+    required:
+    - command
+    - crontab
+    - remain
+    - scheduleType
+    - timeout
+    - title
     type: object
   req.ScheduleDelParam:
     properties:

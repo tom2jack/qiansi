@@ -2,7 +2,6 @@ package dto
 
 // 001-轮训任务数据交换
 type Hook001DTO struct {
-	Deploy string
+	Deploy   string
 	Scheduld string
 }
-

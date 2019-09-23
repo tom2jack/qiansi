@@ -16,10 +16,10 @@ type ApiResult struct {
 }
 
 type PageInfo struct {
-	Page int
-	PageSize int
+	Page      int
+	PageSize  int
 	TotalSize int
-	Rows interface{}
+	Rows      interface{}
 }
 
 func NewApiResult(arg ...interface{}) *ApiResult {

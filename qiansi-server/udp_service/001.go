@@ -19,7 +19,7 @@ type Hook001PO struct {
 
 func init() {
 	Hook001 = &Hook001PO{
-		Deploy: utils.NewSafeStringMap(),
+		Deploy:   utils.NewSafeStringMap(),
 		Scheduld: utils.NewSafeStringMap(),
 	}
 }
@@ -31,7 +31,7 @@ func Hook_001(request []byte) []byte {
 	enc := gob.NewEncoder(&network)
 	// 2.向编码器中写入数据
 	err := enc.Encode(dto.Hook001DTO{
-		Deploy: Hook001.Deploy.GET(string(request)),
+		Deploy:   Hook001.Deploy.GET(string(request)),
 		Scheduld: Hook001.Deploy.GET(string(request)),
 	})
 	if err != nil {
