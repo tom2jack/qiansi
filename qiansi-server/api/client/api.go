@@ -29,7 +29,7 @@ func ApiRegServer(c *gin.Context) {
 		return
 	}
 	var row int
-	models.Mysql.Table("member").Where("uid = ?", uid).Count(&row)
+	models.Mysql.Table("member").Where("id = ?", uid).Count(&row)
 	if row == 0 {
 		resp.NewApiResult(-5, "用户不存在").Json(c)
 		return

@@ -39,7 +39,7 @@ func (cfg *ZMCfg) Save() error {
 func LoadConfig(path string) *ZMCfg {
 	_, err = os.Stat(path)
 	if err != nil {
-		panic("app配置文件读取异常")
+		return nil
 	}
 	cfg, err := goconfig.LoadConfigFile(path)
 	if err != nil {

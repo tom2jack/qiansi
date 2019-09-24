@@ -10,7 +10,6 @@ import (
 	"net/url"
 	"qiansi/common/conf"
 	"qiansi/common/dto"
-	"qiansi/common/logger"
 	"qiansi/common/utils"
 	"strconv"
 	"strings"
@@ -88,7 +87,7 @@ func request(method string, url string, body io.Reader) ([]byte, error) {
 	} else {
 		raw = nil
 	}
-	logger.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, conf.API_URL+url, string(raw))
+	// logger.Info("[发送请求]:(%s)%s\n[返回结果]:%s", method, conf.API_URL+url, string(raw))
 	return raw, nil
 }
 
