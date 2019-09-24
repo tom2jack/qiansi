@@ -60,19 +60,18 @@ func DeploySet(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	po := &models.Deploy{}
-	utils.SuperConvert(param, po)
-
-	if po.Id == 0 {
+	if param.Id == 0 {
+		po := &models.Deploy{}
+		utils.SuperConvert(param, po)
 		po.Uid = c.GetInt("UID")
 		if models.Mysql.Save(po).RowsAffected > 0 {
 			resp.NewApiResult(1, "创建成功", po).Json(c)
 			return
 		}
 	}
-	if po.Id > 0 {
-		if models.Mysql.Table("deploy").Where("id=? and uid=?", po.Id, c.GetInt("UID")).Updates(po).RowsAffected > 0 {
-			resp.NewApiResult(1, "更新成功", po).Json(c)
+	if param.Id > 0 {
+		if models.Mysql.Table("deploy").Where("uid=?", c.GetInt("UID")).Save(param).RowsAffected > 0 {
+			resp.NewApiResult(1, "更新成功").Json(c)
 			return
 		}
 	}

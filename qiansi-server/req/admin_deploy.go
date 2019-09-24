@@ -8,7 +8,7 @@ type DeploySetParam struct {
 	Id int
 	// 应用名称
 	Title string
-	// 部署类型 0-本地 1-git 2-zip
+	// 部署类型 1-git 2-zip 3-other
 	DeployType int
 	// 资源地址
 	RemoteUrl string
