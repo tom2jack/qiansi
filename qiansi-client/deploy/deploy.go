@@ -37,6 +37,7 @@ func Run(data string) {
 }
 
 func runTask(deploy *dto.DeployDTO) {
+	logger.Info("%d号部署任务正在启动...", deploy.Id)
 	if !Task.SETNX(strconv.Itoa(deploy.Id), strconv.FormatInt(time.Now().Unix(), 36)) {
 		logger.Warn("%d号部署任务未完成，拒绝执行", deploy.Id)
 		return
