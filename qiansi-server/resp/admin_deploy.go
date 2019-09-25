@@ -31,6 +31,7 @@ type DeployVO struct {
 	Id            int
 	LocalPath     string
 	NowVersion    int
+	OpenId        string
 	RemoteUrl     string
 	Title         string
 	Uid           int

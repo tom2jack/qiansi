@@ -26,6 +26,8 @@ func init() {
 	{
 		// 客户端注册
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
+		// hook部署
+		client_route.GET("/ApiDeployRun", client.ApiDeployRun)
 		// 客户端交互请求
 		client_route.Use(middleware.ClientAuth())
 		{
@@ -53,9 +55,11 @@ func init() {
 		admin_route.Use(middleware.JWT())
 		{
 			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
+
 			admin_route.GET("/ServerLists", admin.ServerLists)
 			admin_route.POST("/ServerSet", admin.ServerSet)
 			admin_route.DELETE("/ServerDel", admin.ServerDel)
+
 			admin_route.GET("/DeployLists", admin.DeployLists)
 			admin_route.DELETE("/DeployDel", admin.DeployDel)
 			admin_route.POST("/DeploySet", admin.DeploySet)
@@ -65,6 +69,8 @@ func init() {
 			admin_route.GET("/DeployLog", admin.DeployLog)
 			admin_route.POST("/DeployServer", admin.DeployServer)
 			admin_route.GET("/DeployDo", admin.DeployDo)
+			admin_route.GET("/DeployLink", admin.DeployLink)
+
 			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
 			admin_route.POST("/ScheduleCreate", admin.ScheduleCreate)
 			admin_route.DELETE("/ScheduleDel", admin.ScheduleDel)

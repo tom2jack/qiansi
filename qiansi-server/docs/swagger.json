@@ -82,6 +82,38 @@
                 }
             }
         },
+        "/admin/DeployLink": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取部署触发链接",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/req.DeployBase"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/DeployLists": {
             "get": {
                 "consumes": [
@@ -686,6 +718,35 @@
                 }
             }
         },
+        "/client/ApiDeployRun": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "启动部署",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "入参集合",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "操作结果",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/string"
+                        }
+                    }
+                }
+            }
+        },
         "/clinet/ApiDeployLog": {
             "post": {
                 "consumes": [
@@ -890,6 +951,15 @@
                 }
             }
         },
+        "req.DeployBase": {
+            "type": "object",
+            "properties": {
+                "deployId": {
+                    "description": "部署应用ID",
+                    "type": "integer"
+                }
+            }
+        },
         "req.DeployDelParam": {
             "type": "object",
             "properties": {
@@ -1021,7 +1091,7 @@
                     "type": "string"
                 },
                 "deployType": {
-                    "description": "部署类型 0-本地 1-git 2-zip",
+                    "description": "部署类型 1-git 2-zip 3-other",
                     "type": "integer"
                 },
                 "id": {
@@ -1312,6 +1382,9 @@
                 },
                 "nowVersion": {
                     "type": "integer"
+                },
+                "openId": {
+                    "type": "string"
                 },
                 "remoteUrl": {
                     "type": "string"

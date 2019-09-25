@@ -44,6 +44,12 @@ definitions:
       updateTime:
         type: string
     type: object
+  req.DeployBase:
+    properties:
+      deployId:
+        description: 部署应用ID
+        type: integer
+    type: object
   req.DeployDelParam:
     properties:
       deployId:
@@ -135,7 +141,7 @@ definitions:
         description: 部署私钥
         type: string
       deployType:
-        description: 部署类型 0-本地 1-git 2-zip
+        description: 部署类型 1-git 2-zip 3-other
         type: integer
       id:
         description: 应用唯一编号
@@ -334,6 +340,8 @@ definitions:
         type: string
       nowVersion:
         type: integer
+      openId:
+        type: string
       remoteUrl:
         type: string
       title:
@@ -434,6 +442,27 @@ paths:
             $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 启动部署
+  /admin/DeployLink:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeployBase'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "启动成功","data": null}'
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+            type: object
+      summary: 获取部署触发链接
   /admin/DeployLists:
     get:
       consumes:
@@ -833,6 +862,25 @@ paths:
             $ref: '#/definitions/resp.ApiResult'
             type: object
       summary: 获取短信验证码
+  /client/ApiDeployRun:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作结果
+          schema:
+            $ref: '#/definitions/string'
+            type: object
+      summary: 启动部署
   /clinet/ApiDeployLog:
     post:
       consumes:

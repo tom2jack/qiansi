@@ -123,3 +123,36 @@ func ApiDeployNotify(c *gin.Context) {
 	}
 	resp.NewApiResult(1, "没改成功").Json(c)
 }
+
+// @Summary 启动部署
+// @Produce  json
+// @Accept  json
+// @Param key query string true "入参集合"
+// @Success 200 {object} string "操作结果"
+// @Router /client/ApiDeployRun [GET]
+func ApiDeployRun(c *gin.Context) {
+	openId := c.Query("key")
+	if len(openId) != 32 {
+		c.String(404, "服务不存在")
+		return
+	}
+	deployPO := &models.Deploy{
+		OpenId: openId,
+	}
+	if !deployPO.GetIdByOpenId() {
+		c.String(404, "服务不存在")
+		return
+	}
+	db := models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", deployPO.Id)
+	if db.Error != nil || db.RowsAffected != 1 {
+		c.String(404, "服务不存在")
+		return
+	}
+	relation := &models.DeployServerRelation{
+		DeployId: deployPO.Id,
+	}
+	for _, v := range relation.ListByDeployId() {
+		udp_service.Hook001.Deploy.SET(strconv.Itoa(v.ServerId), "1")
+	}
+	c.String(200, "Successful")
+}

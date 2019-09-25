@@ -8,12 +8,15 @@
 package admin
 
 import (
+	uuid "github.com/satori/go.uuid"
+	"qiansi/common/conf"
 	"qiansi/common/utils"
 	"qiansi/qiansi-server/models"
 	"qiansi/qiansi-server/req"
 	"qiansi/qiansi-server/resp"
 	"qiansi/qiansi-server/udp_service"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -64,6 +67,7 @@ func DeploySet(c *gin.Context) {
 		po := &models.Deploy{}
 		utils.SuperConvert(param, po)
 		po.Uid = c.GetInt("UID")
+		po.OpenId = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 		if models.Mysql.Save(po).RowsAffected > 0 {
 			resp.NewApiResult(1, "创建成功", po).Json(c)
 			return
@@ -283,4 +287,31 @@ func DeployDo(c *gin.Context) {
 		udp_service.Hook001.Deploy.SET(strconv.Itoa(v.Id), "1")
 	}
 	resp.NewApiResult(1, "启动成功", server).Json(c)
+}
+
+// @Summary 获取部署触发链接
+// @Produce  json
+// @Accept  json
+// @Param body body req.DeployBase true "入参集合"
+// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
+// @Router /admin/DeployLink [GET]
+func DeployLink(c *gin.Context) {
+	param := &req.DeployBase{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		return
+	}
+	po := &models.Deploy{
+		Id:  param.DeployId,
+		Uid: c.GetInt("UID"),
+	}
+	if po.GetOpenId() {
+		url, err := conf.S.GetValue("server", "api_host")
+		if err == nil {
+			url += "/client/DeployRun?Key=" + po.OpenId
+			resp.NewApiResult(1, "操作成功", url).Json(c)
+			return
+		}
+	}
+	resp.NewApiResult(-5, "获取失败，请重新尝试").Json(c)
 }
