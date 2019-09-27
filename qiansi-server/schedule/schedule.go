@@ -2,8 +2,6 @@ package schedule
 
 import (
 	"github.com/jakecoffman/cron"
-	"net/http"
-	_ "net/http/pprof"
 	"qiansi/common/logger"
 	"qiansi/common/utils"
 	"qiansi/qiansi-server/models"
@@ -49,7 +47,6 @@ func (j *job) Run() {
 var Task task
 
 func init() {
-	go http.ListenAndServe("localhost:8080", nil)
 	Task = task{
 		Cron:      cron.New(),
 		Queue:     make(chan models.Schedule, 50000),
