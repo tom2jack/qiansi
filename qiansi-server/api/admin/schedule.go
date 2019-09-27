@@ -61,7 +61,7 @@ func ScheduleCreate(c *gin.Context) {
 		return
 	}
 	if po.Create() {
-		schedule.Task.Add(po)
+		schedule.Task.Add(*po)
 	}
 	resp.NewApiResult(1).Json(c)
 }
