@@ -64,6 +64,13 @@ func DeploySet(c *gin.Context) {
 		return
 	}
 	if param.Id == 0 {
+		member := &models.Member{
+			Id: c.GetInt("UID"),
+		}
+		if !member.CheckDeploy() {
+			resp.NewApiResult(-4, "您的部署任务创建数量已达上限").Json(c)
+			return
+		}
 		po := &models.Deploy{}
 		utils.SuperConvert(param, po)
 		po.Uid = c.GetInt("UID")

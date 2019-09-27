@@ -48,7 +48,13 @@ func ScheduleCreate(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-
+	member := &models.Member{
+		Id: c.GetInt("UID"),
+	}
+	if !member.CheckSchedule() {
+		resp.NewApiResult(-4, "您的调度任务创建数量已达上限").Json(c)
+		return
+	}
 	po := &models.Schedule{}
 	utils.SuperConvert(param, po)
 	po.Uid = c.GetInt("UID")
