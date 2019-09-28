@@ -15,8 +15,8 @@ var (
 )
 
 const (
-	API_URL  = "http://s01.zhimiao.org:1315"
-	UDP_HOST = "s01.zhimiao.org:1315"
+	API_URL  = "http://qiansi.zhimiao.org"
+	UDP_HOST = "qiansi.zhimiao.org:1315"
 )
 
 type ZMCfg struct {

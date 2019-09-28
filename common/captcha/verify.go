@@ -5,6 +5,7 @@ import (
 	"github.com/mojocn/base64Captcha"
 	"math/rand"
 	"qiansi/common/logger"
+	"qiansi/common/sdk"
 	"qiansi/qiansi-server/models"
 	"time"
 )
@@ -51,10 +52,10 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
-	/*result := sdk.Aliyun.SendSmsVerify(phone, string(rnd))
+	result := sdk.Aliyun.SendSmsVerify(phone, string(rnd))
 	if !result {
 		return fmt.Errorf("发送失败")
-	}*/
+	}
 	logger.Info("短信验证码：%s", rnd)
 	models.Redis.Set(idkey, rnd, 30*60)
 	return nil
@@ -71,13 +72,13 @@ func VerifyByImg(idkey string) (string, string) {
 		150,
 		// DefaultLen Default number of digits in captcha solution.
 		// 默认数字验证长度6.
-		1,
+		6,
 		// MaxSkew max absolute skew factor of a single digit.
 		// 图像验证码的最大干扰洗漱.
-		1, //4.5,
+		4.5, //4.5,
 		// DotCount Number of background circles.
 		// 图像验证码干扰圆点的数量.
-		0, //30,
+		30, //30,
 	})
 	base64blob := base64Captcha.CaptchaWriteToBase64Encoding(captcaInterfaceInstance)
 	return idkey, base64blob

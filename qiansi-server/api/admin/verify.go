@@ -57,10 +57,10 @@ func VerifyBySMS(c *gin.Context) {
 		resp.NewApiResult(-5, "验证码无效").Json(c)
 		return
 	}
-	/*if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
+	if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
 		resp.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
 		return
-	}*/
+	}
 	err := captcha.VerifyBySMS(param.Phone)
 	if err != nil {
 		logger.Warn("[短信发送失败]：%s-%s", param.Phone, err.Error())
