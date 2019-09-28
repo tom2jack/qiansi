@@ -25,8 +25,6 @@ var (
 	}
 )
 
-const BASE_URL = ""
-
 type ApiBody struct {
 	Code int
 	Data *json.RawMessage
