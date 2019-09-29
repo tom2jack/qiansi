@@ -21,9 +21,6 @@ func (m *Member) CheckDeploy() bool {
 	var num int
 	Mysql.Table("deploy").Where("uid=?", m.Id).Count(&num)
 	Mysql.Select("max_deploy").First(m)
-	if m.MaxDeploy == 0 || num == 0 {
-		return false
-	}
 	return m.MaxDeploy > num
 }
 
@@ -32,8 +29,5 @@ func (m *Member) CheckSchedule() bool {
 	var num int
 	Mysql.Table("schedule").Where("uid=?", m.Id).Count(&num)
 	Mysql.Select("max_schedule").First(m)
-	if m.MaxSchedule == 0 || num == 0 {
-		return false
-	}
 	return m.MaxSchedule > num
 }
