@@ -25,8 +25,7 @@ type aliyunSmsResponse struct {
 }
 
 func init() {
-	var err error
-	Aliyun.client, err = aliyunSDK.NewClientWithAccessKey(
+	client, err := aliyunSDK.NewClientWithAccessKey(
 		conf.S.MustValue("Aliyun", "RegionId"),
 		conf.S.MustValue("Aliyun", "AccessKey"),
 		conf.S.MustValue("Aliyun", "AccessSecret"),
@@ -34,6 +33,7 @@ func init() {
 	if err != nil {
 		logger.Error(err.Error())
 	}
+	Aliyun = &aliyun{client: client}
 }
 
 //SendSms 验证码发送
