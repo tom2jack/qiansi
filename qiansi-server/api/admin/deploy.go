@@ -253,8 +253,8 @@ func DeployLog(c *gin.Context) {
 	if param.EndTime.IsZero() {
 		param.EndTime = time.Now()
 	}
-	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30 {
-		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
+	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30*3 {
+		resp.NewApiResult(-4, "日志筛选时长不可大于三个月").Json(c)
 		return
 	}
 	lists, rows := s.List(param.StartTime, param.EndTime, param.Offset(), param.PageSize)
