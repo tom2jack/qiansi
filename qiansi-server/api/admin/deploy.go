@@ -313,7 +313,7 @@ func DeployLink(c *gin.Context) {
 		Uid: c.GetInt("UID"),
 	}
 	if po.GetOpenId() {
-		url := "/client/DeployRun?Key=" + po.OpenId
+		url := "/client/ApiDeployRun?Key=" + po.OpenId
 		resp.NewApiResult(1, "操作成功", conf.API_URL+url).Json(c)
 		return
 	}

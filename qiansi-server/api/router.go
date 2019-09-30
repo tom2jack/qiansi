@@ -28,6 +28,7 @@ func init() {
 		client_route.GET("/ApiRegServer", client.ApiRegServer)
 		// hook部署
 		client_route.GET("/ApiDeployRun", client.ApiDeployRun)
+		client_route.POST("/ApiDeployRun", client.ApiDeployRun)
 		// 客户端交互请求
 		client_route.Use(middleware.ClientAuth())
 		{
