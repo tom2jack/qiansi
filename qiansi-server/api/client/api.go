@@ -131,7 +131,7 @@ func ApiDeployNotify(c *gin.Context) {
 // @Success 200 {object} string "操作结果"
 // @Router /client/ApiDeployRun [GET]
 func ApiDeployRun(c *gin.Context) {
-	openId := c.Query("key")
+	openId := c.Query("Key")
 	if len(openId) != 32 {
 		c.String(404, "服务不存在")
 		return
