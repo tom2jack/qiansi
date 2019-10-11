@@ -69,7 +69,11 @@ func init() {
 				taskNum--
 				continue
 			}
-			Task.Add(item)
+			err := Task.Add(item)
+			if err != nil {
+				taskNum--
+				logger.Warn("添加任务到调度器失败#", err)
+			}
 		}
 		taskNum += count
 		lastId = taskList[count-1].Id
@@ -80,15 +84,13 @@ func init() {
 }
 
 // Add 添加任务
-func (t *task) Add(m models.Schedule) {
+func (t *task) Add(m models.Schedule) error {
 	err := utils.PanicToError(func() {
 		cronName := strconv.Itoa(m.Id)
 		job := &job{Schedule: m}
 		Task.Cron.AddJob(m.Crontab, job, cronName)
 	})
-	if err != nil {
-		logger.Warn("添加任务到调度器失败#", err)
-	}
+	return err
 }
 
 // 直接运行任务
@@ -118,9 +120,15 @@ func jobRun() {
 	}
 }
 
+// NextTime 获取下一次执行时间
+func (t *task) NextTime(cronTable string) time.Time {
+	return cron.Parse(cronTable).Next(time.Now().Local())
+}
+
+// 任务前置执行
 func beforeExecJob(m *models.Schedule) {
 	m.PrevTime = time.Now().Local()
-	m.NextTime = cron.Parse(m.Crontab).Next(time.Now().Local())
+	m.NextTime = Task.NextTime(m.Crontab)
 	// 数据库回调
 	m.RunCallBack()
 }

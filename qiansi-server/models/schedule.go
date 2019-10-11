@@ -1,6 +1,7 @@
 package models
 
 import (
+	"qiansi/common/logger"
 	"time"
 )
 
@@ -67,6 +68,9 @@ func (m *Schedule) Create() bool {
 		return false
 	}
 	db := Mysql.Create(m)
+	if db.Error != nil {
+		logger.Warn("调度任务创建异常(rows: %d): %s", db.RowsAffected, db.Error)
+	}
 	return db.Error == nil && db.RowsAffected > 0
 }
 
