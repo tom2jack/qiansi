@@ -104,9 +104,11 @@ func UserSiginUp(c *gin.Context) {
 		return
 	}
 	member := &models.Member{
-		Phone:      param.Phone,
-		Password:   utils.PasswordHash(param.Password),
-		InviterUid: param.InviterUid,
+		Phone:       param.Phone,
+		Password:    utils.PasswordHash(param.Password),
+		InviterUid:  param.InviterUid,
+		MaxSchedule: 15,
+		MaxDeploy:   15,
 	}
 	models.Mysql.Table("member").Create(member)
 	member.Password = ""
