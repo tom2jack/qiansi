@@ -7,7 +7,6 @@ import (
 	"qiansi/qiansi-server/req"
 	"qiansi/qiansi-server/resp"
 	"qiansi/qiansi-server/schedule"
-	"time"
 )
 
 // @Summary 获取计划任务列表
@@ -57,7 +56,6 @@ func ScheduleCreate(c *gin.Context) {
 	po := &models.Schedule{}
 	utils.SuperConvert(param, po)
 	po.Uid = c.GetInt("UID")
-	po.PrevTime = time.Time{}
 	err := utils.PanicToError(func() {
 		po.NextTime = schedule.Task.NextTime(po.Crontab)
 	})

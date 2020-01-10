@@ -10,8 +10,8 @@ type Schedule struct {
 	CreateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 	Crontab      string    `xorm:"not null comment('规则') VARCHAR(50)"`
 	Id           int       `xorm:"not null pk autoincr INT(10)"`
-	NextTime     time.Time `xorm:"default null comment('下次执行时间') DATETIME"`
-	PrevTime     time.Time `xorm:"default null comment('上次执行时间') DATETIME"`
+	PrevTime     time.Time `gorm:"column:prev_time;type:datetime;default:null"` // 上次执行时间
+	NextTime     time.Time `gorm:"column:next_time;type:datetime"`              // 下次执行时间
 	Remain       int       `xorm:"not null default -1 comment('剩余执行次数 -1无限 0-停止') INT(11)"`
 	ScheduleType int       `xorm:"not null default 1 comment('调度类型 1-serverhttp 2-clientShell') TINYINT(1)"`
 	ServerId     int       `xorm:"not null default 0 comment('服务器ID') INT(10)"`
