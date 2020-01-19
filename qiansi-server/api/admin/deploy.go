@@ -8,13 +8,13 @@
 package admin
 
 import (
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-server/models"
+	"gitee.com/zhimiao/qiansi/qiansi-server/req"
+	"gitee.com/zhimiao/qiansi/qiansi-server/resp"
+	"gitee.com/zhimiao/qiansi/qiansi-server/udp_service"
 	uuid "github.com/satori/go.uuid"
-	"qiansi/common/conf"
-	"qiansi/common/utils"
-	"qiansi/qiansi-server/models"
-	"qiansi/qiansi-server/req"
-	"qiansi/qiansi-server/resp"
-	"qiansi/qiansi-server/udp_service"
 	"strconv"
 	"strings"
 	"time"

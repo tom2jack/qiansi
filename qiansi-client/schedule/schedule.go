@@ -3,11 +3,11 @@ package schedule
 import (
 	"bytes"
 	"encoding/gob"
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/dto"
+	"gitee.com/zhimiao/qiansi/qiansi-client/deploy"
 	"github.com/jakecoffman/cron"
 	"net"
-	"qiansi/common/conf"
-	"qiansi/common/dto"
-	"qiansi/qiansi-client/deploy"
 	"time"
 )
 

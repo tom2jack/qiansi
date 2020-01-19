@@ -2,11 +2,11 @@ package deploy
 
 import (
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/dto"
+	"gitee.com/zhimiao/qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-client/request"
 	"github.com/progrium/go-shell"
-	"qiansi/common/dto"
-	"qiansi/common/logger"
-	"qiansi/common/utils"
-	"qiansi/qiansi-client/request"
 	"runtime"
 	"strconv"
 	"strings"
@@ -65,7 +65,7 @@ func LogPush(deploy *dto.DeployDTO, format string, v ...interface{}) {
 		fname = runtime.FuncForPC(pc).Name()
 	}
 	logger.Info("("+fname+") "+format, v...)
-	// fname = strings.ReplaceAll(fname, "qiansi/qiansi-client/deploy.", "")
+	// fname = strings.ReplaceAll(fname, "gitee.com/zhimiao/qiansi/qiansi-client/deploy.", "")
 	// 反向推送日志到千丝平台
 	request.LogPush(deploy, fmt.Sprintf("("+fname+") "+format, v...))
 }

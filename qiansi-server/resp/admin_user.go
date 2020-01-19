@@ -1,6 +1,6 @@
 package resp
 
-import "qiansi/qiansi-server/models"
+import "gitee.com/zhimiao/qiansi/qiansi-server/models"
 
 type UserInfoVO struct {
 	models.Member

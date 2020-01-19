@@ -1,10 +1,10 @@
 package udp_service
 
 import (
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/logger"
 	"net"
 	"os"
-	"qiansi/common/conf"
-	"qiansi/common/logger"
 )
 
 // 初始化启动监听

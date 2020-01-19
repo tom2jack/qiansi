@@ -2,9 +2,9 @@ package install
 
 import (
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/qiansi-client/request"
 	uuid "github.com/satori/go.uuid"
-	"qiansi/common/conf"
-	"qiansi/qiansi-client/request"
 	"strconv"
 )
 

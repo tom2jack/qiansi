@@ -8,11 +8,11 @@
 package admin
 
 import (
-	"qiansi/common/captcha"
-	"qiansi/common/utils"
-	"qiansi/qiansi-server/models"
-	"qiansi/qiansi-server/req"
-	"qiansi/qiansi-server/resp"
+	"gitee.com/zhimiao/qiansi/common/captcha"
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-server/models"
+	"gitee.com/zhimiao/qiansi/qiansi-server/req"
+	"gitee.com/zhimiao/qiansi/qiansi-server/resp"
 	"strconv"
 	"time"
 

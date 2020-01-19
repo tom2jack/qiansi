@@ -8,11 +8,11 @@
 package admin
 
 import (
-	"qiansi/common/captcha"
-	"qiansi/common/logger"
-	"qiansi/common/utils"
-	"qiansi/qiansi-server/req"
-	"qiansi/qiansi-server/resp"
+	"gitee.com/zhimiao/qiansi/common/captcha"
+	"gitee.com/zhimiao/qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-server/req"
+	"gitee.com/zhimiao/qiansi/qiansi-server/resp"
 	"time"
 
 	"github.com/gin-gonic/gin"

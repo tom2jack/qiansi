@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/qiansi-client/install"
+	"gitee.com/zhimiao/qiansi/qiansi-client/schedule"
 	"os"
-	"qiansi/common/conf"
-	"qiansi/qiansi-client/install"
-	"qiansi/qiansi-client/schedule"
 )
 
 func main() {

@@ -1,7 +1,7 @@
 package deploy
 
 import (
-	"qiansi/common/dto"
+	"gitee.com/zhimiao/qiansi/common/dto"
 	"testing"
 )
 

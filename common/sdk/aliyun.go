@@ -3,10 +3,10 @@ package sdk
 import (
 	"encoding/json"
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/logger"
 	aliyunSDK "github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
-	"qiansi/common/conf"
-	"qiansi/common/logger"
 )
 
 var (

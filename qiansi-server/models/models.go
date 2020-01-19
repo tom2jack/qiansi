@@ -2,11 +2,11 @@ package models
 
 import (
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/conf"
 	"github.com/gomodule/redigo/redis"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
-	"qiansi/common/conf"
 	"time"
 )
 

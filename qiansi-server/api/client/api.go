@@ -1,12 +1,12 @@
 package client
 
 import (
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-server/models"
+	"gitee.com/zhimiao/qiansi/qiansi-server/resp"
+	"gitee.com/zhimiao/qiansi/qiansi-server/udp_service"
 	"github.com/gin-gonic/gin"
 	"github.com/lifei6671/gorand"
-	"qiansi/common/utils"
-	"qiansi/qiansi-server/models"
-	"qiansi/qiansi-server/resp"
-	"qiansi/qiansi-server/udp_service"
 	"strconv"
 )
 

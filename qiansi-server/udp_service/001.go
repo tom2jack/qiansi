@@ -3,8 +3,8 @@ package udp_service
 import (
 	"bytes"
 	"encoding/gob"
-	"qiansi/common/dto"
-	"qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/common/dto"
+	"gitee.com/zhimiao/qiansi/common/utils"
 )
 
 var Hook001 *Hook001PO

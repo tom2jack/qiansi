@@ -1,7 +1,7 @@
 package request
 
 import (
-	"qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/conf"
 	"testing"
 )
 

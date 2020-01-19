@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"gitee.com/zhimiao/qiansi/common/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"qiansi/common/utils"
 	"strconv"
 )
 

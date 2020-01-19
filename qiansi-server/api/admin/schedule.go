@@ -1,12 +1,12 @@
 package admin
 
 import (
+	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/qiansi-server/models"
+	"gitee.com/zhimiao/qiansi/qiansi-server/req"
+	"gitee.com/zhimiao/qiansi/qiansi-server/resp"
+	"gitee.com/zhimiao/qiansi/qiansi-server/schedule"
 	"github.com/gin-gonic/gin"
-	"qiansi/common/utils"
-	"qiansi/qiansi-server/models"
-	"qiansi/qiansi-server/req"
-	"qiansi/qiansi-server/resp"
-	"qiansi/qiansi-server/schedule"
 )
 
 // @Summary 获取计划任务列表

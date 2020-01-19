@@ -1,13 +1,13 @@
 package main
 
 import (
+	"gitee.com/zhimiao/qiansi/common/conf"
+	"gitee.com/zhimiao/qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/qiansi-server/api"
+	_ "gitee.com/zhimiao/qiansi/qiansi-server/schedule"
+	_ "gitee.com/zhimiao/qiansi/qiansi-server/udp_service"
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"qiansi/common/conf"
-	"qiansi/common/logger"
-	"qiansi/qiansi-server/api"
-	_ "qiansi/qiansi-server/schedule"
-	_ "qiansi/qiansi-server/udp_service"
 	"time"
 )
 

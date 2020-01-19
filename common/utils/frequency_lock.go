@@ -2,7 +2,7 @@
 package utils
 
 import (
-	"qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common/logger"
 	"sync"
 	"time"
 )

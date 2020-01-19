@@ -1,9 +1,9 @@
 package middleware
 
 import (
+	"gitee.com/zhimiao/qiansi/common/conf"
 	"github.com/gin-gonic/gin"
 	"github.com/unrolled/secure"
-	"qiansi/common/conf"
 )
 
 func TLS() gin.HandlerFunc {

@@ -1,7 +1,7 @@
 package models
 
 import (
-	"qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common/logger"
 	"time"
 )
 

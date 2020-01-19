@@ -2,9 +2,9 @@ package schedule
 
 import (
 	"fmt"
+	"gitee.com/zhimiao/qiansi/common/net"
+	"gitee.com/zhimiao/qiansi/qiansi-server/models"
 	"net/http"
-	"qiansi/common/net"
-	"qiansi/qiansi-server/models"
 )
 
 type Handler interface {

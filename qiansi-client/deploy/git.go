@@ -1,12 +1,12 @@
 package deploy
 
 import (
+	"gitee.com/zhimiao/qiansi/common/dto"
 	"golang.org/x/crypto/ssh"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/config"
 	"gopkg.in/src-d/go-git.v4/plumbing"
 	gitssh "gopkg.in/src-d/go-git.v4/plumbing/transport/ssh"
-	"qiansi/common/dto"
 )
 
 func Git(deploy *dto.DeployDTO) error {

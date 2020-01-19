@@ -1,7 +1,7 @@
 package models
 
 import (
-	"qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/common/utils"
 	"time"
 )
 

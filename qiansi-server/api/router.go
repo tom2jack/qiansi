@@ -1,13 +1,13 @@
 package api
 
 import (
+	"gitee.com/zhimiao/qiansi/qiansi-server/api/admin"
+	"gitee.com/zhimiao/qiansi/qiansi-server/api/client"
+	_ "gitee.com/zhimiao/qiansi/qiansi-server/docs"
+	"gitee.com/zhimiao/qiansi/qiansi-server/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
-	"qiansi/qiansi-server/api/admin"
-	"qiansi/qiansi-server/api/client"
-	_ "qiansi/qiansi-server/docs"
-	"qiansi/qiansi-server/middleware"
 )
 
 var Router *gin.Engine
