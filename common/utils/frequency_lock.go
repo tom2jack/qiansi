@@ -2,7 +2,7 @@
 package utils
 
 import (
-	"gitee.com/zhimiao/qiansi/common/logger"
+	"github.com/sirupsen/logrus"
 	"sync"
 	"time"
 )
@@ -39,13 +39,13 @@ func (this *LockTable) IsLock(key string, lock_time time.Duration) bool {
 			this.cleanerCheck()
 			return false
 		}
-		logger.Info("[LockTable] %s is limited\n", key)
+		logrus.Infof("[LockTable] %s is limited\n", key)
 		return true
 	}
 	this.Items[key] = item
 	cleannerDuraction := this.CleanerDuraction
 	this.Unlock()
-	logger.Info("[LockTable] add %s to table\n", key)
+	logrus.Infof("[LockTable] add %s to table\n", key)
 	if cleannerDuraction == 0 {
 		this.cleanerCheck()
 	}
@@ -55,7 +55,7 @@ func (this *LockTable) IsLock(key string, lock_time time.Duration) bool {
 func (this *LockTable) cleanerCheck() {
 	this.Lock()
 	defer this.Unlock()
-	logger.Info("[LockTable] start timer cleaner Duraction after %.2f s\n", this.CleanerDuraction.Seconds())
+	logrus.Infof("[LockTable] start timer cleaner Duraction after %.2f s\n", this.CleanerDuraction.Seconds())
 	if this.Cleaner != nil {
 		this.Cleaner.Stop()
 	}
@@ -68,7 +68,7 @@ func (this *LockTable) cleanerCheck() {
 		lifeSpan := item.LifeSpan
 		createOn := item.CreateOn
 		if now.Sub(createOn) >= lifeSpan {
-			logger.Info("[LockTable] delete key %s", key)
+			logrus.Infof("[LockTable] delete key %s", key)
 			delete(this.Items, key)
 		} else {
 			if smallestDuracton == 0 || lifeSpan-now.Sub(createOn) < smallestDuracton {

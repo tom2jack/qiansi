@@ -7,9 +7,9 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/conf"
-	"gitee.com/zhimiao/qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common"
 	"github.com/dgrijalva/jwt-go"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -23,11 +23,7 @@ func MD5(value string) string {
 
 //ParseToken 解析jwtToken
 func ParseToken(tokenString string) (string, error) {
-	jwt_secret, err := conf.S.GetValue("app", "jwt_secret")
-	if err != nil {
-		return "", err
-	}
-	jwtSecret := []byte(jwt_secret)
+	jwtSecret := []byte(common.Config.App.JwtSecret)
 	tokenClaims, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -48,11 +44,7 @@ func ParseToken(tokenString string) (string, error) {
 
 //CreateToken 生成jwtToken
 func CreateToken(subject string, expire time.Duration) (string, error) {
-	jwt_secret, err := conf.S.GetValue("app", "jwt_secret")
-	if err != nil {
-		return "", err
-	}
-	jwtSecret := []byte(jwt_secret)
+	jwtSecret := []byte(common.Config.App.JwtSecret)
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(expire).Unix(),
@@ -66,7 +58,7 @@ func CreateToken(subject string, expire time.Duration) (string, error) {
 func PasswordHash(pwd string) string {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.MinCost)
 	if err != nil {
-		logger.Warn(err.Error())
+		logrus.Warn(err.Error())
 	}
 	return string(hash)
 }
@@ -75,7 +67,7 @@ func PasswordHash(pwd string) string {
 func PasswordVerify(hashedPwd string, plainPwd string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(plainPwd))
 	if err != nil {
-		logger.Warn(err.Error())
+		logrus.Warn(err.Error())
 		return false
 	}
 	return true

@@ -2,10 +2,10 @@ package captcha
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/logger"
 	"gitee.com/zhimiao/qiansi/common/sdk"
-	"gitee.com/zhimiao/qiansi/qiansi-server/models"
+	"gitee.com/zhimiao/qiansi/models"
 	"github.com/mojocn/base64Captcha"
+	"github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
 )
@@ -56,7 +56,7 @@ func VerifyBySMS(phone string) error {
 	if !result {
 		return fmt.Errorf("发送失败")
 	}
-	logger.Info("短信验证码：%s", rnd)
+	logrus.Infof("短信验证码：%s", rnd)
 	models.Redis.Set(idkey, rnd, 30*60)
 	return nil
 }

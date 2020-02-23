@@ -3,10 +3,10 @@ package sdk
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/conf"
-	"gitee.com/zhimiao/qiansi/common/logger"
+	"gitee.com/zhimiao/qiansi/common"
 	aliyunSDK "github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -26,12 +26,12 @@ type aliyunSmsResponse struct {
 
 func init() {
 	client, err := aliyunSDK.NewClientWithAccessKey(
-		conf.S.MustValue("Aliyun", "RegionId"),
-		conf.S.MustValue("Aliyun", "AccessKey"),
-		conf.S.MustValue("Aliyun", "AccessSecret"),
+		common.Config.Aliyun.RegionId,
+		common.Config.Aliyun.AccessKey,
+		common.Config.Aliyun.AccessSecret,
 	)
 	if err != nil {
-		logger.Error(err.Error())
+		logrus.Error(err.Error())
 	}
 	Aliyun = &aliyun{client: client}
 }
@@ -43,7 +43,7 @@ func (a *aliyun) SendSmsVerify(phone string, code string) bool {
 		"verify": code,
 	})
 	if err != nil {
-		logger.Warn(log_str + err.Error())
+		logrus.Warn(log_str + err.Error())
 		return false
 	}
 	request := requests.NewCommonRequest()
@@ -52,14 +52,14 @@ func (a *aliyun) SendSmsVerify(phone string, code string) bool {
 	request.Domain = "dysmsapi.aliyuncs.com"
 	request.Version = "2017-05-25"
 	request.ApiName = "SendSms"
-	request.QueryParams["RegionId"] = conf.S.MustValue("AliyunSms", "RegionId")
+	request.QueryParams["RegionId"] = common.Config.Aliyun.SmsConfig.RegionId
 	request.QueryParams["PhoneNumbers"] = phone
-	request.QueryParams["SignName"] = conf.S.MustValue("AliyunSms", "SignName")
-	request.QueryParams["TemplateCode"] = conf.S.MustValue("AliyunSms", "TemplateCode")
+	request.QueryParams["SignName"] = common.Config.Aliyun.SmsConfig.SignName
+	request.QueryParams["TemplateCode"] = common.Config.Aliyun.SmsConfig.TemplateCode
 	request.QueryParams["TemplateParam"] = string(param)
 	response, err := a.client.ProcessCommonRequest(request)
 	if err != nil {
-		logger.Warn(log_str + err.Error())
+		logrus.Warn(log_str + err.Error())
 		return false
 	}
 	//{"Message":"OK","RequestId":"B1EB5CD5-1F93-4983-852D-B225B934CF65","BizId":"440415459725393922^0","Code":"OK"}
@@ -67,7 +67,7 @@ func (a *aliyun) SendSmsVerify(phone string, code string) bool {
 	json_data := &aliyunSmsResponse{}
 	err = json.Unmarshal([]byte(str), json_data)
 	if !response.IsSuccess() || err != nil || json_data.Code != "OK" {
-		logger.Warn(log_str + str)
+		logrus.Warn(log_str + str)
 		return false
 	}
 	return true
