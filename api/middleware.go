@@ -2,12 +2,23 @@ package api
 
 import (
 	"gitee.com/zhimiao/qiansi/common/utils"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
 	"time"
 )
+
+// corsMiddleware 跨域
+func corsMiddleware() gin.HandlerFunc {
+	return cors.New(cors.Config{
+		AllowOrigins:  []string{"*"},
+		AllowMethods:  []string{"*"},
+		AllowHeaders:  []string{"*"},
+		ExposeHeaders: []string{"*"},
+	})
+}
 
 // logMiddleware 日志中间件
 func logMiddleware() gin.HandlerFunc {
