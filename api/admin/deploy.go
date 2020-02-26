@@ -8,6 +8,7 @@
 package admin
 
 import (
+	"fmt"
 	"gitee.com/zhimiao/qiansi/common"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
@@ -224,9 +225,15 @@ func DeployRunLog(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	deployLogs := &[]models.DeployLog{}
-	models.Mysql.Where("uid=? and deploy_id=? and server_id=? and deploy_version=?", c.GetInt("UID"), param.DeployId, param.ServerId, param.Version).Find(deployLogs)
-	resp.NewApiResult(1, "读取成功", deployLogs).Json(c)
+	data, _ := models.InfluxDB.QueryToArray(fmt.Sprintf(
+		`from(bucket: "client_log")
+					|> range(start: -30d)
+					|> filter(fn: (r) => r._measurement == "deploy" and r.DEPLOY_ID=="%v" and r.DEPLOY_VERSION == "%v" and r.SERVER_ID == "%v")`,
+		param.DeployId,
+		param.Version,
+		param.ServerId,
+	))
+	resp.NewApiResult(1, "读取成功", data).Json(c)
 }
 
 // @Summary 获取部署日志
@@ -253,22 +260,19 @@ func DeployLog(c *gin.Context) {
 	if param.EndTime.IsZero() {
 		param.EndTime = time.Now()
 	}
-	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30*3 {
-		resp.NewApiResult(-4, "日志筛选时长不可大于三个月").Json(c)
+	if param.EndTime.Sub(time.Now()) > time.Hour*24*30 {
+		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
 		return
 	}
-	lists, rows := s.List(param.StartTime, param.EndTime, param.Offset(), param.PageSize)
-	vo := make([]resp.DeployLogVO, len(lists))
-	for k, v := range lists {
-		utils.SuperConvert(&v, &vo[k])
-		// vo[k].CreateTime = resp.JsonTimeDate(v.CreateTime)
-	}
-	resp.NewApiResult(1, "读取成功", resp.PageInfo{
-		Page:      param.Page,
-		PageSize:  param.PageSize,
-		TotalSize: rows,
-		Rows:      vo,
-	}).Json(c)
+	data, _ := models.InfluxDB.QueryToArray(fmt.Sprintf(
+		`from(bucket: "client_log")
+					|> range(start: "%v", end: "%v")
+					|> filter(fn: (r) => r._measurement == "deploy" and r.DEPLOY_ID=="%v" and r.DEPLOY_VERSION == "%v" and r.SERVER_ID == "%v")`,
+		param.DeployId,
+		param.Version,
+		param.ServerId,
+	))
+	resp.NewApiResult(1, "读取成功", data).Json(c)
 }
 
 // @Summary 启动部署

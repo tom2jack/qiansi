@@ -26,6 +26,11 @@ type config struct {
 		Database    string
 		TablePrefix string
 	}
+	InfluxDB struct {
+		Host  string
+		Token string
+		Org   string
+	}
 	Redis struct {
 		Host        string
 		Auth        string

@@ -1,13 +1,16 @@
 package client
 
 import (
-	"gitee.com/zhimiao/qiansi/common/utils"
+	"encoding/json"
+	"fmt"
 	"gitee.com/zhimiao/qiansi/models"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/udp_service"
 	"github.com/gin-gonic/gin"
+	"github.com/influxdata/influxdb-client-go"
 	"github.com/lifei6671/gorand"
 	"strconv"
+	"time"
 )
 
 // @Summary 服务器注册
@@ -73,28 +76,39 @@ func ApiGetDeployTask(c *gin.Context) {
 // @Success 200 {object} resp.ApiResult ""
 // @Router /clinet/ApiDeployLog [post]
 func ApiDeployLog(c *gin.Context) {
-	serverId := c.GetInt("SERVER-ID")
-	uid := c.GetInt("SERVER-UID")
-	deviceId := c.GetString("SERVER-DEVICE")
-	deployId, _ := strconv.Atoi(c.PostForm("deployId"))
-	version, _ := strconv.Atoi(c.PostForm("version"))
-	content := utils.MustUtf8(c.PostForm("content"))
-	var row int
-	models.Mysql.Table("server").Where("id=? and uid=? and device_id=?", serverId, uid, deviceId).Count(&row)
-	if row == 0 {
+	raw, err := c.GetRawData()
+	if err != nil {
 		c.Status(403)
 		return
 	}
-	deployLog := &models.DeployLog{
-		Uid:           uid,
-		DeployId:      deployId,
-		ServerId:      serverId,
-		DeviceId:      deviceId,
-		DeployVersion: version,
-		Content:       content,
-		ClientIp:      c.ClientIP(),
+	rawData := map[string]interface{}{}
+	err = json.Unmarshal(raw, &rawData)
+	if err != nil {
+		c.Status(400)
+		return
 	}
-	models.Mysql.Create(deployLog)
+	mFields := map[string]interface{}{}
+	mName := ""
+	mTags := map[string]string{
+		"SERVER_ID":     strconv.Itoa(c.GetInt("SERVER-ID")),
+		"SERVER_UID":    strconv.Itoa(c.GetInt("SERVER-UID")),
+		"SERVER_DEVICE": c.GetString("SERVER-DEVICE"),
+	}
+	for k, v := range rawData {
+		vData := fmt.Sprintf("%v", v)
+		switch k {
+		case "__MODEL__":
+			mName = vData
+		case "__MESSAGE__":
+			mFields["Message"] = vData
+		case "__LOG_LEVEL__":
+			mTags["LOG_LEVEL"] = vData
+		default:
+			mTags[k] = vData
+		}
+	}
+	metric := influxdb.NewRowMetric(mFields, mName, mTags, time.Now())
+	models.InfluxDB.Write("client_log", metric)
 	resp.NewApiResult(1).Json(c)
 }
 

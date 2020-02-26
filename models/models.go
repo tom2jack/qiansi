@@ -1,22 +1,31 @@
 package models
 
 import (
+	"context"
 	"fmt"
 	"gitee.com/zhimiao/qiansi/common"
 	"github.com/gomodule/redigo/redis"
+	"github.com/influxdata/influxdb-client-go"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/sirupsen/logrus"
+	"io/ioutil"
 	"log"
 	"time"
 )
 
 var (
-	Redis *zmRedis
-	Mysql *gorm.DB
+	Redis    *zmRedis
+	Mysql    *gorm.DB
+	InfluxDB *zmInflux
 )
 
 type zmRedis struct {
 	redis.Pool
+}
+
+type zmInflux struct {
+	Client *influxdb.Client
 }
 
 type CommonMap map[string]interface{}
@@ -27,9 +36,16 @@ type ModelBase1 struct {
 	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 }
 
+// Start 初始化数据
 func Start() {
 	loadRedis()
 	loadMysql()
+	loadInfluxDB()
+}
+
+// 初始化influxDb
+func loadInfluxDB() {
+	InfluxDB = &zmInflux{}
 }
 
 // Setup Initialize the Redis instance
@@ -72,16 +88,13 @@ func loadMysql() {
 	if err != nil {
 		log.Fatalf("models.Setup err: %v", err)
 	}
-
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
 		return common.Config.Mysql.TablePrefix + defaultTableName
 	}
-
 	Mysql.LogMode(true)
 	Mysql.SingularTable(true)
 	Mysql.DB().SetMaxIdleConns(10)
 	Mysql.DB().SetMaxOpenConns(100)
-
 	Mysql.Callback().Create().Replace("gorm:update_time_stamp", func(scope *gorm.Scope) {
 		if !scope.HasError() {
 			if createTimeField, ok := scope.FieldByName("CreateTime"); ok {
@@ -89,7 +102,6 @@ func loadMysql() {
 					createTimeField.Set(time.Now())
 				}
 			}
-
 			if modifyTimeField, ok := scope.FieldByName("UpdateTime"); ok {
 				if modifyTimeField.IsBlank {
 					modifyTimeField.Set(time.Now())
@@ -152,4 +164,50 @@ func (r *zmRedis) Del(key string) (bool, error) {
 	conn := r.Pool.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("DEL", key))
+}
+
+func (m *zmInflux) DB() *influxdb.Client {
+	client, err := influxdb.New(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token)
+	if err != nil {
+		logrus.Warn("InfluxDB初始化失败")
+	}
+	return client
+}
+
+func (m *zmInflux) Write(bucket string, metric ...influxdb.Metric) (err error) {
+	conn := m.DB()
+	defer conn.Close()
+	_, err = conn.Write(context.Background(), bucket, common.Config.InfluxDB.Org, metric...)
+	return
+}
+
+func (m *zmInflux) QueryToRaw(flux string) (raw []byte, err error) {
+	conn := m.DB()
+	defer conn.Close()
+	data, err := conn.QueryCSV(context.Background(), flux, common.Config.InfluxDB.Org)
+	if err != nil {
+		return
+	}
+	raw, err = ioutil.ReadAll(data)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (m *zmInflux) QueryToArray(flux string) (result []map[string]interface{}, err error) {
+	conn := m.DB()
+	defer conn.Close()
+	data, err := conn.QueryCSV(context.Background(), flux, common.Config.InfluxDB.Org)
+	if err != nil {
+		return
+	}
+	for data.Next() {
+		rows := make(map[string]interface{})
+		err = data.Unmarshal(rows)
+		if data.Unmarshal(rows) == nil {
+			result = append(result, rows)
+		}
+	}
+	return
 }
