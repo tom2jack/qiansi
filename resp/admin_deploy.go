@@ -38,15 +38,3 @@ type DeployVO struct {
 	CreateTime    time.Time
 	UpdateTime    time.Time
 }
-
-type DeployLogVO struct {
-	ClientIp      string
-	Content       string
-	DeployId      int
-	DeployVersion int
-	DeviceId      string
-	Id            int64
-	ServerId      int
-	Uid           int
-	CreateTime    time.Time
-}

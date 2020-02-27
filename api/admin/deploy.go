@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unsafe"
 
 	"github.com/gin-gonic/gin"
 )
@@ -217,7 +218,7 @@ func DeployRunLogTab(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployRunLogParam true "入参集合"
-// @Success 200 {object} models.DeployLog "返回"
+// @Success 200 {object} resp.ApiResult ""
 // @Router /admin/DeployRunLog [get]
 func DeployRunLog(c *gin.Context) {
 	param := &req.DeployRunLogParam{}
@@ -240,7 +241,7 @@ func DeployRunLog(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployLogParam true "入参集合"
-// @Success 200 {array} resp.DeployLogVO "返回"
+// @Success 200 {object} resp.PageInfo ""
 // @Router /admin/DeployLog [get]
 func DeployLog(c *gin.Context) {
 	param := &req.DeployLogParam{}
@@ -248,31 +249,49 @@ func DeployLog(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	s := &models.DeployLog{
-		Uid:           c.GetInt("UID"),
-		DeployId:      param.DeployId,
-		DeployVersion: param.DeployVersion,
-		ServerId:      param.ServerId,
-	}
 	if param.StartTime.IsZero() {
 		param.StartTime = time.Now().Add(-time.Hour * 24 * 30)
 	}
 	if param.EndTime.IsZero() {
 		param.EndTime = time.Now()
 	}
-	if param.EndTime.Sub(time.Now()) > time.Hour*24*30 {
+	if param.StartTime.Sub(time.Now()) > time.Hour*24*30 {
 		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
 		return
 	}
-	data, _ := models.InfluxDB.QueryToArray(fmt.Sprintf(
+	fluxQuery := fmt.Sprintf(
 		`from(bucket: "client_log")
-					|> range(start: "%v", end: "%v")
-					|> filter(fn: (r) => r._measurement == "deploy" and r.DEPLOY_ID=="%v" and r.DEPLOY_VERSION == "%v" and r.SERVER_ID == "%v")`,
-		param.DeployId,
-		param.Version,
-		param.ServerId,
-	))
-	resp.NewApiResult(1, "读取成功", data).Json(c)
+					|> range(start: %s, stop: %s)
+					|> filter(fn: (r) => r._measurement == "deploy" and r.SERVER_UID == "%v")`,
+		param.StartTime.Format(time.RFC3339),
+		param.EndTime.Format(time.RFC3339),
+		c.GetInt("UID"),
+	)
+	if param.DeployId > 0 {
+		fluxQuery += fmt.Sprintf(`|> filter(fn: (r) => r.DEPLOY_ID=="%v")`, param.DeployId)
+	}
+	if param.DeployVersion > 0 {
+		fluxQuery += fmt.Sprintf(`|> filter(fn: (r) => r.DEPLOY_VERSION=="%v")`, param.DeployVersion)
+	}
+	if param.ServerId > 0 {
+		fluxQuery += fmt.Sprintf(`|> filter(fn: (r) => r.SERVER_ID=="%v")`, param.ServerId)
+	}
+	fluxQuery += "|> group()"
+	rowData, _ := models.InfluxDB.QueryToArray(fluxQuery + `|>count()`)
+	var rows int
+	if rowData != nil && len(rowData) > 0 {
+		if v, ok := rowData[0]["_value"].(int64); ok {
+			// 将 int64 转化为 int
+			rows = *(*int)(unsafe.Pointer(&v))
+		}
+	}
+	lists, _ := models.InfluxDB.QueryToArray(fluxQuery + fmt.Sprintf(`|> limit(n:%d, offset: %d)`, param.PageSize, param.Offset()))
+	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+		Page:      param.Page,
+		PageSize:  param.PageSize,
+		TotalSize: rows,
+		Rows:      lists,
+	}).Json(c)
 }
 
 // @Summary 启动部署
