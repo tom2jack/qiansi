@@ -46,6 +46,8 @@ func initRoute() {
 			client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
 			// 部署回调
 			client_route.GET("/ApiDeployNotify", client.ApiDeployNotify)
+			// 获取监控配置
+			client_route.GET("/ApiGetTelegrafConfig", client.ApiGetTelegrafConfig)
 		}
 	}
 

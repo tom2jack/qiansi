@@ -67,6 +67,39 @@ func ApiGetDeployTask(c *gin.Context) {
 	resp.NewApiResult(1, "读取成功", deploy).Encypt(c)
 }
 
+// @Summary 获取Telegraf监控配置
+// @Produce  json
+// @Accept  json
+// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "读取成功","data": [deploy]}"
+// @Router /clinet/ApiGetTelegrafConfig [GET]
+func ApiGetTelegrafConfig(c *gin.Context) {
+	server_id := c.GetInt("SERVER-ID")
+	uid := c.GetInt("SERVER-UID")
+	sysConfig := &models.SysConfig{}
+	sysConfig.Get("telegraf_config")
+	defaultConfig := sysConfig.Data
+	telegraf := &models.Telegraf{
+		ServerID: server_id,
+		UId:      uid,
+	}
+	telegraf.Get()
+	// TODO: 配置合并
+	selfConfig := telegraf.TomlConfig
+	if selfConfig == "" {
+		selfConfig = defaultConfig
+	}
+	// 判断当前客户端是否开启监控
+	var isOpen = true
+	if telegraf.IsOpen == 2 {
+		isOpen = false
+	}
+	resuslt := map[string]interface{}{
+		"config":  selfConfig,
+		"is_open": isOpen,
+	}
+	resp.NewApiResult(1, "读取成功", resuslt).Encypt(c)
+}
+
 // @Summary 客户端日志推送
 // @Produce  json
 // @Accept  multipart/form-data
