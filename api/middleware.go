@@ -1,7 +1,11 @@
 package api
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"gitee.com/zhimiao/qiansi/common/utils"
+	"gitee.com/zhimiao/qiansi/models"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -54,16 +58,32 @@ func logMiddleware() gin.HandlerFunc {
 func clientAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		serverId, _ := strconv.Atoi(c.GetHeader("SERVER-ID"))
-		serverUid, _ := strconv.Atoi(c.GetHeader("SERVER-UID"))
-		serverDevice := c.GetHeader("SERVER-DEVICE")
-		if serverId == 0 || serverUid == 0 || serverDevice == "" {
+		token := c.GetHeader("CLIENT-TOKEN")
+		if d, e := base64.StdEncoding.DecodeString(token); e == nil {
+			token = string(d)
+		}
+		if serverId == 0 || token == "" {
+			c.AbortWithStatus(403)
+			c.Abort()
+			return
+		}
+		server := &models.Server{}
+		token = utils.DecrptogAES(token, server.GetApiSecret(serverId))
+		type tokenDTO struct {
+			ServerId     int    `json:"server_id"`
+			ServerDevice string `json:"server_device"`
+			ServerUid    int    `json:"server_uid"`
+		}
+		tokenData := tokenDTO{}
+		err := json.Unmarshal([]byte(token), &tokenData)
+		if err != nil || tokenData.ServerId != serverId {
 			c.AbortWithStatus(403)
 			c.Abort()
 			return
 		}
 		c.Set("SERVER-ID", serverId)
-		c.Set("SERVER-UID", serverUid)
-		c.Set("SERVER-DEVICE", serverDevice)
+		c.Set("SERVER-UID", tokenData.ServerUid)
+		c.Set("SERVER-DEVICE", tokenData.ServerDevice)
 		c.Next()
 	}
 }

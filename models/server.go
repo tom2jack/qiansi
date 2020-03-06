@@ -2,6 +2,7 @@ package models
 
 import (
 	"gitee.com/zhimiao/qiansi/common/utils"
+	"sync"
 	"time"
 )
 
@@ -16,6 +17,41 @@ type Server struct {
 	ServerStatus int       `xorm:"not null default 0 comment('服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定') TINYINT(1)"`
 	Uid          int       `xorm:"not null comment('用户ID') index INT(10)"`
 	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+}
+
+type safeISMap struct {
+	sync.RWMutex
+	Map map[int]string
+}
+
+var serverSecretCache *safeISMap
+
+func init() {
+	// 初始化serverSecretCache
+	serverSecretCache = new(safeISMap)
+	serverSecretCache.Map = make(map[int]string)
+}
+
+// GetApiSecret 获取服务器ApiSecret信息
+func (m *Server) GetApiSecret(id int) (secret string) {
+	serverSecretCache.RLock()
+	secret = serverSecretCache.Map[id]
+	serverSecretCache.RUnlock()
+	if secret == "" {
+		m.Id = id
+		m.Get()
+		serverSecretCache.Lock()
+		serverSecretCache.Map[id] = m.ApiSecret
+		serverSecretCache.Unlock()
+		secret = m.ApiSecret
+	}
+	return
+}
+
+// Get 获取服务器信息
+func (m *Server) Get() bool {
+	db := Mysql.Model(m).Where("id=?", m.Id).First(m)
+	return db.Error == nil && db.RowsAffected > 0
 }
 
 // List 获取应用列表
