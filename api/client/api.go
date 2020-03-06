@@ -94,8 +94,8 @@ func ApiGetTelegrafConfig(c *gin.Context) {
 		isOpen = false
 	}
 	resuslt := map[string]interface{}{
-		"config":  selfConfig,
-		"is_open": isOpen,
+		"toml_config": selfConfig,
+		"is_open":     isOpen,
 	}
 	resp.NewApiResult(1, "读取成功", resuslt).Encypt(c)
 }

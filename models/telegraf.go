@@ -6,7 +6,7 @@ import "time"
 type Telegraf struct {
 	ServerID   int       `gorm:"primary_key;column:server_id;type:int(11);not null"` // 服务器ID
 	UId        int       `gorm:"column:uid;type:int(11)"`                            // 用户ID
-	TomlConfig string    `gorm:"column:toml_config;type:text"`                       // 私有配置
+	TomlConfig string    `gorm:"column:toml_config;type:longtext"`                   // 私有配置
 	IsOpen     int8      `gorm:"column:is_open;type:tinyint(1)"`                     // 是否开启监控功能 1-开启 2-关闭
 	CreateTime time.Time `gorm:"column:create_time;type:datetime"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime"`
