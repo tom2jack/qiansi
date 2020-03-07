@@ -48,6 +48,8 @@ func initRoute() {
 			client_route.GET("/ApiDeployNotify", client.ApiDeployNotify)
 			// 获取监控配置
 			client_route.GET("/ApiGetTelegrafConfig", client.ApiGetTelegrafConfig)
+			// 客户端监控推送
+			client_route.POST("/ApiClientMetric", client.ApiClientMetric)
 		}
 	}
 

@@ -3,6 +3,7 @@ package client
 import (
 	"encoding/json"
 	"fmt"
+	"gitee.com/zhimiao/qiansi/dto"
 	"gitee.com/zhimiao/qiansi/models"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/udp_service"
@@ -98,6 +99,39 @@ func ApiGetTelegrafConfig(c *gin.Context) {
 		"is_open":     isOpen,
 	}
 	resp.NewApiResult(1, "读取成功", resuslt).Encypt(c)
+}
+
+// @Summary 客户端监控指标推送
+// @Produce  json
+// @Accept  json
+// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功"}"
+// @Router /clinet/ApiClientMetric [post]
+func ApiClientMetric(c *gin.Context) {
+	raw, err := c.GetRawData()
+	if err != nil {
+		c.Status(403)
+		return
+	}
+	type dataModel struct {
+		Metrics []dto.ClientMetricDTO `json:"metrics"`
+	}
+	rawData := dataModel{}
+	err = json.Unmarshal(raw, &rawData)
+	if err != nil {
+		fmt.Print(err.Error())
+		c.Status(400)
+		return
+	}
+	if len(rawData.Metrics) == 0 {
+		resp.NewApiResult(1).Json(c)
+		return
+	}
+	mds := make([]influxdb.Metric, len(rawData.Metrics))
+	for k, v := range rawData.Metrics {
+		mds[k] = influxdb.NewRowMetric(v.Fields, v.Name, v.Tags, time.Unix(v.Timestamp, 0))
+	}
+	models.InfluxDB.Write("client_metric", mds...)
+	resp.NewApiResult(1).Json(c)
 }
 
 // @Summary 客户端日志推送

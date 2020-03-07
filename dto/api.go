@@ -1,6 +1,8 @@
 package dto
 
-import "time"
+import (
+	"time"
+)
 
 type DeployDTO struct {
 	AfterCommand  string    `xorm:"not null comment('后置命令') VARCHAR(2000)"`
@@ -28,4 +30,36 @@ type ServerDTO struct {
 	ServerStatus int       `xorm:"not null default 0 comment('服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定') TINYINT(1)"`
 	Uid          int       `xorm:"not null comment('用户ID') index INT(10)"`
 	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+}
+
+/*
+"metrics": [
+        {
+            "fields": {
+                "free": 63143084032,
+                "inodes_free": 0,
+                "inodes_total": 0,
+                "inodes_used": 0,
+                "total": 498788749312,
+                "used": 435645665280,
+                "used_percent": 87.3407160608382
+            },
+            "name": "disk",
+            "tags": {
+                "QIANSI_CLIENT_ID": "34",
+                "QIANSI_CLIENT_UID": "2",
+                "device": "D:",
+                "fstype": "NTFS",
+                "host": "DESKTOP-6DFIG5P",
+                "mode": "rw",
+                "path": "\\D:"
+            },
+            "timestamp": 1583576850000000000
+        },
+*/
+type ClientMetricDTO struct {
+	Fields    map[string]interface{} `json:"fields"`
+	Name      string                 `json:"name"`
+	Tags      map[string]string      `json:"tags"`
+	Timestamp int64                  `json:"timestamp"`
 }
