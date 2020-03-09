@@ -4,4 +4,5 @@ package dto
 type Hook001DTO struct {
 	Deploy   string
 	Scheduld string
+	Telegraf string
 }
