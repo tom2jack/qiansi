@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"time"
 )
@@ -78,4 +79,13 @@ func (m *Schedule) Create() bool {
 func (m *Schedule) Del() bool {
 	db := Mysql.Delete(m, "id=? and uid=?", m.Id, m.Uid)
 	return db.Error == nil && db.RowsAffected > 0
+}
+
+// Count 统计当前用户调度应用数量
+func (m *Schedule) Count() (num int, err error) {
+	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
+	if db.Error != nil || db.RowsAffected == 0 {
+		err = fmt.Errorf("查询失败")
+	}
+	return
 }

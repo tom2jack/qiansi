@@ -33,23 +33,23 @@ func initRoute() {
 	client_route := Router.Group("/client")
 	{
 		// 客户端注册
-		client_route.GET("/ApiRegServer", client.ApiRegServer)
+		client_route.GET("/ApiRegServer", client.Api.RegServer)
 		// hook部署
-		client_route.GET("/ApiDeployRun", client.ApiDeployRun)
-		client_route.POST("/ApiDeployRun", client.ApiDeployRun)
+		client_route.GET("/ApiDeployRun", client.Api.DeployRun)
+		client_route.POST("/ApiDeployRun", client.Api.DeployRun)
 		// 客户端交互请求
 		client_route.Use(clientAuthMiddleware())
 		{
 			// 客户端部署日志推送
-			client_route.POST("/ApiDeployLog", client.ApiDeployLog)
+			client_route.POST("/ApiDeployLog", client.Api.DeployLog)
 			// 获取任务
-			client_route.GET("/ApiGetDeployTask", client.ApiGetDeployTask)
+			client_route.GET("/ApiGetDeployTask", client.Api.GetDeployTask)
 			// 部署回调
-			client_route.GET("/ApiDeployNotify", client.ApiDeployNotify)
+			client_route.GET("/ApiDeployNotify", client.Api.DeployNotify)
 			// 获取监控配置
-			client_route.GET("/ApiGetTelegrafConfig", client.ApiGetTelegrafConfig)
+			client_route.GET("/ApiGetTelegrafConfig", client.Api.GetTelegrafConfig)
 			// 客户端监控推送
-			client_route.POST("/ApiClientMetric", client.ApiClientMetric)
+			client_route.POST("/ApiClientMetric", client.Api.ClientMetric)
 		}
 	}
 
@@ -57,37 +57,37 @@ func initRoute() {
 	admin_route := Router.Group("/admin")
 	{
 		// 获取图片验证码
-		admin_route.GET("/VerifyByImg", admin.VerifyByImg)
+		admin_route.GET("/VerifyByImg", admin.Verify.ByImg)
 		// 获取短信验证码
-		admin_route.POST("/VerifyBySMS", admin.VerifyBySMS)
+		admin_route.POST("/VerifyBySMS", admin.Verify.BySMS)
 		// 登录
-		admin_route.POST("/UserSigin", admin.UserSigin)
+		admin_route.POST("/UserSigin", admin.User.Sigin)
 		// 注册
-		admin_route.POST("/UserSiginUp", admin.UserSiginUp)
+		admin_route.POST("/UserSiginUp", admin.User.SiginUp)
 		// 需要登陆的部分
 		admin_route.Use(jwtMiddleware())
 		{
-			admin_route.POST("/UserResetPwd", admin.UserResetPwd)
+			admin_route.POST("/UserResetPwd", admin.User.ResetPwd)
 
-			admin_route.GET("/ServerLists", admin.ServerLists)
-			admin_route.POST("/ServerSet", admin.ServerSet)
-			admin_route.DELETE("/ServerDel", admin.ServerDel)
+			admin_route.GET("/ServerLists", admin.Server.Lists)
+			admin_route.POST("/ServerSet", admin.Server.Set)
+			admin_route.DELETE("/ServerDel", admin.Server.Del)
 
-			admin_route.GET("/DeployLists", admin.DeployLists)
-			admin_route.DELETE("/DeployDel", admin.DeployDel)
-			admin_route.POST("/DeploySet", admin.DeploySet)
-			admin_route.POST("/DeployRelationServer", admin.DeployRelationServer)
-			admin_route.GET("/DeployRunLogTab", admin.DeployRunLogTab)
-			admin_route.GET("/DeployRunLog", admin.DeployRunLog)
-			admin_route.GET("/DeployLog", admin.DeployLog)
-			admin_route.POST("/DeployServer", admin.DeployServer)
-			admin_route.GET("/DeployDo", admin.DeployDo)
-			admin_route.GET("/DeployLink", admin.DeployLink)
+			admin_route.GET("/DeployLists", admin.Deploy.Lists)
+			admin_route.DELETE("/DeployDel", admin.Deploy.Del)
+			admin_route.POST("/DeploySet", admin.Deploy.Set)
+			admin_route.POST("/DeployRelationServer", admin.Deploy.RelationServer)
+			admin_route.GET("/DeployRunLogTab", admin.Deploy.RunLogTab)
+			admin_route.GET("/DeployRunLog", admin.Deploy.RunLog)
+			admin_route.GET("/DeployLog", admin.Deploy.Log)
+			admin_route.POST("/DeployServer", admin.Deploy.Server)
+			admin_route.GET("/DeployDo", admin.Deploy.Do)
+			admin_route.GET("/DeployLink", admin.Deploy.Link)
 
-			admin_route.GET("/ScheduleLists", admin.ScheduleLists)
-			admin_route.POST("/ScheduleCreate", admin.ScheduleCreate)
-			admin_route.DELETE("/ScheduleDel", admin.ScheduleDel)
-			admin_route.GET("/ScheduleDo", admin.ScheduleDo)
+			admin_route.GET("/ScheduleLists", admin.Schedule.Lists)
+			admin_route.POST("/ScheduleCreate", admin.Schedule.Create)
+			admin_route.DELETE("/ScheduleDel", admin.Schedule.Del)
+			admin_route.GET("/ScheduleDo", admin.Schedule.Do)
 		}
 	}
 }

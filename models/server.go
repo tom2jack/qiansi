@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"sync"
 	"time"
@@ -78,4 +79,13 @@ func (m *Server) BatchCheck(ids []int) bool {
 	var count = 0
 	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, m.Uid).Count(&count)
 	return db.Error == nil && count == len(ids)
+}
+
+// Count 统计当前用户客戶端注冊數量
+func (m *Server) Count() (num int, err error) {
+	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
+	if db.Error != nil || db.RowsAffected == 0 {
+		err = fmt.Errorf("查询失败")
+	}
+	return
 }

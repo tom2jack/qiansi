@@ -11,6 +11,7 @@ import (
 	"gitee.com/zhimiao/qiansi/common/captcha"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
+	"gitee.com/zhimiao/qiansi/models/service"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"strconv"
@@ -19,13 +20,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type userApi struct{}
+
+var User = &userApi{}
+
 // @Summary 登录
 // @Produce  json
 // @Accept json
 // @Param body body req.UserSiginParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSigin [post]
-func UserSigin(c *gin.Context) {
+func (r *userApi) Sigin(c *gin.Context) {
 	param := &req.UserSiginParam{}
 	if err := c.Bind(param); err != nil {
 		resp.NewApiResult(-4, "入参解析失败").Json(c)
@@ -67,7 +72,7 @@ func UserSigin(c *gin.Context) {
 // @Param body body req.UserSiginUpParam true "入参集合"
 // @Success 200 {object} resp.UserInfoVO "{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /admin/UserSiginUp [post]
-func UserSiginUp(c *gin.Context) {
+func (r *userApi) SiginUp(c *gin.Context) {
 	var row int
 	param := &req.UserSiginUpParam{}
 	if err := c.Bind(param); err != nil {
@@ -107,8 +112,8 @@ func UserSiginUp(c *gin.Context) {
 		Phone:       param.Phone,
 		Password:    utils.PasswordHash(param.Password),
 		InviterUid:  param.InviterUid,
-		MaxSchedule: 15,
-		MaxDeploy:   15,
+		MaxSchedule: 2,
+		MaxDeploy:   2,
 	}
 	models.Mysql.Table("member").Create(member)
 	member.Password = ""
@@ -118,6 +123,8 @@ func UserSiginUp(c *gin.Context) {
 		return
 	}
 	if member.Id > 0 {
+		// 用户邀请奖励发放
+		service.InviterActive(param.InviterUid, member.Id)
 		resp.NewApiResult(1, "注册成功", &resp.UserInfoVO{
 			*member,
 			token,
@@ -133,7 +140,7 @@ func UserSiginUp(c *gin.Context) {
 // @Param body body req.UserResetPwdParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "修改成功", "data": null}"
 // @Router /admin/UserResetPwd [post]
-func UserResetPwd(c *gin.Context) {
+func (r *userApi) ResetPwd(c *gin.Context) {
 	param := &req.UserResetPwdParam{}
 	if err := c.Bind(param); err != nil {
 		resp.NewApiResult(-4, "入参解析失败").Json(c)

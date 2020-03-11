@@ -1,10 +1,3 @@
-/**
- * 校验模块
- * Created by 纸喵软件.
- * User: 倒霉狐狸
- * Date: 2019-8-17 18:31:41
- */
-
 package admin
 
 import (
@@ -18,6 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type verifyApi struct{}
+
+var Verify = &verifyApi{}
+
 var ZM_LOCK = utils.NewLockTable()
 
 // @Summary 获取图片验证码
@@ -25,7 +22,7 @@ var ZM_LOCK = utils.NewLockTable()
 // @Accept  json
 // @Success 200 {object} resp.ApiResult "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
 // @Router /admin/VerifyByImg [get]
-func VerifyByImg(c *gin.Context) {
+func (r *verifyApi) ByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
 		resp.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
 		return
@@ -43,7 +40,7 @@ func VerifyByImg(c *gin.Context) {
 // @Param body body req.VerifyBySMSParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code":1,"msg":"发送成功","data":null}"
 // @Router /admin/VerifyBySMS [post]
-func VerifyBySMS(c *gin.Context) {
+func (r *verifyApi) BySMS(c *gin.Context) {
 	param := &req.VerifyBySMSParam{}
 	if err := c.Bind(param); err != nil {
 		resp.NewApiResult(-4, "入参解析失败"+err.Error()).Json(c)

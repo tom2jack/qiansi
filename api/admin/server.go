@@ -16,13 +16,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type serverApi struct{}
+
+var Server = &serverApi{}
+
 // @Summary 获取服务器(客户端)列表
 // @Produce  json
 // @Accept  json
 // @Param body body req.ServerListParam true "入参集合"
 // @Success 200 {array} resp.ServerVO ""
 // @Router /admin/ServerLists [get]
-func ServerLists(c *gin.Context) {
+func (r *serverApi) Lists(c *gin.Context) {
 	param := &req.ServerListParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
@@ -51,7 +55,7 @@ func ServerLists(c *gin.Context) {
 // @Param body body req.ServerSetParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerSet [POST]
-func ServerSet(c *gin.Context) {
+func (r *serverApi) Set(c *gin.Context) {
 	param := &req.ServerSetParam{}
 	if c.ShouldBind(param) != nil {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -72,7 +76,7 @@ func ServerSet(c *gin.Context) {
 // @Param body body req.ServerDelParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/ServerDel [DELETE]
-func ServerDel(c *gin.Context) {
+func (r *serverApi) Del(c *gin.Context) {
 	param := &req.ServerDelParam{}
 	if err := c.Bind(param); err != nil || param.ServerId == 0 {
 		resp.NewApiResult(-4, "入参解析失败").Json(c)

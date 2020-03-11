@@ -12,6 +12,7 @@ import (
 	"gitee.com/zhimiao/qiansi/common"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
+	"gitee.com/zhimiao/qiansi/models/service"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/udp_service"
@@ -23,13 +24,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type deployApi struct{}
+
+var Deploy = &deployApi{}
+
 // @Summary 获取部署应用列表
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployListParam true "入参集合"
 // @Success 200 {array} resp.DeployVO ""
 // @Router /admin/DeployLists [get]
-func DeployLists(c *gin.Context) {
+func (r *deployApi) Lists(c *gin.Context) {
 	param := &req.DeployListParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
@@ -58,17 +63,19 @@ func DeployLists(c *gin.Context) {
 // @Param body body req.DeploySetParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeploySet [POST]
-func DeploySet(c *gin.Context) {
+func (r *deployApi) Set(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
 	if param.Id == 0 {
-		member := &models.Member{
-			Id: c.GetInt("UID"),
+		info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
+		if err != nil {
+			resp.NewApiResult(-4, "用户限额检测失败").Json(c)
+			return
 		}
-		if !member.CheckDeploy() {
+		if info.MaxSchedule <= info.DeployNum {
 			resp.NewApiResult(-4, "您的部署任务创建数量已达上限").Json(c)
 			return
 		}
@@ -96,7 +103,7 @@ func DeploySet(c *gin.Context) {
 // @Param body body req.DeployDelParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
 // @Router /admin/DeployDel [DELETE]
-func DeployDel(c *gin.Context) {
+func (r *deployApi) Del(c *gin.Context) {
 	param := &req.DeployDelParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -118,7 +125,7 @@ func DeployDel(c *gin.Context) {
 // @Param body body req.DeployRelationParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "关联成功","data": null}"
 // @Router /admin/DeployRelationServer [POST]
-func DeployRelationServer(c *gin.Context) {
+func (r *deployApi) RelationServer(c *gin.Context) {
 	param := &[]req.DeployRelationParam{}
 	if c.ShouldBind(param) != nil || len(*param) == 0 {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -163,7 +170,7 @@ func DeployRelationServer(c *gin.Context) {
 // @Param body body req.DeployServerParam true "入参集合"
 // @Success 200 {object} models.Server "返回"
 // @Router /admin/DeployServer [post]
-func DeployServer(c *gin.Context) {
+func (r *deployApi) Server(c *gin.Context) {
 	param := &req.DeployServerParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -201,7 +208,7 @@ func DeployServer(c *gin.Context) {
 // @Param body body req.DeployServerParam true "入参集合"
 // @Success 200 {array} resp.DeployRunLogTabVO "返回"
 // @Router /admin/DeployRunLogTab [get]
-func DeployRunLogTab(c *gin.Context) {
+func (r *deployApi) RunLogTab(c *gin.Context) {
 	param := &req.DeployServerParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -219,7 +226,7 @@ func DeployRunLogTab(c *gin.Context) {
 // @Param body body req.DeployRunLogParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /admin/DeployRunLog [get]
-func DeployRunLog(c *gin.Context) {
+func (r *deployApi) RunLog(c *gin.Context) {
 	param := &req.DeployRunLogParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -242,7 +249,7 @@ func DeployRunLog(c *gin.Context) {
 // @Param body body req.DeployLogParam true "入参集合"
 // @Success 200 {object} resp.PageInfo ""
 // @Router /admin/DeployLog [get]
-func DeployLog(c *gin.Context) {
+func (r *deployApi) Log(c *gin.Context) {
 	param := &req.DeployLogParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
@@ -299,7 +306,7 @@ func DeployLog(c *gin.Context) {
 // @Param body body req.DeployDoParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
 // @Router /admin/DeployDo [GET]
-func DeployDo(c *gin.Context) {
+func (r *deployApi) Do(c *gin.Context) {
 	param := &req.DeployDoParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
@@ -324,7 +331,7 @@ func DeployDo(c *gin.Context) {
 // @Param body body req.DeployBase true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
 // @Router /admin/DeployLink [GET]
-func DeployLink(c *gin.Context) {
+func (r *deployApi) Link(c *gin.Context) {
 	param := &req.DeployBase{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)

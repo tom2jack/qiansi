@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"time"
 )
@@ -51,4 +52,13 @@ func (m *Deploy) GetOpenId() bool {
 func (m *Deploy) GetIdByOpenId() bool {
 	db := Mysql.Select("id").Where("open_id=?", m.OpenId).First(m)
 	return db.Error == nil && db.RowsAffected > 0
+}
+
+// Count 统计当前用户部署应用数量
+func (m *Deploy) Count() (num int, err error) {
+	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
+	if db.Error != nil || db.RowsAffected == 0 {
+		err = fmt.Errorf("查询失败")
+	}
+	return
 }

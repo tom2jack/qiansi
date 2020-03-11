@@ -14,6 +14,10 @@ import (
 	"time"
 )
 
+type apiApi struct{}
+
+var Api = &apiApi{}
+
 // @Summary 服务器注册
 // @Produce  json
 // @Accept  json
@@ -21,7 +25,7 @@ import (
 // @Param device query string true "客户端设备号"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
 // @Router /clinet/ApiRegServer [get]
-func ApiRegServer(c *gin.Context) {
+func (r *apiApi) RegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
 	if !(uid > 0) {
 		resp.NewApiResult(-4, "用户UID非法").Json(c)
@@ -60,7 +64,7 @@ func ApiRegServer(c *gin.Context) {
 // @Accept  json
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "读取成功","data": [deploy]}"
 // @Router /clinet/ApiGetDeployTask [GET]
-func ApiGetDeployTask(c *gin.Context) {
+func (r *apiApi) GetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
 	defer udp_service.Hook001.DelDeploy(server_id)
 	deploy := &[]models.Deploy{}
@@ -73,7 +77,7 @@ func ApiGetDeployTask(c *gin.Context) {
 // @Accept  json
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "读取成功","data": [deploy]}"
 // @Router /clinet/ApiGetTelegrafConfig [GET]
-func ApiGetTelegrafConfig(c *gin.Context) {
+func (r *apiApi) GetTelegrafConfig(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
 	uid := c.GetInt("SERVER-UID")
 	sysConfig := &models.SysConfig{}
@@ -108,7 +112,7 @@ func ApiGetTelegrafConfig(c *gin.Context) {
 // @Accept  json
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功"}"
 // @Router /clinet/ApiClientMetric [post]
-func ApiClientMetric(c *gin.Context) {
+func (r *apiApi) ClientMetric(c *gin.Context) {
 	raw, err := c.GetRawData()
 	if err != nil {
 		c.Status(403)
@@ -144,7 +148,7 @@ func ApiClientMetric(c *gin.Context) {
 // @Param content formData string true "日志文本内容"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /clinet/ApiDeployLog [post]
-func ApiDeployLog(c *gin.Context) {
+func (r *apiApi) DeployLog(c *gin.Context) {
 	raw, err := c.GetRawData()
 	if err != nil {
 		c.Status(403)
@@ -188,7 +192,7 @@ func ApiDeployLog(c *gin.Context) {
 // @Param deploy_id query string true "部署应用ID"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /clinet/ApiDeployNotify [get]
-func ApiDeployNotify(c *gin.Context) {
+func (r *apiApi) DeployNotify(c *gin.Context) {
 	serverId := c.GetInt("SERVER-ID")
 	version, _ := strconv.Atoi(c.Query("version"))
 	deployId, _ := strconv.Atoi(c.Query("deployId"))
@@ -213,7 +217,7 @@ func ApiDeployNotify(c *gin.Context) {
 // @Param key query string true "入参集合"
 // @Success 200 {object} string "操作结果"
 // @Router /client/ApiDeployRun [GET]
-func ApiDeployRun(c *gin.Context) {
+func (r *apiApi) DeployRun(c *gin.Context) {
 	openId := c.Query("Key")
 	if len(openId) != 32 {
 		c.String(404, "服务不存在")

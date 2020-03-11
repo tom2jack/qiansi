@@ -1,33 +1,47 @@
 package models
 
 import (
+	"fmt"
+	"github.com/jinzhu/gorm"
 	"time"
 )
 
+// Member 用户表
 type Member struct {
-	CreateTime  time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' DATETIME"`
-	Id          int       `xorm:"not null pk autoincr INT(10)"`
-	InviterUid  int       `xorm:"not null default 0 comment('邀请人UID') INT(10)"`
-	MaxDeploy   int       `xorm:"not null default 15 comment('最大部署应用数量') INT(10)"`
-	MaxSchedule int       `xorm:"not null default 15 comment('最大调度任务数量') INT(10)"`
-	Password    string    `xorm:"not null comment('密码') VARCHAR(255)"`
-	Phone       string    `xorm:"not null comment('手机号') unique CHAR(11)"`
-	Status      int       `xorm:"not null default 1 comment('0-锁定 1-正常') TINYINT(1)"`
-	UpdateTime  time.Time `xorm:"not null default 'CURRENT_TIMESTAMP' DATETIME"`
+	Id          int       `gorm:"primary_key;column:id;type:int(10) unsigned;not null"`
+	Phone       string    `gorm:"unique;column:phone;type:char(11);not null"`         // 手机号
+	Password    string    `gorm:"column:password;type:varchar(255);not null"`         // 密码
+	InviterUid  int       `gorm:"column:inviter_uid;type:int(10) unsigned;not null"`  // 邀请人UID
+	MaxDeploy   int       `gorm:"column:max_deploy;type:int(10) unsigned;not null"`   // 最大部署应用数量
+	MaxSchedule int       `gorm:"column:max_schedule;type:int(10) unsigned;not null"` // 最大调度任务数量
+	Status      int8      `gorm:"column:status;type:tinyint(1);not null"`             // 0-锁定 1-正常
+	CreateTime  time.Time `gorm:"column:create_time;type:datetime;not null"`
+	UpdateTime  time.Time `gorm:"column:update_time;type:datetime;not null"`
 }
 
-// CheckDeploy 校验部署任务数量
-func (m *Member) CheckDeploy() bool {
-	var num int
-	Mysql.Table("deploy").Where("uid=?", m.Id).Count(&num)
-	Mysql.Select("max_deploy").First(m)
-	return m.MaxDeploy > num
+// MaxInfo 获取限制信息
+func (m *Member) MaxInfo() (err error) {
+	db := Mysql.Model(m).Select("max_deploy, max_schedule").First(m)
+	if db.RowsAffected == 0 || db.Error != nil {
+		err = fmt.Errorf("查询异常")
+	}
+	return
 }
 
-// CheckSchedule 校验调度任务数量
-func (m *Member) CheckSchedule() bool {
-	var num int
-	Mysql.Table("schedule").Where("uid=?", m.Id).Count(&num)
-	Mysql.Select("max_schedule").First(m)
-	return m.MaxSchedule > num
+// AddDeployNum 添加部署任务数量
+func (m *Member) AddDeployNum(num int) (err error) {
+	db := Mysql.Model(m).Where("id > ?", m.Id).UpdateColumn("max_deploy", gorm.Expr("max_deploy + ?", num))
+	if db.RowsAffected == 0 || db.Error != nil {
+		err = fmt.Errorf("查询异常")
+	}
+	return
+}
+
+// AddScheduleNum 添加调度任务数量
+func (m *Member) AddScheduleNum(num int) (err error) {
+	db := Mysql.Model(m).Where("id > ?", m.Id).UpdateColumn("max_schedule", gorm.Expr("max_schedule + ?", num))
+	if db.RowsAffected == 0 || db.Error != nil {
+		err = fmt.Errorf("查询异常")
+	}
+	return
 }

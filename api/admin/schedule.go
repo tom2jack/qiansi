@@ -3,11 +3,16 @@ package admin
 import (
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
+	"gitee.com/zhimiao/qiansi/models/service"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/schedule"
 	"github.com/gin-gonic/gin"
 )
+
+type scheduleApi struct{}
+
+var Schedule = &scheduleApi{}
 
 // @Summary 获取计划任务列表
 // @Produce  json
@@ -15,7 +20,7 @@ import (
 // @Param body body req.ScheduleListParam true "入参集合"
 // @Success 200 {object} resp.PageInfo ""
 // @Router /admin/ScheduleLists [get]
-func ScheduleLists(c *gin.Context) {
+func (r *scheduleApi) Lists(c *gin.Context) {
 	param := &req.ScheduleListParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
@@ -40,23 +45,25 @@ func ScheduleLists(c *gin.Context) {
 // @Param body body req.ScheduleCreateParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /admin/ScheduleCreate [POST]
-func ScheduleCreate(c *gin.Context) {
+func (r *scheduleApi) Create(c *gin.Context) {
 	param := &req.ScheduleCreateParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	member := &models.Member{
-		Id: c.GetInt("UID"),
+	info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
+	if err != nil {
+		resp.NewApiResult(-4, "用户限额检测失败").Json(c)
+		return
 	}
-	if !member.CheckSchedule() {
+	if info.MaxSchedule <= info.ScheduleNum {
 		resp.NewApiResult(-4, "您的调度任务创建数量已达上限").Json(c)
 		return
 	}
 	po := &models.Schedule{}
 	utils.SuperConvert(param, po)
 	po.Uid = c.GetInt("UID")
-	err := utils.PanicToError(func() {
+	err = utils.PanicToError(func() {
 		po.NextTime = schedule.Task.NextTime(po.Crontab)
 	})
 	if err != nil {
@@ -81,7 +88,7 @@ func ScheduleCreate(c *gin.Context) {
 // @Param body body req.ScheduleDelParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /admin/ScheduleDel [DELETE]
-func ScheduleDel(c *gin.Context) {
+func (r *scheduleApi) Del(c *gin.Context) {
 	param := &req.ScheduleDelParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
@@ -103,7 +110,7 @@ func ScheduleDel(c *gin.Context) {
 // @Param body body req.ScheduleDoParam true "入参集合"
 // @Success 200 {object} resp.ApiResult ""
 // @Router /admin/ScheduleDo [get]
-func ScheduleDo(c *gin.Context) {
+func (r *scheduleApi) Do(c *gin.Context) {
 	param := &req.ScheduleDoParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
