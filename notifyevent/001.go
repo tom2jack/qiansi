@@ -5,17 +5,20 @@ import (
 	"encoding/gob"
 	"strconv"
 	"sync"
+	"time"
 )
 
 // 001-轮训任务存储器
 type Hook001PO struct {
 	sync.RWMutex
 	// 部署存储集合
-	Deploy map[string]string
+	Deploy map[int]string
 	// 调度任务
-	Scheduld map[string]string
+	Scheduld map[int]string
 	// 指标监控配置
-	Telegraf map[string]string
+	Telegraf map[int]string
+	// 活跃服务器
+	ActiveServer map[int]time.Time
 }
 
 // 001-轮训任务数据交换
@@ -29,20 +32,20 @@ var Hook001 *Hook001PO
 
 func init() {
 	Hook001 = &Hook001PO{
-		Deploy:   make(map[string]string),
-		Scheduld: make(map[string]string),
-		Telegraf: make(map[string]string),
+		Deploy:       make(map[int]string),
+		Scheduld:     make(map[int]string),
+		Telegraf:     make(map[int]string),
+		ActiveServer: make(map[int]time.Time),
 	}
 }
 
 // GetHookData 获取存储器交换数据
-func (m *Hook001PO) GetHookData(key []byte) Hook001DTO {
-	skey := string(key)
+func (m *Hook001PO) GetHookData(serverId int) Hook001DTO {
 	m.RLock()
 	dtoData := Hook001DTO{
-		Deploy:   m.Deploy[skey],
-		Scheduld: m.Scheduld[skey],
-		Telegraf: m.Telegraf[skey],
+		Deploy:   m.Deploy[serverId],
+		Scheduld: m.Scheduld[serverId],
+		Telegraf: m.Telegraf[serverId],
 	}
 	m.RUnlock()
 	return dtoData
@@ -50,71 +53,88 @@ func (m *Hook001PO) GetHookData(key []byte) Hook001DTO {
 
 // AddDeploy 添加部署消息
 func (m *Hook001PO) AddDeploy(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		m.Deploy[s] = "1"
-		m.Unlock()
-	}
+	m.Lock()
+	m.Deploy[serverId] = "1"
+	m.Unlock()
 }
 
 // DelDeploy 删除部署消息
 func (m *Hook001PO) DelDeploy(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		delete(m.Deploy, s)
-		m.Unlock()
-	}
+	m.Lock()
+	delete(m.Deploy, serverId)
+	m.Unlock()
 }
 
 // AddScheduld 添加调度消息
 func (m *Hook001PO) AddScheduld(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		m.Scheduld[s] = "1"
-		m.Unlock()
-	}
+	m.Lock()
+	m.Scheduld[serverId] = "1"
+	m.Unlock()
 }
 
 // DelScheduld 删除调度消息
 func (m *Hook001PO) DelScheduld(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		delete(m.Scheduld, s)
-		m.Unlock()
-	}
+	delete(m.Scheduld, serverId)
 }
 
 // AddTelegraf 添加指标消息
 func (m *Hook001PO) AddTelegraf(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		m.Telegraf[s] = "1"
-		m.Unlock()
-	}
+	m.Lock()
+	m.Telegraf[serverId] = "1"
+	m.Unlock()
 }
 
 // DelTelegraf 删除指标消息
 func (m *Hook001PO) DelTelegraf(serverId int) {
-	s := strconv.Itoa(serverId)
-	if s != "" {
-		m.Lock()
-		delete(m.Telegraf, s)
-		m.Unlock()
-	}
+	m.Lock()
+	delete(m.Telegraf, serverId)
+	m.Unlock()
 }
 
-// ClientTaskLoop 轮训， Task结构为 {001{deploy_id}:1}
+func (m *Hook001PO) UpdateServerLastRequest(serverId int) {
+	m.Lock()
+	m.ActiveServer[serverId] = time.Now()
+	m.Unlock()
+}
+
+// GetServerLastRequest 获取服务器最后一次请求
+func (m *Hook001PO) GetServerLastRequest(serverId ...int) (r map[int]time.Time) {
+	m.RLock()
+	for _, v := range serverId {
+		if t, ok := m.ActiveServer[v]; ok {
+			r[v] = t
+		}
+	}
+	m.RUnlock()
+	return
+}
+
+// GetServerLastRequest 获取服务器最后一次请求
+func (m *Hook001PO) GetActiveServerNum(serverId ...int) (num int) {
+	ts := time.Now().Add(-10 * time.Second)
+	m.RLock()
+	for _, v := range serverId {
+		if t, ok := m.ActiveServer[v]; ok && t.After(ts) {
+			num++
+		}
+	}
+	m.RUnlock()
+	return
+}
+
+// ClientTaskLoop 轮训
 func Hook_001(request []byte) []byte {
+	serverId, err := strconv.Atoi(string(request))
+	if err != nil {
+		return nil
+	}
+	// 更新最后请求
+	Hook001.UpdateServerLastRequest(serverId)
 	var network bytes.Buffer
 	// 1.创建编码器
 	enc := gob.NewEncoder(&network)
 	// 2.向编码器中写入数据
-	err := enc.Encode(Hook001.GetHookData(request))
+	err = enc.Encode(Hook001.GetHookData(serverId))
 	if err != nil {
 		return nil
 	}

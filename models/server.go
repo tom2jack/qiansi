@@ -68,9 +68,9 @@ func (m *Server) List(offset int, limit int) ([]Server, int) {
 }
 
 func (m *Server) ListByUser() []Server {
-	data := &[]Server{}
-	Mysql.Where("uid = ?", m.Uid).Find(data)
-	return *data
+	data := []Server{}
+	Mysql.Where("uid = ?", m.Uid).Find(&data)
+	return data
 }
 
 // BatchCheck 批量检测是否是当前用户服务器
@@ -86,6 +86,16 @@ func (m *Server) Count() (num int, err error) {
 	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
 	if db.Error != nil || db.RowsAffected == 0 {
 		err = fmt.Errorf("查询失败")
+	}
+	return
+}
+
+// UserServerIds 获取用户的服务器编号
+func (m *Server) UserServerIds() (ids []int) {
+	data := []Server{}
+	Mysql.Model(m).Select("id").Where("uid = ?", m.Uid).Find(&data)
+	for _, v := range data {
+		ids = append(ids, v.Id)
 	}
 	return
 }

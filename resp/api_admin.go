@@ -1,6 +1,19 @@
 package resp
 
-import "time"
+import (
+	"gitee.com/zhimiao/qiansi/models"
+	"time"
+)
+
+type DashboardInfoVO struct {
+	DeployNum    int
+	MaxDeploy    int
+	ScheduleNum  int
+	MaxSchedule  int
+	ServerNum    int
+	InviteNum    int
+	DeployRunNum int
+}
 
 // 部署服务器
 type DeployServerVO struct {
@@ -37,4 +50,20 @@ type DeployVO struct {
 	Uid           int
 	CreateTime    time.Time
 	UpdateTime    time.Time
+}
+
+type ServerVO struct {
+	CreateTime   time.Time
+	DeviceId     string
+	Domain       string
+	Id           int
+	ServerName   string
+	ServerRuleId int
+	ServerStatus int
+	UpdateTime   time.Time
+}
+
+type UserInfoVO struct {
+	models.Member
+	Token string
 }

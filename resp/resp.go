@@ -2,11 +2,9 @@ package resp
 
 import (
 	"encoding/json"
-	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
 	"github.com/gin-gonic/gin"
-	"time"
 )
 
 type ApiResult struct {
@@ -76,16 +74,4 @@ func (r *ApiResult) Encypt(c *gin.Context) {
 	// result = base64.StdEncoding.EncodeToString([]byte(result))
 	c.Header("ZHIMIAO-Encypt", "1")
 	c.String(200, result)
-}
-
-type JsonTimeUnix time.Time
-type JsonTimeDate time.Time
-
-func (t JsonTimeDate) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf(`"%s"`, time.Time(t).Format("2006-01-02 15:04:05"))
-	return []byte(stamp), nil
-}
-func (t JsonTimeUnix) MarshalJSON() ([]byte, error) {
-	stamp := fmt.Sprintf(`"%d"`, time.Time(t).Unix())
-	return []byte(stamp), nil
 }

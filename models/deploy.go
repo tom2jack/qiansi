@@ -62,3 +62,18 @@ func (m *Deploy) Count() (num int, err error) {
 	}
 	return
 }
+
+// Count 统计当前用户调度应用部署次数
+func (m *Deploy) CountDo() (num int, err error) {
+	type Result struct {
+		Total int
+	}
+	r := &Result{}
+	db := Mysql.Model(m).Select("sum(now_version) as total").Where("uid=?", m.Uid).Scan(r)
+	if db.Error != nil || db.RowsAffected == 0 {
+		err = fmt.Errorf("查询失败")
+		return
+	}
+	num = r.Total
+	return
+}
