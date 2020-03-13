@@ -24,7 +24,7 @@ func createHandler(taskModel *models.Schedule) Handler {
 type HTTPHandler struct{}
 
 // http任务执行时间不超过300秒
-const HttpExecTimeout = 300
+const HttpExecTimeout = 3
 
 func (h *HTTPHandler) Run(m *models.Schedule) (result string, err error) {
 	if m.Timeout <= 0 || m.Timeout > HttpExecTimeout {
