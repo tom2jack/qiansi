@@ -1,4 +1,4 @@
-package udp_service
+package notifyevent
 
 import (
 	"gitee.com/zhimiao/qiansi/common"

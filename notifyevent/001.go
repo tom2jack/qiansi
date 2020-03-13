@@ -1,9 +1,8 @@
-package udp_service
+package notifyevent
 
 import (
 	"bytes"
 	"encoding/gob"
-	"gitee.com/zhimiao/qiansi/dto"
 	"strconv"
 	"sync"
 )
@@ -19,6 +18,13 @@ type Hook001PO struct {
 	Telegraf map[string]string
 }
 
+// 001-轮训任务数据交换
+type Hook001DTO struct {
+	Deploy   string
+	Scheduld string
+	Telegraf string
+}
+
 var Hook001 *Hook001PO
 
 func init() {
@@ -30,10 +36,10 @@ func init() {
 }
 
 // GetHookData 获取存储器交换数据
-func (m *Hook001PO) GetHookData(key []byte) dto.Hook001DTO {
+func (m *Hook001PO) GetHookData(key []byte) Hook001DTO {
 	skey := string(key)
 	m.RLock()
-	dtoData := dto.Hook001DTO{
+	dtoData := Hook001DTO{
 		Deploy:   m.Deploy[skey],
 		Scheduld: m.Scheduld[skey],
 		Telegraf: m.Telegraf[skey],

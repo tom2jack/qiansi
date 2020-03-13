@@ -12,10 +12,10 @@ import (
 	"gitee.com/zhimiao/qiansi/common"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/models/service"
+	"gitee.com/zhimiao/qiansi/notifyevent"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
-	"gitee.com/zhimiao/qiansi/udp_service"
+	"gitee.com/zhimiao/qiansi/service"
 	uuid "github.com/satori/go.uuid"
 	"strings"
 	"time"
@@ -320,7 +320,7 @@ func (r *deployApi) Do(c *gin.Context) {
 	server := &[]models.Server{}
 	models.Mysql.Select("id").Where("id in (select server_id from deploy_server_relation where deploy_id=?)", param.DeployId).Find(server)
 	for _, v := range *server {
-		udp_service.Hook001.AddDeploy(v.Id)
+		notifyevent.Hook001.AddDeploy(v.Id)
 	}
 	resp.NewApiResult(1, "启动成功", server).Json(c)
 }

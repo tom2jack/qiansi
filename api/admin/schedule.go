@@ -3,10 +3,10 @@ package admin
 import (
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/models/service"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/schedule"
+	"gitee.com/zhimiao/qiansi/service"
 	"github.com/gin-gonic/gin"
 )
 

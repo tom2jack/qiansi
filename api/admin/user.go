@@ -11,9 +11,9 @@ import (
 	"gitee.com/zhimiao/qiansi/common/captcha"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/models/service"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
+	"gitee.com/zhimiao/qiansi/service"
 	"strconv"
 	"time"
 

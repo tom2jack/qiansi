@@ -3,10 +3,10 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/dto"
 	"gitee.com/zhimiao/qiansi/models"
+	"gitee.com/zhimiao/qiansi/notifyevent"
+	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
-	"gitee.com/zhimiao/qiansi/udp_service"
 	"github.com/gin-gonic/gin"
 	"github.com/influxdata/influxdb-client-go"
 	"github.com/lifei6671/gorand"
@@ -66,7 +66,7 @@ func (r *apiApi) RegServer(c *gin.Context) {
 // @Router /clinet/ApiGetDeployTask [GET]
 func (r *apiApi) GetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
-	defer udp_service.Hook001.DelDeploy(server_id)
+	defer notifyevent.Hook001.DelDeploy(server_id)
 	deploy := &[]models.Deploy{}
 	models.Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
 	resp.NewApiResult(1, "读取成功", deploy).Encypt(c)
@@ -103,7 +103,7 @@ func (r *apiApi) GetTelegrafConfig(c *gin.Context) {
 		"is_open":     isOpen,
 	}
 	// 清理更新消息通知
-	udp_service.Hook001.DelTelegraf(server_id)
+	notifyevent.Hook001.DelTelegraf(server_id)
 	resp.NewApiResult(1, "读取成功", resuslt).Encypt(c)
 }
 
@@ -118,10 +118,7 @@ func (r *apiApi) ClientMetric(c *gin.Context) {
 		c.Status(403)
 		return
 	}
-	type dataModel struct {
-		Metrics []dto.ClientMetricDTO `json:"metrics"`
-	}
-	rawData := dataModel{}
+	rawData := req.ClientMetricParam{}
 	err = json.Unmarshal(raw, &rawData)
 	if err != nil {
 		fmt.Print(err.Error())
@@ -239,7 +236,7 @@ func (r *apiApi) DeployRun(c *gin.Context) {
 		DeployId: deployPO.Id,
 	}
 	for _, v := range relation.ListByDeployId() {
-		udp_service.Hook001.AddDeploy(v.ServerId)
+		notifyevent.Hook001.AddDeploy(v.ServerId)
 	}
 	c.String(200, "Successful")
 }

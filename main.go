@@ -4,8 +4,8 @@ import (
 	"gitee.com/zhimiao/qiansi/api"
 	"gitee.com/zhimiao/qiansi/common"
 	"gitee.com/zhimiao/qiansi/models"
+	"gitee.com/zhimiao/qiansi/notifyevent"
 	"gitee.com/zhimiao/qiansi/schedule"
-	"gitee.com/zhimiao/qiansi/udp_service"
 )
 
 // @title 纸喵 qiansi API
@@ -27,6 +27,6 @@ func main() {
 	models.Start()
 	go api.Start()
 	go schedule.Start()
-	go udp_service.Start()
+	go notifyevent.Start()
 	select {}
 }
