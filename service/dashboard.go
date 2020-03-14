@@ -39,15 +39,32 @@ func GetUserModuleMaxInfo(uid int) (info MaxInfo, err error) {
 }
 
 // GetClientCPURate 获取服务器近1h的CPU利用率
-func GetClientCPURate(uid, serverId int) (result []map[string]interface{}) {
-	startTime := time.Now().Add(-1 * time.Hour)
-	endTime := time.Now()
+func GetClientCPURate(uid, serverId int, startTime, endTime time.Time) (result []map[string]interface{}) {
 	fluxQuery := fmt.Sprintf(`
 		from(bucket: "client_metric")
 			|> range(start: %s, stop: %s)
 			|> filter(fn: (r) => r._measurement == "cpu" and r.QIANSI_CLIENT_ID == "%d" and r.QIANSI_CLIENT_UID == "%d")
 			|> filter(fn: (r) => r._field == "usage_user" or r._field == "usage_system" or r._field == "usage_idle")
 			|> filter(fn: (r) => r.cpu == "cpu-total")
+			|> aggregateWindow(every: 10000ms, fn: mean, createEmpty: false)
+			|> yield(name: "mean")
+		`,
+		startTime.Format(time.RFC3339),
+		endTime.Format(time.RFC3339),
+		serverId,
+		uid,
+	)
+	lists, _ := models.InfluxDB.QueryToArray(fluxQuery)
+	return lists
+}
+
+// GetClientMemRate 获取服务器近1h的内存利用率
+func GetClientMemRate(uid, serverId int, startTime, endTime time.Time) (result []map[string]interface{}) {
+	fluxQuery := fmt.Sprintf(`
+		from(bucket: "client_metric")
+			|> range(start: %s, stop: %s)
+			|> filter(fn: (r) => r._measurement == "mem" and r.QIANSI_CLIENT_ID == "%d" and r.QIANSI_CLIENT_UID == "%d")
+			|> filter(fn: (r) => r._field == "used_percent")
 			|> aggregateWindow(every: 10000ms, fn: mean, createEmpty: false)
 			|> yield(name: "mean")
 		`,

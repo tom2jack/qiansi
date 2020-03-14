@@ -34,7 +34,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployDelParam"
                         }
                     }
@@ -43,7 +42,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -66,7 +64,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployDoParam"
                         }
                     }
@@ -75,7 +72,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -98,7 +94,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployBase"
                         }
                     }
@@ -107,7 +102,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -130,7 +124,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployListParam"
                         }
                     }
@@ -164,19 +157,15 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployLogParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "返回",
+                        "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/resp.DeployLogVO"
-                            }
+                            "$ref": "#/definitions/resp.PageInfo"
                         }
                     }
                 }
@@ -198,7 +187,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployRelationParam"
                         }
                     }
@@ -207,7 +195,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"关联成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -230,17 +217,15 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployRunLogParam"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "返回",
+                        "description": "OK",
                         "schema": {
-                            "type": "object",
-                            "$ref": "#/definitions/models.DeployLog"
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -262,7 +247,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployServerParam"
                         }
                     }
@@ -296,7 +280,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeployServerParam"
                         }
                     }
@@ -305,7 +288,6 @@
                     "200": {
                         "description": "返回",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/models.Server"
                         }
                     }
@@ -328,7 +310,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.DeploySetParam"
                         }
                     }
@@ -337,7 +318,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -360,7 +340,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ScheduleCreateParam"
                         }
                     }
@@ -369,7 +348,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -392,7 +370,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ScheduleDelParam"
                         }
                     }
@@ -401,7 +378,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -424,7 +400,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ScheduleDoParam"
                         }
                     }
@@ -433,7 +408,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -456,7 +430,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ScheduleListParam"
                         }
                     }
@@ -465,7 +438,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.PageInfo"
                         }
                     }
@@ -488,7 +460,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ServerDelParam"
                         }
                     }
@@ -497,7 +468,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -520,7 +490,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ServerListParam"
                         }
                     }
@@ -554,7 +523,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.ServerSetParam"
                         }
                     }
@@ -563,7 +531,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -586,7 +553,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.UserResetPwdParam"
                         }
                     }
@@ -595,7 +561,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -618,7 +583,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.UserSiginParam"
                         }
                     }
@@ -627,7 +591,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -650,7 +613,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.UserSiginUpParam"
                         }
                     }
@@ -659,7 +621,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.UserInfoVO"
                         }
                     }
@@ -679,7 +640,6 @@
                     "200": {
                         "description": "{\"code\":1,\"msg\":\"\",\"data\":{\"idkey\":\"ckFbFAcMo7sy7qGyonAd\",\"img\":\"data:image/png;base64,iVBORw0...\"}}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -702,7 +662,6 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/req.VerifyBySMSParam"
                         }
                     }
@@ -711,8 +670,62 @@
                     "200": {
                         "description": "{\"code\":1,\"msg\":\"发送成功\",\"data\":null}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/dashboard/IndexMetric": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "概览大盘",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.DashboardIndexMetricParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.DashboardIndexMetricVO"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/dashboard/info": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取基本信息",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/resp.DashboardInfoVO"
+                            }
                         }
                     }
                 }
@@ -740,8 +753,26 @@
                     "200": {
                         "description": "操作结果",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/string"
+                        }
+                    }
+                }
+            }
+        },
+        "/clinet/ApiClientMetric": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "客户端监控指标推送",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\"}",
+                        "schema": {
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -783,7 +814,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -819,7 +849,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -839,7 +868,25 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
                         "schema": {
-                            "type": "object",
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            }
+        },
+        "/clinet/ApiGetTelegrafConfig": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取Telegraf监控配置",
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
+                        "schema": {
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -875,7 +922,6 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
@@ -884,38 +930,6 @@
         }
     },
     "definitions": {
-        "models.DeployLog": {
-            "type": "object",
-            "properties": {
-                "clientIp": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "deployId": {
-                    "type": "integer"
-                },
-                "deployVersion": {
-                    "type": "integer"
-                },
-                "deviceId": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "serverId": {
-                    "type": "integer"
-                },
-                "uid": {
-                    "type": "integer"
-                }
-            }
-        },
         "models.Server": {
             "type": "object",
             "properties": {
@@ -947,6 +961,23 @@
                     "type": "integer"
                 },
                 "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
+        "req.DashboardIndexMetricParam": {
+            "type": "object",
+            "required": [
+                "serverId"
+            ],
+            "properties": {
+                "endTime": {
+                    "type": "string"
+                },
+                "serverId": {
+                    "type": "integer"
+                },
+                "startTime": {
                     "type": "string"
                 }
             }
@@ -1307,34 +1338,50 @@
                 }
             }
         },
-        "resp.DeployLogVO": {
+        "resp.DashboardIndexMetricVO": {
             "type": "object",
             "properties": {
-                "clientIp": {
-                    "type": "string"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "deployId": {
+                "activeServerNum": {
                     "type": "integer"
                 },
-                "deployVersion": {
+                "cpurate": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                },
+                "menRate": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
+                }
+            }
+        },
+        "resp.DashboardInfoVO": {
+            "type": "object",
+            "properties": {
+                "deployNum": {
                     "type": "integer"
                 },
-                "deviceId": {
-                    "type": "string"
-                },
-                "id": {
+                "deployRunNum": {
                     "type": "integer"
                 },
-                "serverId": {
+                "inviteNum": {
                     "type": "integer"
                 },
-                "uid": {
+                "maxDeploy": {
+                    "type": "integer"
+                },
+                "maxSchedule": {
+                    "type": "integer"
+                },
+                "scheduleNum": {
+                    "type": "integer"
+                },
+                "serverNum": {
                     "type": "integer"
                 }
             }
@@ -1449,7 +1496,40 @@
         "resp.UserInfoVO": {
             "type": "object",
             "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "inviterUid": {
+                    "description": "邀请人UID",
+                    "type": "integer"
+                },
+                "maxDeploy": {
+                    "description": "最大部署应用数量",
+                    "type": "integer"
+                },
+                "maxSchedule": {
+                    "description": "最大调度任务数量",
+                    "type": "integer"
+                },
+                "password": {
+                    "description": "密码",
+                    "type": "string"
+                },
+                "phone": {
+                    "description": "手机号",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "0-锁定 1-正常",
+                    "type": "integer"
+                },
                 "token": {
+                    "type": "string"
+                },
+                "updateTime": {
                     "type": "string"
                 }
             }

@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+type DashboardIndexMetricVO struct {
+	ActiveServerNum int
+	CPURate         []map[string]interface{}
+	MenRate         []map[string]interface{}
+}
+
 type DashboardInfoVO struct {
 	DeployNum    int
 	MaxDeploy    int

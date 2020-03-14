@@ -2,6 +2,13 @@ package req
 
 import "time"
 
+//DashboardIndexMetricParam 监控入参
+type DashboardIndexMetricParam struct {
+	ServerId  int `binding:"required"`
+	StartTime time.Time
+	EndTime   time.Time
+}
+
 // 部署应用操作入参
 type DeploySetParam struct {
 	// 应用唯一编号
@@ -146,9 +153,9 @@ type UserResetPwdParam struct {
 
 type VerifyBySMSParam struct {
 	// 手机号
-	Phone string `json: "phone"`
+	Phone string `json:"phone"`
 	// 图片验证码id
-	ImgIdKey string `json: "imgIdKey"`
+	ImgIdKey string `json:"imgIdKey"`
 	// 验证码code
 	ImgCode string `json:"imgCode"`
 }

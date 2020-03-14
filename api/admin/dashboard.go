@@ -1,12 +1,14 @@
 package admin
 
 import (
+	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
 	"gitee.com/zhimiao/qiansi/notifyevent"
+	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"gitee.com/zhimiao/qiansi/service"
 	"github.com/gin-gonic/gin"
-	"strconv"
+	"time"
 )
 
 type dashboardApi struct{}
@@ -43,21 +45,24 @@ func (r *dashboardApi) Info(c *gin.Context) {
 // @Summary 概览大盘
 // @Produce  json
 // @Accept  json
-// @Param body body req.DeployListParam true "入参集合"
-// @Success 200 {array} resp.DeployVO ""
+// @Param body body req.DashboardIndexMetricParam true "入参集合"
+// @Success 200 {array} resp.DashboardIndexMetricVO ""
 // @Router /admin/dashboard/IndexMetric [get]
 func (r *dashboardApi) IndexMetric(c *gin.Context) {
-	serverId, err := strconv.Atoi(c.Query("serverId"))
-	if err != nil || serverId == 0 {
-		resp.NewApiResult(-4, "服务器ID错误").Json(c)
+	param := &req.DashboardIndexMetricParam{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
+	param.EndTime = time.Now()
+	param.StartTime = param.EndTime.Add(-1 * time.Minute)
 	uid := c.GetInt("UID")
 	s := &models.Server{Uid: uid}
 	serIds := s.UserServerIds()
-	activeServerNum := notifyevent.Hook001.GetActiveServerNum(serIds...)
-	print(activeServerNum)
-
-	cpuRate := service.GetClientCPURate(uid, serverId)
-	resp.NewApiResult(1, "读取成功", cpuRate).Json(c)
+	vo := resp.DashboardIndexMetricVO{
+		ActiveServerNum: notifyevent.Hook001.GetActiveServerNum(serIds...),
+		CPURate:         service.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime),
+		MenRate:         service.GetClientMemRate(uid, param.ServerId, param.StartTime, param.EndTime),
+	}
+	resp.NewApiResult(1, "读取成功", vo).Json(c)
 }
