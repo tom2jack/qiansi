@@ -41,7 +41,7 @@ func (r *deployApi) Lists(c *gin.Context) {
 		return
 	}
 	s := &models.Deploy{
-		Uid:   c.GetInt("UID"),
+		UId:   c.GetInt("UID"),
 		Title: param.Title,
 	}
 	lists, rows := s.List(param.Offset(), param.PageSize)
@@ -81,8 +81,8 @@ func (r *deployApi) Set(c *gin.Context) {
 		}
 		po := &models.Deploy{}
 		utils.SuperConvert(param, po)
-		po.Uid = c.GetInt("UID")
-		po.OpenId = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+		po.UId = c.GetInt("UID")
+		po.OpenID = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
 		if models.Mysql.Save(po).RowsAffected > 0 {
 			resp.NewApiResult(1, "创建成功", po).Json(c)
 			return
