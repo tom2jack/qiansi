@@ -22,6 +22,7 @@ type PageInfo struct {
 	Rows      interface{} `json:"Rows"`
 }
 
+// NewApiResult 初始化api返回
 func NewApiResult(arg ...interface{}) *ApiResult {
 	result := &ApiResult{
 		Code: 1,
