@@ -32,7 +32,7 @@ var Deploy = &deployApi{}
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployListParam true "入参集合"
-// @Success 200 {array} resp.DeployVO ""
+// @Success 200 {array} models.Deploy ""
 // @Router /admin/DeployLists [get]
 func (r *deployApi) Lists(c *gin.Context) {
 	param := &req.DeployListParam{}
@@ -40,36 +40,28 @@ func (r *deployApi) Lists(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	s := &models.Deploy{
-		UId:   c.GetInt("UID"),
-		Title: param.Title,
-	}
-	lists, rows := s.List(param.Offset(), param.PageSize)
-	vo := make([]resp.DeployVO, len(lists))
-	for k, v := range lists {
-		utils.SuperConvert(&v, &vo[k])
-	}
+	list, totalRows := models.DeployList(c.GetInt("UID"), param)
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
-		TotalSize: rows,
-		Rows:      vo,
+		TotalSize: totalRows,
+		Rows:      list,
 	}).Json(c)
 }
 
-// @Summary 设置部署应用
+// @Summary 创建部署应用
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeploySetParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/DeploySet [POST]
-func (r *deployApi) Set(c *gin.Context) {
+// @Router /admin/Deploy [POST]
+func (r *deployApi) Create(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	if param.Id == 0 {
+	if param.ID == 0 {
 		info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
 		if err != nil {
 			resp.NewApiResult(-4, "用户限额检测失败").Json(c)
@@ -88,7 +80,47 @@ func (r *deployApi) Set(c *gin.Context) {
 			return
 		}
 	}
-	if param.Id > 0 {
+	if param.ID > 0 {
+		if models.Mysql.Table("deploy").Where("uid=?", c.GetInt("UID")).Save(param).RowsAffected > 0 {
+			resp.NewApiResult(1, "更新成功").Json(c)
+			return
+		}
+	}
+	resp.NewApiResult(1).Json(c)
+}
+
+// @Summary 更新部署应用
+// @Produce  json
+// @Accept  json
+// @Param body body req.DeploySetParam true "入参集合"
+// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Router /admin/Deploy [put]
+func (r *deployApi) Update(c *gin.Context) {
+	param := &req.DeploySetParam{}
+	if c.ShouldBind(param) != nil {
+		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		return
+	}
+	if param.ID == 0 {
+		info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
+		if err != nil {
+			resp.NewApiResult(-4, "用户限额检测失败").Json(c)
+			return
+		}
+		if info.MaxSchedule <= info.DeployNum {
+			resp.NewApiResult(-4, "您的部署任务创建数量已达上限").Json(c)
+			return
+		}
+		po := &models.Deploy{}
+		utils.SuperConvert(param, po)
+		po.UId = c.GetInt("UID")
+		po.OpenID = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
+		if models.Mysql.Save(po).RowsAffected > 0 {
+			resp.NewApiResult(1, "创建成功", po).Json(c)
+			return
+		}
+	}
+	if param.ID > 0 {
 		if models.Mysql.Table("deploy").Where("uid=?", c.GetInt("UID")).Save(param).RowsAffected > 0 {
 			resp.NewApiResult(1, "更新成功").Json(c)
 			return
@@ -100,78 +132,31 @@ func (r *deployApi) Set(c *gin.Context) {
 // @Summary 删除部署应用
 // @Produce  json
 // @Accept  json
-// @Param body body req.DeployDelParam true "入参集合"
+// @Param body body req.DeployParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/DeployDel [DELETE]
+// @Router /admin/Deploy [DELETE]
 func (r *deployApi) Del(c *gin.Context) {
-	param := &req.DeployDelParam{}
+	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	db := models.Mysql.Delete(&models.Deploy{}, "id=? and uid=?", param.DeployId, c.GetInt("UID"))
-	if db.Error != nil || db.RowsAffected != 1 {
-		resp.NewApiResult(-5, "删除失败", db).Json(c)
+	err := models.DelDeploy(c.GetInt("UID"), param.DeployId)
+	if err != nil {
+		resp.NewApiResult(-5, err.Error()).Json(c)
 		return
 	}
-	// 删除关联
-	models.Mysql.Delete(&models.DeployServerRelation{}, "deploy_id=?", param.DeployId)
-	resp.NewApiResult(1, "操作成功", db).Json(c)
-}
-
-// @Summary 部署应用关联服务器
-// @Produce  json
-// @Accept  json
-// @Param body body req.DeployRelationParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "关联成功","data": null}"
-// @Router /admin/DeployRelationServer [POST]
-func (r *deployApi) RelationServer(c *gin.Context) {
-	param := &[]req.DeployRelationParam{}
-	if c.ShouldBind(param) != nil || len(*param) == 0 {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
-		return
-	}
-	var (
-		max       = len(*param)
-		serverIds = make([]int, max)
-		deployIds = make([]int, max)
-		result    = make([]bool, max)
-	)
-	for k, e := range *param {
-		serverIds[k] = e.ServerId
-		deployIds[k] = e.DeployId
-	}
-	server := &models.Server{
-		Uid: c.GetInt("UID"),
-	}
-	if !server.BatchCheck(serverIds) {
-		resp.NewApiResult(-5, "含有非法服务器绑定").Json(c)
-		return
-	}
-	deploy := &models.Deploy{
-		Uid: c.GetInt("UID"),
-	}
-	if !deploy.BatchCheck(deployIds) {
-		resp.NewApiResult(-5, "含有非法应用绑定").Json(c)
-		return
-	}
-	relation := &models.DeployServerRelation{}
-	for k, e := range *param {
-		relation.DeployId = e.DeployId
-		relation.ServerId = e.ServerId
-		result[k] = relation.Relation(e.Relation)
-	}
-	resp.NewApiResult(1, "成功", result).Json(c)
+	resp.NewApiResult(1).Json(c)
 }
 
 // @Summary 获取当前部署应用的服务器列表
 // @Produce  json
 // @Accept  json
-// @Param body body req.DeployServerParam true "入参集合"
+// @Param body body req.DeployParam true "入参集合"
 // @Success 200 {object} models.Server "返回"
 // @Router /admin/DeployServer [post]
 func (r *deployApi) Server(c *gin.Context) {
-	param := &req.DeployServerParam{}
+	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
@@ -181,12 +166,12 @@ func (r *deployApi) Server(c *gin.Context) {
 	}
 	serverList := server.ListByUser()
 	relation := &models.DeployServerRelation{
-		DeployId: param.DeployId,
+		DeployID: param.DeployId,
 	}
 	relationList := relation.ListByDeployId()
 	relationMap := make(map[int]models.DeployServerRelation)
 	for _, e := range relationList {
-		relationMap[e.ServerId] = e
+		relationMap[e.ServerID] = e
 	}
 	len := len(serverList)
 	list := make([]resp.DeployServerVO, len)

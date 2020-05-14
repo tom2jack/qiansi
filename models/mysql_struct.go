@@ -22,7 +22,7 @@ type Deploy struct {
 	ID            int       `gorm:"primary_key;column:id;type:int(10) unsigned;not null"` // 应用唯一编号
 	UId           int       `gorm:"index:IX_UID;column:uid;type:int(11);not null"`        // 创建用户UID
 	Title         string    `gorm:"column:title;type:varchar(120);not null"`              // 应用名称
-	DeployType    int8      `gorm:"column:deploy_type;type:tinyint(1);not null"`          // 部署类型 0-本地 1-git 2-zip
+	DeployType    int8      `gorm:"column:deploy_type;type:tinyint(1);not null"`          // 部署类型 0-本地 1-git 2-zip 3-docker
 	WorkDir       string    `gorm:"column:work_dir;type:varchar(255);not null"`           // 工作目录
 	BeforeCommand string    `gorm:"column:before_command;type:varchar(2000);not null"`    // 前置命令
 	AfterCommand  string    `gorm:"column:after_command;type:varchar(2000);not null"`     // 后置命令
@@ -53,4 +53,13 @@ type DeployZip struct {
 	Password   string    `gorm:"column:password;type:varchar(255);not null"`                  // 密码
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;not null"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime"`
+}
+
+// DeployServerRelation 部署服务-server关联表
+type DeployServerRelation struct {
+	DeployID      int       `gorm:"primary_key;column:deploy_id;type:int(11);not null"` // 部署服务id
+	ServerID      int       `gorm:"primary_key;column:server_id;type:int(11);not null"` // 服务器ID
+	DeployVersion int       `gorm:"column:deploy_version;type:int(10) unsigned"`        // 已部署版本
+	CreateTime    time.Time `gorm:"column:create_time;type:datetime"`
+	UpdateTime    time.Time `gorm:"column:update_time;type:datetime"`
 }
