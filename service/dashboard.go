@@ -23,7 +23,7 @@ func GetUserModuleMaxInfo(uid int) (info MaxInfo, err error) {
 	}
 	info.MaxDeploy, info.MaxSchedule = member.MaxDeploy, member.MaxSchedule
 	var num int
-	deploy := models.Deploy{Uid: uid}
+	deploy := models.Deploy{UId: uid}
 	num, err = deploy.Count()
 	if err != nil {
 		return

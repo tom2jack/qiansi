@@ -61,32 +61,8 @@ func (r *deployApi) Create(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	if param.ID == 0 {
-		info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
-		if err != nil {
-			resp.NewApiResult(-4, "用户限额检测失败").Json(c)
-			return
-		}
-		if info.MaxSchedule <= info.DeployNum {
-			resp.NewApiResult(-4, "您的部署任务创建数量已达上限").Json(c)
-			return
-		}
-		po := &models.Deploy{}
-		utils.SuperConvert(param, po)
-		po.UId = c.GetInt("UID")
-		po.OpenID = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
-		if models.Mysql.Save(po).RowsAffected > 0 {
-			resp.NewApiResult(1, "创建成功", po).Json(c)
-			return
-		}
-	}
-	if param.ID > 0 {
-		if models.Mysql.Table("deploy").Where("uid=?", c.GetInt("UID")).Save(param).RowsAffected > 0 {
-			resp.NewApiResult(1, "更新成功").Json(c)
-			return
-		}
-	}
-	resp.NewApiResult(1).Json(c)
+	err := models.CreateDeploy(c.GetInt("UID"), param)
+	resp.NewApiResult(err).Json(c)
 }
 
 // @Summary 更新部署应用
@@ -101,32 +77,8 @@ func (r *deployApi) Update(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	if param.ID == 0 {
-		info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
-		if err != nil {
-			resp.NewApiResult(-4, "用户限额检测失败").Json(c)
-			return
-		}
-		if info.MaxSchedule <= info.DeployNum {
-			resp.NewApiResult(-4, "您的部署任务创建数量已达上限").Json(c)
-			return
-		}
-		po := &models.Deploy{}
-		utils.SuperConvert(param, po)
-		po.UId = c.GetInt("UID")
-		po.OpenID = strings.ReplaceAll(uuid.NewV4().String(), "-", "")
-		if models.Mysql.Save(po).RowsAffected > 0 {
-			resp.NewApiResult(1, "创建成功", po).Json(c)
-			return
-		}
-	}
-	if param.ID > 0 {
-		if models.Mysql.Table("deploy").Where("uid=?", c.GetInt("UID")).Save(param).RowsAffected > 0 {
-			resp.NewApiResult(1, "更新成功").Json(c)
-			return
-		}
-	}
-	resp.NewApiResult(1).Json(c)
+	err := models.UpdateDeploy(c.GetInt("UID"), param)
+	resp.NewApiResult(err).Json(c)
 }
 
 // @Summary 删除部署应用
@@ -142,11 +94,7 @@ func (r *deployApi) Del(c *gin.Context) {
 		return
 	}
 	err := models.DelDeploy(c.GetInt("UID"), param.DeployId)
-	if err != nil {
-		resp.NewApiResult(-5, err.Error()).Json(c)
-		return
-	}
-	resp.NewApiResult(1).Json(c)
+	resp.NewApiResult(err).Json(c)
 }
 
 // @Summary 获取当前部署应用的服务器列表

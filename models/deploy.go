@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/req"
+	"gitee.com/zhimiao/qiansi/service"
 	"github.com/jinzhu/gorm"
+	uuid "github.com/satori/go.uuid"
+	"strings"
 )
 
 // DeployList 部署应用列表
@@ -18,13 +21,169 @@ func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows
 }
 
 // CreateDeploy 创建部署应用
-func CreateDeploy(uid int, param req.DeploySetParam) (err error) {
-	return
+func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
+	return Mysql.Transaction(func(tx *gorm.DB) error {
+		info, err := service.GetUserModuleMaxInfo(uid)
+		if err != nil {
+			return fmt.Errorf("用户限额检测失败")
+		}
+		if info.MaxDeploy <= info.DeployNum {
+			return fmt.Errorf("您的部署任务创建数量已达上限")
+		}
+		deploy := Deploy{
+			UId:           uid,
+			Title:         param.Title,
+			DeployType:    param.DeployType,
+			WorkDir:       param.WorkDir,
+			BeforeCommand: param.BeforeCommand,
+			AfterCommand:  param.AfterCommand,
+			NowVersion:    0,
+			OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
+		}
+		err = tx.Save(&deploy).Error
+		if err != nil {
+			return fmt.Errorf("应用创建失败")
+		}
+		// 部署类型 0-本地 1-git 2-zip 3-docker
+		switch deploy.DeployType {
+		case 0:
+		case 1:
+			err = tx.Save(&DeployGit{
+				DeployID:   deploy.ID,
+				RemoteURL:  param.DeployGit.RemoteURL,
+				DeployPath: param.DeployGit.DeployPath,
+				Branch:     param.DeployGit.Branch,
+				DeployKeys: param.DeployGit.DeployKeys,
+				UserName:   param.DeployGit.UserName,
+				Password:   param.DeployGit.Password,
+			}).Error
+		case 2:
+			err = tx.Save(&DeployZip{
+				DeployID:   deploy.ID,
+				RemoteURL:  param.DeployZip.RemoteURL,
+				DeployPath: param.DeployZip.DeployPath,
+				Password:   param.DeployZip.Password,
+			}).Error
+		case 3:
+			err = tx.Save(&DeployDocker{
+				DeployID:         deploy.ID,
+				DockerImage:      param.DeployDocker.DockerImage,
+				UserName:         param.DeployDocker.UserName,
+				Password:         param.DeployDocker.Password,
+				IsRuning:         param.DeployDocker.IsRuning,
+				ContainerName:    param.DeployDocker.ContainerName,
+				ContainerVolumes: param.DeployDocker.ContainerVolumes,
+				ContainerPorts:   param.DeployDocker.ContainerPorts,
+				ContainerEnv:     param.DeployDocker.ContainerEnv,
+			}).Error
+		default:
+			return fmt.Errorf("无法识别的应用类型")
+		}
+		if err != nil {
+			return fmt.Errorf("应用创建失败")
+		}
+		serverIds := make([]int, len(param.ServerRelation))
+		for _, s := range param.ServerRelation {
+			serverIds = append(serverIds, s.ServerId)
+		}
+		server := &Server{Uid: uid}
+		if !server.BatchCheck(serverIds) {
+			return fmt.Errorf("含有非法服务器绑定")
+		}
+		relation := &DeployServerRelation{}
+		for _, e := range param.ServerRelation {
+			relation.DeployID = deploy.ID
+			relation.ServerID = e.ServerId
+			if tx.Save(relation).Error != nil {
+				return fmt.Errorf("服务器关联失败")
+			}
+		}
+		return nil
+	})
 }
 
 // UpdateDeploy 更新部署应用
-func UpdateDeploy(uid int, param req.DeploySetParam) (err error) {
-	return
+func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
+	// TODO:
+	return Mysql.Transaction(func(tx *gorm.DB) error {
+		info, err := service.GetUserModuleMaxInfo(uid)
+		if err != nil {
+			return fmt.Errorf("用户限额检测失败")
+		}
+		if info.MaxDeploy <= info.DeployNum {
+			return fmt.Errorf("您的部署任务创建数量已达上限")
+		}
+		deploy := Deploy{
+			ID:            param.ID,
+			UId:           uid,
+			Title:         param.Title,
+			DeployType:    param.DeployType,
+			WorkDir:       param.WorkDir,
+			BeforeCommand: param.BeforeCommand,
+			AfterCommand:  param.AfterCommand,
+			NowVersion:    0,
+			OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
+		}
+		err = tx.Model(&deploy).Update(&deploy).Error
+		if err != nil {
+			return fmt.Errorf("应用创建失败")
+		}
+		// 部署类型 0-本地 1-git 2-zip 3-docker
+		switch deploy.DeployType {
+		case 0:
+		case 1:
+			err = tx.Model(&DeployGit{}).Update(&DeployGit{
+				DeployID:   deploy.ID,
+				RemoteURL:  param.DeployGit.RemoteURL,
+				DeployPath: param.DeployGit.DeployPath,
+				Branch:     param.DeployGit.Branch,
+				DeployKeys: param.DeployGit.DeployKeys,
+				UserName:   param.DeployGit.UserName,
+				Password:   param.DeployGit.Password,
+			}).Error
+		case 2:
+			err = tx.Model(&DeployZip{}).Update(&DeployZip{
+				DeployID:   deploy.ID,
+				RemoteURL:  param.DeployZip.RemoteURL,
+				DeployPath: param.DeployZip.DeployPath,
+				Password:   param.DeployZip.Password,
+			}).Error
+		case 3:
+			err = tx.Model(&DeployDocker{}).Update(&DeployDocker{
+				DeployID:         deploy.ID,
+				DockerImage:      param.DeployDocker.DockerImage,
+				UserName:         param.DeployDocker.UserName,
+				Password:         param.DeployDocker.Password,
+				IsRuning:         param.DeployDocker.IsRuning,
+				ContainerName:    param.DeployDocker.ContainerName,
+				ContainerVolumes: param.DeployDocker.ContainerVolumes,
+				ContainerPorts:   param.DeployDocker.ContainerPorts,
+				ContainerEnv:     param.DeployDocker.ContainerEnv,
+			}).Error
+		default:
+			return fmt.Errorf("无法识别的应用类型")
+		}
+		if err != nil {
+			return fmt.Errorf("应用创建失败")
+		}
+		serverIds := make([]int, len(param.ServerRelation))
+		for _, s := range param.ServerRelation {
+			serverIds = append(serverIds, s.ServerId)
+		}
+		server := &Server{Uid: uid}
+		if !server.BatchCheck(serverIds) {
+			return fmt.Errorf("含有非法服务器绑定")
+		}
+		relation := &DeployServerRelation{}
+		for _, e := range param.ServerRelation {
+			relation.DeployID = deploy.ID
+			relation.ServerID = e.ServerId
+			if tx.Save(relation).Error != nil {
+				return fmt.Errorf("服务器关联失败")
+			}
+		}
+		return nil
+	})
 }
 
 // DelDeploy 删除部署应用
