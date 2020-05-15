@@ -1,5 +1,55 @@
 basePath: /
 definitions:
+  models.Deploy:
+    properties:
+      afterCommand:
+        description: 后置命令
+        type: string
+      beforeCommand:
+        description: 前置命令
+        type: string
+      createTime:
+        type: string
+      deployType:
+        description: 部署类型 0-本地 1-git 2-zip 3-docker
+        type: integer
+      id:
+        description: 应用唯一编号
+        type: integer
+      nowVersion:
+        description: 当前版本
+        type: integer
+      openID:
+        description: 应用开放编码(用于hook部署)
+        type: string
+      title:
+        description: 应用名称
+        type: string
+      uid:
+        description: 创建用户UID
+        type: integer
+      updateTime:
+        type: string
+      workDir:
+        description: 工作目录
+        type: string
+    type: object
+  models.DeployServerRelation:
+    properties:
+      createTime:
+        type: string
+      deployID:
+        description: 部署服务id
+        type: integer
+      deployVersion:
+        description: 已部署版本
+        type: integer
+      serverID:
+        description: 服务器ID
+        type: integer
+      updateTime:
+        type: string
+    type: object
   models.Server:
     properties:
       apiSecret:
@@ -34,18 +84,6 @@ definitions:
     required:
     - serverId
     type: object
-  req.DeployBase:
-    properties:
-      deployId:
-        description: 部署应用ID
-        type: integer
-    type: object
-  req.DeployDelParam:
-    properties:
-      deployId:
-        description: 部署应用ID
-        type: integer
-    type: object
   req.DeployDoParam:
     properties:
       deployId:
@@ -54,17 +92,21 @@ definitions:
     type: object
   req.DeployListParam:
     properties:
+      Page:
+        type: integer
+      PageSize:
+        type: integer
+      Title:
+        type: string
       lastId:
         type: integer
-      page:
-        type: integer
-      pageSize:
-        type: integer
-      title:
-        type: string
     type: object
   req.DeployLogParam:
     properties:
+      Page:
+        type: integer
+      PageSize:
+        type: integer
       deployId:
         description: 应用ID
         type: integer
@@ -76,10 +118,6 @@ definitions:
         type: string
       lastId:
         type: integer
-      page:
-        type: integer
-      pageSize:
-        type: integer
       serverId:
         description: 服务器
         type: integer
@@ -87,16 +125,10 @@ definitions:
         description: 开始时间
         type: string
     type: object
-  req.DeployRelationParam:
+  req.DeployParam:
     properties:
       deployId:
         description: 部署应用ID
-        type: integer
-      relation:
-        description: 关联操作 true-关联 false-取消
-        type: boolean
-      serverId:
-        description: 服务器ID
         type: integer
     type: object
   req.DeployRunLogParam:
@@ -118,32 +150,106 @@ definitions:
     type: object
   req.DeploySetParam:
     properties:
-      afterCommand:
+      after_command:
         description: 后置命令
         type: string
-      beforeCommand:
+      before_command:
         description: 前置命令
         type: string
-      branch:
-        description: git分支
-        type: string
-      deployKeys:
-        description: 部署私钥
-        type: string
-      deployType:
-        description: 部署类型 1-git 2-zip 3-other
+      deploy_docker:
+        description: DeployDocker 纸喵部署-docker
+        properties:
+          container_env:
+            description: 环境变量注入
+            type: string
+          container_name:
+            description: 容器名称
+            type: string
+          container_ports:
+            description: 端口暴露 a:b a内部 b外部
+            type: string
+          container_volumes:
+            description: 地址映射 a:b a宿主机 b容器内
+            type: string
+          docker_image:
+            description: 资源地址(完整路径)
+            type: string
+          is_runing:
+            description: 是否启动 -1-不启动 1-启动
+            type: integer
+          password:
+            description: 密码
+            type: string
+          user_name:
+            description: 账号
+            type: string
+        type: object
+      deploy_git:
+        description: DeployGit 纸喵部署-git
+        properties:
+          branch:
+            description: git分支
+            type: string
+          deploy_keys:
+            description: 部署私钥
+            type: string
+          deploy_path:
+            description: 本地部署地址
+            type: string
+          password:
+            description: 密码
+            type: string
+          remote_url:
+            description: 资源地址
+            type: string
+          user_name:
+            description: 账号
+            type: string
+        type: object
+      deploy_type:
+        description: 部署类型 0-本地 1-git 2-zip 3-docker
         type: integer
+      deploy_zip:
+        description: DeployZip 纸喵部署-zip
+        properties:
+          deploy_path:
+            description: 本地部署地址
+            type: string
+          password:
+            description: 密码
+            type: string
+          remote_url:
+            description: 资源地址
+            type: string
+        type: object
       id:
         description: 应用唯一编号
         type: integer
-      localPath:
-        description: 本地部署地址
+      now_version:
+        description: 当前版本
+        type: integer
+      open_id:
+        description: 应用开放编码(用于hook部署)
         type: string
-      remoteUrl:
-        description: 资源地址
-        type: string
+      server_relation:
+        items:
+          properties:
+            relation:
+              description: 关联操作 true-关联 false-取消
+              type: boolean
+            serverId:
+              description: 服务器ID
+              type: integer
+          type: object
+        type: array
       title:
         description: 应用名称
+        type: string
+      uid:
+        description: 创建用户UID
+        type: integer
+      work_dir:
+        description: 工作目录
         type: string
     type: object
   req.ScheduleCreateParam:
@@ -189,11 +295,11 @@ definitions:
     type: object
   req.ScheduleListParam:
     properties:
+      Page:
+        type: integer
+      PageSize:
+        type: integer
       lastId:
-        type: integer
-      page:
-        type: integer
-      pageSize:
         type: integer
       title:
         type: string
@@ -205,11 +311,11 @@ definitions:
     type: object
   req.ServerListParam:
     properties:
+      Page:
+        type: integer
+      PageSize:
+        type: integer
       lastId:
-        type: integer
-      page:
-        type: integer
-      pageSize:
         type: integer
       serverName:
         type: string
@@ -321,46 +427,15 @@ definitions:
       serverName:
         type: string
     type: object
-  resp.DeployVO:
-    properties:
-      afterCommand:
-        type: string
-      beforeCommand:
-        type: string
-      branch:
-        type: string
-      createTime:
-        type: string
-      deployKeys:
-        type: string
-      deployType:
-        type: integer
-      id:
-        type: integer
-      localPath:
-        type: string
-      nowVersion:
-        type: integer
-      openId:
-        type: string
-      remoteUrl:
-        type: string
-      title:
-        type: string
-      uid:
-        type: integer
-      updateTime:
-        type: string
-    type: object
   resp.PageInfo:
     properties:
-      page:
+      Page:
         type: integer
-      pageSize:
+      PageSize:
         type: integer
-      rows:
+      Rows:
         type: object
-      totalSize:
+      TotalSize:
         type: integer
     type: object
   resp.ServerVO:
@@ -425,7 +500,7 @@ info:
   title: 纸喵 qiansi API
   version: "1.0"
 paths:
-  /admin/DeployDel:
+  /admin/Deploy:
     delete:
       consumes:
       - application/json
@@ -435,7 +510,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/req.DeployDelParam'
+          $ref: '#/definitions/req.DeployParam'
       produces:
       - application/json
       responses:
@@ -444,6 +519,42 @@ paths:
           schema:
             $ref: '#/definitions/resp.ApiResult'
       summary: 删除部署应用
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeploySetParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+      summary: 创建部署应用
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeploySetParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+      summary: 更新部署应用
   /admin/DeployDo:
     get:
       consumes:
@@ -473,7 +584,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/req.DeployBase'
+          $ref: '#/definitions/req.DeployParam'
       produces:
       - application/json
       responses:
@@ -500,7 +611,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/resp.DeployVO'
+              $ref: '#/definitions/models.Deploy'
             type: array
       summary: 获取部署应用列表
   /admin/DeployLog:
@@ -522,25 +633,6 @@ paths:
           schema:
             $ref: '#/definitions/resp.PageInfo'
       summary: 获取部署日志
-  /admin/DeployRelationServer:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: 入参集合
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/req.DeployRelationParam'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "关联成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 部署应用关联服务器
   /admin/DeployRunLog:
     get:
       consumes:
@@ -591,34 +683,17 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/req.DeployServerParam'
+          $ref: '#/definitions/req.DeployParam'
       produces:
       - application/json
       responses:
         "200":
           description: 返回
           schema:
-            $ref: '#/definitions/models.Server'
+            items:
+              $ref: '#/definitions/models.DeployServerRelation'
+            type: array
       summary: 获取当前部署应用的服务器列表
-  /admin/DeploySet:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: 入参集合
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/req.DeploySetParam'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 设置部署应用
   /admin/ScheduleCreate:
     post:
       consumes:
@@ -972,7 +1047,9 @@ paths:
         "200":
           description: '{"code": 1,"msg": "读取成功","data": [deploy]}'
           schema:
-            $ref: '#/definitions/resp.ApiResult'
+            items:
+              $ref: '#/definitions/models.Deploy'
+            type: array
       summary: 获取服务器部署任务清单
   /clinet/ApiGetTelegrafConfig:
     get:
@@ -1005,10 +1082,8 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
-            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
-            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
+          description: OK
           schema:
-            $ref: '#/definitions/resp.ApiResult'
+            $ref: '#/definitions/models.Server'
       summary: 服务器注册
 swagger: "2.0"

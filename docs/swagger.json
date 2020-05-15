@@ -18,7 +18,63 @@
     "host": "localhost:1315",
     "basePath": "/",
     "paths": {
-        "/admin/DeployDel": {
+        "/admin/Deploy": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新部署应用",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.DeploySetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "创建部署应用",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.DeploySetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "$ref": "#/definitions/resp.ApiResult"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "consumes": [
                     "application/json"
@@ -34,7 +90,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/req.DeployDelParam"
+                            "$ref": "#/definitions/req.DeployParam"
                         }
                     }
                 ],
@@ -94,7 +150,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/req.DeployBase"
+                            "$ref": "#/definitions/req.DeployParam"
                         }
                     }
                 ],
@@ -134,7 +190,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/resp.DeployVO"
+                                "$ref": "#/definitions/models.Deploy"
                             }
                         }
                     }
@@ -166,36 +222,6 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/resp.PageInfo"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/DeployRelationServer": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "部署应用关联服务器",
-                "parameters": [
-                    {
-                        "description": "入参集合",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/req.DeployRelationParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"关联成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -280,7 +306,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/req.DeployServerParam"
+                            "$ref": "#/definitions/req.DeployParam"
                         }
                     }
                 ],
@@ -288,37 +314,10 @@
                     "200": {
                         "description": "返回",
                         "schema": {
-                            "$ref": "#/definitions/models.Server"
-                        }
-                    }
-                }
-            }
-        },
-        "/admin/DeploySet": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "设置部署应用",
-                "parameters": [
-                    {
-                        "description": "入参集合",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/req.DeploySetParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.DeployServerRelation"
+                            }
                         }
                     }
                 }
@@ -868,7 +867,10 @@
                     "200": {
                         "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
                         "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Deploy"
+                            }
                         }
                     }
                 }
@@ -920,9 +922,9 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
+                        "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "$ref": "#/definitions/models.Server"
                         }
                     }
                 }
@@ -930,6 +932,76 @@
         }
     },
     "definitions": {
+        "models.Deploy": {
+            "type": "object",
+            "properties": {
+                "afterCommand": {
+                    "description": "后置命令",
+                    "type": "string"
+                },
+                "beforeCommand": {
+                    "description": "前置命令",
+                    "type": "string"
+                },
+                "createTime": {
+                    "type": "string"
+                },
+                "deployType": {
+                    "description": "部署类型 0-本地 1-git 2-zip 3-docker",
+                    "type": "integer"
+                },
+                "id": {
+                    "description": "应用唯一编号",
+                    "type": "integer"
+                },
+                "nowVersion": {
+                    "description": "当前版本",
+                    "type": "integer"
+                },
+                "openID": {
+                    "description": "应用开放编码(用于hook部署)",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "应用名称",
+                    "type": "string"
+                },
+                "uid": {
+                    "description": "创建用户UID",
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                },
+                "workDir": {
+                    "description": "工作目录",
+                    "type": "string"
+                }
+            }
+        },
+        "models.DeployServerRelation": {
+            "type": "object",
+            "properties": {
+                "createTime": {
+                    "type": "string"
+                },
+                "deployID": {
+                    "description": "部署服务id",
+                    "type": "integer"
+                },
+                "deployVersion": {
+                    "description": "已部署版本",
+                    "type": "integer"
+                },
+                "serverID": {
+                    "description": "服务器ID",
+                    "type": "integer"
+                },
+                "updateTime": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Server": {
             "type": "object",
             "properties": {
@@ -982,24 +1054,6 @@
                 }
             }
         },
-        "req.DeployBase": {
-            "type": "object",
-            "properties": {
-                "deployId": {
-                    "description": "部署应用ID",
-                    "type": "integer"
-                }
-            }
-        },
-        "req.DeployDelParam": {
-            "type": "object",
-            "properties": {
-                "deployId": {
-                    "description": "部署应用ID",
-                    "type": "integer"
-                }
-            }
-        },
         "req.DeployDoParam": {
             "type": "object",
             "properties": {
@@ -1012,23 +1066,29 @@
         "req.DeployListParam": {
             "type": "object",
             "properties": {
+                "Page": {
+                    "type": "integer"
+                },
+                "PageSize": {
+                    "type": "integer"
+                },
+                "Title": {
+                    "type": "string"
+                },
                 "lastId": {
                     "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
                 }
             }
         },
         "req.DeployLogParam": {
             "type": "object",
             "properties": {
+                "Page": {
+                    "type": "integer"
+                },
+                "PageSize": {
+                    "type": "integer"
+                },
                 "deployId": {
                     "description": "应用ID",
                     "type": "integer"
@@ -1044,12 +1104,6 @@
                 "lastId": {
                     "type": "integer"
                 },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
-                    "type": "integer"
-                },
                 "serverId": {
                     "description": "服务器",
                     "type": "integer"
@@ -1060,19 +1114,11 @@
                 }
             }
         },
-        "req.DeployRelationParam": {
+        "req.DeployParam": {
             "type": "object",
             "properties": {
                 "deployId": {
                     "description": "部署应用ID",
-                    "type": "integer"
-                },
-                "relation": {
-                    "description": "关联操作 true-关联 false-取消",
-                    "type": "boolean"
-                },
-                "serverId": {
-                    "description": "服务器ID",
                     "type": "integer"
                 }
             }
@@ -1105,40 +1151,142 @@
         "req.DeploySetParam": {
             "type": "object",
             "properties": {
-                "afterCommand": {
+                "after_command": {
                     "description": "后置命令",
                     "type": "string"
                 },
-                "beforeCommand": {
+                "before_command": {
                     "description": "前置命令",
                     "type": "string"
                 },
-                "branch": {
-                    "description": "git分支",
-                    "type": "string"
+                "deploy_docker": {
+                    "description": "DeployDocker 纸喵部署-docker",
+                    "type": "object",
+                    "properties": {
+                        "container_env": {
+                            "description": "环境变量注入",
+                            "type": "string"
+                        },
+                        "container_name": {
+                            "description": "容器名称",
+                            "type": "string"
+                        },
+                        "container_ports": {
+                            "description": "端口暴露 a:b a内部 b外部",
+                            "type": "string"
+                        },
+                        "container_volumes": {
+                            "description": "地址映射 a:b a宿主机 b容器内",
+                            "type": "string"
+                        },
+                        "docker_image": {
+                            "description": "资源地址(完整路径)",
+                            "type": "string"
+                        },
+                        "is_runing": {
+                            "description": "是否启动 -1-不启动 1-启动",
+                            "type": "integer"
+                        },
+                        "password": {
+                            "description": "密码",
+                            "type": "string"
+                        },
+                        "user_name": {
+                            "description": "账号",
+                            "type": "string"
+                        }
+                    }
                 },
-                "deployKeys": {
-                    "description": "部署私钥",
-                    "type": "string"
+                "deploy_git": {
+                    "description": "DeployGit 纸喵部署-git",
+                    "type": "object",
+                    "properties": {
+                        "branch": {
+                            "description": "git分支",
+                            "type": "string"
+                        },
+                        "deploy_keys": {
+                            "description": "部署私钥",
+                            "type": "string"
+                        },
+                        "deploy_path": {
+                            "description": "本地部署地址",
+                            "type": "string"
+                        },
+                        "password": {
+                            "description": "密码",
+                            "type": "string"
+                        },
+                        "remote_url": {
+                            "description": "资源地址",
+                            "type": "string"
+                        },
+                        "user_name": {
+                            "description": "账号",
+                            "type": "string"
+                        }
+                    }
                 },
-                "deployType": {
-                    "description": "部署类型 1-git 2-zip 3-other",
+                "deploy_type": {
+                    "description": "部署类型 0-本地 1-git 2-zip 3-docker",
                     "type": "integer"
+                },
+                "deploy_zip": {
+                    "description": "DeployZip 纸喵部署-zip",
+                    "type": "object",
+                    "properties": {
+                        "deploy_path": {
+                            "description": "本地部署地址",
+                            "type": "string"
+                        },
+                        "password": {
+                            "description": "密码",
+                            "type": "string"
+                        },
+                        "remote_url": {
+                            "description": "资源地址",
+                            "type": "string"
+                        }
+                    }
                 },
                 "id": {
                     "description": "应用唯一编号",
                     "type": "integer"
                 },
-                "localPath": {
-                    "description": "本地部署地址",
+                "now_version": {
+                    "description": "当前版本",
+                    "type": "integer"
+                },
+                "open_id": {
+                    "description": "应用开放编码(用于hook部署)",
                     "type": "string"
                 },
-                "remoteUrl": {
-                    "description": "资源地址",
-                    "type": "string"
+                "server_relation": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "relation": {
+                                "description": "关联操作 true-关联 false-取消",
+                                "type": "boolean"
+                            },
+                            "serverId": {
+                                "description": "服务器ID",
+                                "type": "integer"
+                            }
+                        }
+                    }
                 },
                 "title": {
                     "description": "应用名称",
+                    "type": "string"
+                },
+                "uid": {
+                    "description": "创建用户UID",
+                    "type": "integer"
+                },
+                "work_dir": {
+                    "description": "工作目录",
                     "type": "string"
                 }
             }
@@ -1203,13 +1351,13 @@
         "req.ScheduleListParam": {
             "type": "object",
             "properties": {
+                "Page": {
+                    "type": "integer"
+                },
+                "PageSize": {
+                    "type": "integer"
+                },
                 "lastId": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
                     "type": "integer"
                 },
                 "title": {
@@ -1228,13 +1376,13 @@
         "req.ServerListParam": {
             "type": "object",
             "properties": {
+                "Page": {
+                    "type": "integer"
+                },
+                "PageSize": {
+                    "type": "integer"
+                },
                 "lastId": {
-                    "type": "integer"
-                },
-                "page": {
-                    "type": "integer"
-                },
-                "pageSize": {
                     "type": "integer"
                 },
                 "serverName": {
@@ -1400,66 +1548,19 @@
                 }
             }
         },
-        "resp.DeployVO": {
-            "type": "object",
-            "properties": {
-                "afterCommand": {
-                    "type": "string"
-                },
-                "beforeCommand": {
-                    "type": "string"
-                },
-                "branch": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "deployKeys": {
-                    "type": "string"
-                },
-                "deployType": {
-                    "type": "integer"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "localPath": {
-                    "type": "string"
-                },
-                "nowVersion": {
-                    "type": "integer"
-                },
-                "openId": {
-                    "type": "string"
-                },
-                "remoteUrl": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "uid": {
-                    "type": "integer"
-                },
-                "updateTime": {
-                    "type": "string"
-                }
-            }
-        },
         "resp.PageInfo": {
             "type": "object",
             "properties": {
-                "page": {
+                "Page": {
                     "type": "integer"
                 },
-                "pageSize": {
+                "PageSize": {
                     "type": "integer"
                 },
-                "rows": {
+                "Rows": {
                     "type": "object"
                 },
-                "totalSize": {
+                "TotalSize": {
                     "type": "integer"
                 }
             }

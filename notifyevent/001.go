@@ -52,9 +52,11 @@ func (m *Hook001PO) GetHookData(serverId int) Hook001DTO {
 }
 
 // AddDeploy 添加部署消息
-func (m *Hook001PO) AddDeploy(serverId int) {
+func (m *Hook001PO) AddDeploy(serverIds ...int) {
 	m.Lock()
-	m.Deploy[serverId] = "1"
+	for _, serverId := range serverIds {
+		m.Deploy[serverId] = "1"
+	}
 	m.Unlock()
 }
 
@@ -74,7 +76,9 @@ func (m *Hook001PO) AddScheduld(serverId int) {
 
 // DelScheduld 删除调度消息
 func (m *Hook001PO) DelScheduld(serverId int) {
+	m.Lock()
 	delete(m.Scheduld, serverId)
+	m.Unlock()
 }
 
 // AddTelegraf 添加指标消息

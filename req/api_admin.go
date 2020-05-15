@@ -22,7 +22,6 @@ type DeploySetParam struct {
 	OpenID        string `json:"open_id"`        // 应用开放编码(用于hook部署)
 	// DeployDocker 纸喵部署-docker
 	DeployDocker struct {
-		DeployID         int    `json:"-"`                 // 部署应用编号
 		DockerImage      string `json:"docker_image"`      // 资源地址(完整路径)
 		UserName         string `json:"user_name"`         // 账号
 		Password         string `json:"password"`          // 密码
@@ -34,7 +33,6 @@ type DeploySetParam struct {
 	} `json:"deploy_docker"`
 	// DeployGit 纸喵部署-git
 	DeployGit struct {
-		DeployID   int    `json:"-"`           // 部署应用编号
 		RemoteURL  string `json:"remote_url"`  // 资源地址
 		DeployPath string `json:"deploy_path"` // 本地部署地址
 		Branch     string `json:"branch"`      // git分支
@@ -44,7 +42,6 @@ type DeploySetParam struct {
 	} `json:"deploy_git"`
 	// DeployZip 纸喵部署-zip
 	DeployZip struct {
-		DeployID   int    `json:"-"`           // 部署应用编号
 		RemoteURL  string `json:"remote_url"`  // 资源地址
 		DeployPath string `json:"deploy_path"` // 本地部署地址
 		Password   string `json:"password"`    // 密码

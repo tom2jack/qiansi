@@ -30,6 +30,11 @@ type zmInflux struct {
 
 type CommonMap map[string]interface{}
 
+type ModelBase struct {
+	Num int
+	Has bool
+}
+
 type ModelBase1 struct {
 	Id         int       `xorm:"not null pk autoincr INT(11)"`
 	UpdateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`

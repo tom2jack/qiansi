@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/req"
-	"gitee.com/zhimiao/qiansi/service"
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"strings"
@@ -23,11 +22,17 @@ func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows
 // CreateDeploy 创建部署应用
 func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
-		info, err := service.GetUserModuleMaxInfo(uid)
+		userInfo := &Member{Id: uid}
+		err := userInfo.MaxInfo()
 		if err != nil {
 			return fmt.Errorf("用户限额检测失败")
 		}
-		if info.MaxDeploy <= info.DeployNum {
+		var deployNum int
+		err = tx.Model(&Deploy{}).Where("uid=?", uid).Count(&deployNum).Error
+		if err != nil {
+			return fmt.Errorf("部署应用数量查询失败")
+		}
+		if userInfo.MaxDeploy <= deployNum {
 			return fmt.Errorf("您的部署任务创建数量已达上限")
 		}
 		deploy := Deploy{
@@ -40,7 +45,7 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			NowVersion:    0,
 			OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
 		}
-		err = tx.Save(&deploy).Error
+		err = tx.Model(&deploy).Create(&deploy).Error
 		if err != nil {
 			return fmt.Errorf("应用创建失败")
 		}
@@ -48,7 +53,7 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		switch deploy.DeployType {
 		case 0:
 		case 1:
-			err = tx.Save(&DeployGit{
+			err = tx.Model(&DeployGit{}).Create(&DeployGit{
 				DeployID:   deploy.ID,
 				RemoteURL:  param.DeployGit.RemoteURL,
 				DeployPath: param.DeployGit.DeployPath,
@@ -58,14 +63,14 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 				Password:   param.DeployGit.Password,
 			}).Error
 		case 2:
-			err = tx.Save(&DeployZip{
+			err = tx.Model(&DeployZip{}).Create(&DeployZip{
 				DeployID:   deploy.ID,
 				RemoteURL:  param.DeployZip.RemoteURL,
 				DeployPath: param.DeployZip.DeployPath,
 				Password:   param.DeployZip.Password,
 			}).Error
 		case 3:
-			err = tx.Save(&DeployDocker{
+			err = tx.Model(&DeployDocker{}).Create(&DeployDocker{
 				DeployID:         deploy.ID,
 				DockerImage:      param.DeployDocker.DockerImage,
 				UserName:         param.DeployDocker.UserName,
@@ -94,7 +99,7 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		for _, e := range param.ServerRelation {
 			relation.DeployID = deploy.ID
 			relation.ServerID = e.ServerId
-			if tx.Save(relation).Error != nil {
+			if tx.Model(&DeployServerRelation{}).Create(relation).Error != nil {
 				return fmt.Errorf("服务器关联失败")
 			}
 		}
@@ -104,36 +109,29 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 
 // UpdateDeploy 更新部署应用
 func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
-	// TODO:
 	return Mysql.Transaction(func(tx *gorm.DB) error {
-		info, err := service.GetUserModuleMaxInfo(uid)
-		if err != nil {
-			return fmt.Errorf("用户限额检测失败")
-		}
-		if info.MaxDeploy <= info.DeployNum {
-			return fmt.Errorf("您的部署任务创建数量已达上限")
+		scan := ModelBase{}
+		tx.Raw("SELECT EXISTS(SELECT 1 FROM deploy WHERE id=? and uid=?) as has", param.ID, uid).Scan(&scan)
+		if !scan.Has {
+			return fmt.Errorf("应用不存在")
 		}
 		deploy := Deploy{
 			ID:            param.ID,
-			UId:           uid,
 			Title:         param.Title,
-			DeployType:    param.DeployType,
 			WorkDir:       param.WorkDir,
 			BeforeCommand: param.BeforeCommand,
 			AfterCommand:  param.AfterCommand,
-			NowVersion:    0,
-			OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
 		}
 		err = tx.Model(&deploy).Update(&deploy).Error
 		if err != nil {
-			return fmt.Errorf("应用创建失败")
+			return fmt.Errorf("应用更新失败")
 		}
 		// 部署类型 0-本地 1-git 2-zip 3-docker
 		switch deploy.DeployType {
 		case 0:
 		case 1:
 			err = tx.Model(&DeployGit{}).Update(&DeployGit{
-				DeployID:   deploy.ID,
+				DeployID:   param.ID,
 				RemoteURL:  param.DeployGit.RemoteURL,
 				DeployPath: param.DeployGit.DeployPath,
 				Branch:     param.DeployGit.Branch,
@@ -143,14 +141,14 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			}).Error
 		case 2:
 			err = tx.Model(&DeployZip{}).Update(&DeployZip{
-				DeployID:   deploy.ID,
+				DeployID:   param.ID,
 				RemoteURL:  param.DeployZip.RemoteURL,
 				DeployPath: param.DeployZip.DeployPath,
 				Password:   param.DeployZip.Password,
 			}).Error
 		case 3:
 			err = tx.Model(&DeployDocker{}).Update(&DeployDocker{
-				DeployID:         deploy.ID,
+				DeployID:         param.ID,
 				DockerImage:      param.DeployDocker.DockerImage,
 				UserName:         param.DeployDocker.UserName,
 				Password:         param.DeployDocker.Password,
@@ -164,7 +162,7 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			return fmt.Errorf("无法识别的应用类型")
 		}
 		if err != nil {
-			return fmt.Errorf("应用创建失败")
+			return fmt.Errorf("应用更新失败")
 		}
 		serverIds := make([]int, len(param.ServerRelation))
 		for _, s := range param.ServerRelation {
@@ -178,8 +176,12 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		for _, e := range param.ServerRelation {
 			relation.DeployID = deploy.ID
 			relation.ServerID = e.ServerId
-			if tx.Save(relation).Error != nil {
-				return fmt.Errorf("服务器关联失败")
+			if e.Relation {
+				if tx.Save(relation).Error != nil {
+					return fmt.Errorf("服务器关联失败")
+				}
+			} else if tx.Delete(relation, "server_id=? and deploy_id=?", relation.ServerID, relation.DeployID).Error != nil {
+				return fmt.Errorf("服务器取消关联失败")
 			}
 		}
 		return nil
@@ -213,16 +215,27 @@ func DelDeploy(uid, DeployID int) error {
 	})
 }
 
-// List 获取应用列表
-func (m *Deploy) List(offset int, limit int) ([]Deploy, int) {
-	data := []Deploy{}
-	rows := 0
-	db := Mysql.Where("uid=?", m.UId)
-	if m.Title != "" {
-		db = db.Where("title like ?", "%"+m.Title+"%")
+// DeployRelationServerIds 根据应用ID
+func DeployRelationServerIds(deployId int) []int {
+	data := []DeployServerRelation{}
+	Mysql.Where("deploy_id=?", deployId).Find(&data)
+	result := make([]int, len(data))
+	for _, datum := range data {
+		result = append(result, datum.ServerID)
 	}
-	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
-	return data, rows
+	return result
+}
+
+// DeployRelationServer 部署服务器信息
+type DeployRelationServer struct {
+	Server
+	DeployServerRelation
+}
+
+// DeployServerList 可部署服务器列表
+func DeployServerList(uid, deployId int) (result []DeployServerRelation, err error) {
+	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
+	return
 }
 
 // BatchCheck 批量检测是否是当前用户应用

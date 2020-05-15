@@ -23,7 +23,7 @@ var Api = &apiApi{}
 // @Accept  json
 // @Param uid query string true "用户UID"
 // @Param device query string true "客户端设备号"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Success 200 {object} models.Server ""
 // @Router /clinet/ApiRegServer [get]
 func (r *apiApi) RegServer(c *gin.Context) {
 	uid, _ := strconv.Atoi(c.Query("uid"))
@@ -62,7 +62,7 @@ func (r *apiApi) RegServer(c *gin.Context) {
 // @Summary 获取服务器部署任务清单
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "读取成功","data": [deploy]}"
+// @Success 200 {array} models.Deploy "{"code": 1,"msg": "读取成功","data": [deploy]}"
 // @Router /clinet/ApiGetDeployTask [GET]
 func (r *apiApi) GetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
@@ -220,23 +220,17 @@ func (r *apiApi) DeployRun(c *gin.Context) {
 		c.String(404, "服务不存在")
 		return
 	}
-	deployPO := &models.Deploy{
-		OpenId: openId,
-	}
+	deployPO := &models.Deploy{OpenID: openId}
 	if !deployPO.GetIdByOpenId() {
 		c.String(404, "服务不存在")
 		return
 	}
-	db := models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", deployPO.Id)
+	db := models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", deployPO.ID)
 	if db.Error != nil || db.RowsAffected != 1 {
 		c.String(404, "服务不存在")
 		return
 	}
-	relation := &models.DeployServerRelation{
-		DeployId: deployPO.Id,
-	}
-	for _, v := range relation.ListByDeployId() {
-		notifyevent.Hook001.AddDeploy(v.ServerId)
-	}
+	ids := models.DeployRelationServerIds(deployPO.ID)
+	notifyevent.Hook001.AddDeploy(ids...)
 	c.String(200, "Successful")
 }

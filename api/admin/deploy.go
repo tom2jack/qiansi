@@ -15,9 +15,6 @@ import (
 	"gitee.com/zhimiao/qiansi/notifyevent"
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
-	"gitee.com/zhimiao/qiansi/service"
-	uuid "github.com/satori/go.uuid"
-	"strings"
 	"time"
 	"unsafe"
 
@@ -101,36 +98,18 @@ func (r *deployApi) Del(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
-// @Success 200 {object} models.Server "返回"
+// @Success 200 {array} models.DeployServerRelation "返回"
 // @Router /admin/DeployServer [post]
-func (r *deployApi) Server(c *gin.Context) {
+func (r *deployApi) DeployServer(c *gin.Context) {
 	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	server := &models.Server{
-		Uid: c.GetInt("UID"),
-	}
-	serverList := server.ListByUser()
-	relation := &models.DeployServerRelation{
-		DeployID: param.DeployId,
-	}
-	relationList := relation.ListByDeployId()
-	relationMap := make(map[int]models.DeployServerRelation)
-	for _, e := range relationList {
-		relationMap[e.ServerID] = e
-	}
-	len := len(serverList)
-	list := make([]resp.DeployServerVO, len)
-	for _, v := range serverList {
-		d := resp.DeployServerVO{}
-		len--
-		utils.SuperConvert(&v, &d)
-		if r, ok := relationMap[v.Id]; ok {
-			utils.SuperConvert(&r, &d)
-		}
-		list[len] = d
+	list, err := models.DeployServerList(c.GetInt("UID"), param.DeployId)
+	if err != nil {
+		resp.NewApiResult(err).Json(c)
+		return
 	}
 	resp.NewApiResult(1, "读取成功", list).Json(c)
 }
@@ -261,21 +240,21 @@ func (r *deployApi) Do(c *gin.Context) {
 // @Summary 获取部署触发链接
 // @Produce  json
 // @Accept  json
-// @Param body body req.DeployBase true "入参集合"
+// @Param body body req.DeployParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
 // @Router /admin/DeployLink [GET]
 func (r *deployApi) Link(c *gin.Context) {
-	param := &req.DeployBase{}
+	param := &req.DeployParam{}
 	if err := c.ShouldBind(param); err != nil {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
 	po := &models.Deploy{
-		Id:  param.DeployId,
-		Uid: c.GetInt("UID"),
+		ID:  param.DeployId,
+		UId: c.GetInt("UID"),
 	}
 	if po.GetOpenId() {
-		url := "/client/ApiDeployRun?Key=" + po.OpenId
+		url := "/client/ApiDeployRun?Key=" + po.OpenID
 		resp.NewApiResult(1, "操作成功", common.Config.Server.ApiHost+url).Json(c)
 		return
 	}
