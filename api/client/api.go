@@ -67,9 +67,8 @@ func (r *apiApi) RegServer(c *gin.Context) {
 func (r *apiApi) GetDeployTask(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
 	defer notifyevent.Hook001.DelDeploy(server_id)
-	deploy := &[]models.Deploy{}
-	models.Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", server_id).Scan(deploy)
-	resp.NewApiResult(1, "读取成功", deploy).Encypt(c)
+	info := models.DeployInfo(server_id)
+	resp.NewApiResult(1, "读取成功", info).Encypt(c)
 }
 
 // @Summary 获取Telegraf监控配置

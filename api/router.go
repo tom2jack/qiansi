@@ -64,7 +64,7 @@ func initRoute() {
 			adminRoute.GET("/DeployRunLogTab", admin.Deploy.RunLogTab)
 			adminRoute.GET("/DeployRunLog", admin.Deploy.RunLog)
 			adminRoute.GET("/DeployLog", admin.Deploy.Log)
-			adminRoute.POST("/DeployServer", admin.Deploy.DeployServer)
+			adminRoute.GET("/DeployServer", admin.Deploy.DeployServer)
 			adminRoute.GET("/DeployDo", admin.Deploy.Do)
 			adminRoute.GET("/DeployLink", admin.Deploy.Link)
 

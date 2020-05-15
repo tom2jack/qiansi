@@ -99,7 +99,7 @@ func (r *deployApi) Del(c *gin.Context) {
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
 // @Success 200 {array} models.DeployServerRelation "返回"
-// @Router /admin/DeployServer [post]
+// @Router /admin/DeployServer [get]
 func (r *deployApi) DeployServer(c *gin.Context) {
 	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {

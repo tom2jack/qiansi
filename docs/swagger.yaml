@@ -52,23 +52,30 @@ definitions:
     type: object
   models.Server:
     properties:
-      apiSecret:
+      apisecret:
+        description: API密钥
         type: string
       createTime:
         type: string
-      deviceId:
+      deviceID:
+        description: 服务器唯一设备号
         type: string
       domain:
+        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
       serverName:
+        description: 服务器备注名
         type: string
-      serverRuleId:
+      serverRuleID:
+        description: 服务器规则id
         type: integer
       serverStatus:
+        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
         type: integer
       uid:
+        description: 用户ID
         type: integer
       updateTime:
         type: string
@@ -674,7 +681,7 @@ paths:
             type: array
       summary: 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
   /admin/DeployServer:
-    post:
+    get:
       consumes:
       - application/json
       parameters:

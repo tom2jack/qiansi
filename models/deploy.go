@@ -19,6 +19,34 @@ func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows
 	return
 }
 
+// DeployTaskInfo 部署应用信息结构
+type DeployTaskInfo struct {
+	Deploy
+	DeployGit    DeployGit    `json:"deploy_git"`
+	DeployZip    DeployZip    `json:"deploy_zip"`
+	DeployDocker DeployDocker `json:"deploy_docker"`
+}
+
+// DeployInfo 根据服务器ID获取部署应用任务信息
+func DeployInfo(serverId int) (result []DeployTaskInfo) {
+	result = []DeployTaskInfo{}
+	Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", serverId).Scan(&result)
+	for i, info := range result {
+		// 部署类型 0-本地 1-git 2-zip 3-docker
+		switch info.DeployType {
+		case 0:
+		case 1:
+			Mysql.Model(&DeployGit{}).Where("deploy_id=?", info.ID).First(&result[i].DeployGit)
+		case 2:
+			Mysql.Model(&DeployZip{}).Where("deploy_id=?", info.ID).First(&result[i].DeployZip)
+		case 3:
+			Mysql.Model(&DeployDocker{}).Where("deploy_id=?", info.ID).First(&result[i].DeployDocker)
+		default:
+		}
+	}
+	return
+}
+
 // CreateDeploy 创建部署应用
 func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
