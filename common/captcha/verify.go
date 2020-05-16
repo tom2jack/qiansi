@@ -22,7 +22,7 @@ var VerifyStore *verifyStore
 func init() {
 	// init redis store
 	VerifyStore = &verifyStore{
-		"YUANSHU:verify:",
+		"QIANSI:verify:",
 		30 * 60,
 	}
 }
