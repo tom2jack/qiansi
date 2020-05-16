@@ -1,4 +1,3 @@
-basePath: /
 definitions:
   models.Deploy:
     properties:
@@ -470,7 +469,7 @@ definitions:
         type: string
       id:
         type: integer
-      inviterUid:
+      inviterUId:
         description: 邀请人UID
         type: integer
       maxDeploy:
@@ -507,25 +506,7 @@ info:
   title: 纸喵 qiansi API
   version: "1.0"
 paths:
-  /admin/Deploy:
-    delete:
-      consumes:
-      - application/json
-      parameters:
-      - description: 入参集合
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/req.DeployParam'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 删除部署应用
+  /admin/DeployCreate:
     post:
       consumes:
       - application/json
@@ -544,7 +525,8 @@ paths:
           schema:
             $ref: '#/definitions/resp.ApiResult'
       summary: 创建部署应用
-    put:
+  /admin/DeployDelete:
+    delete:
       consumes:
       - application/json
       parameters:
@@ -553,7 +535,7 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/req.DeploySetParam'
+          $ref: '#/definitions/req.DeployParam'
       produces:
       - application/json
       responses:
@@ -561,7 +543,7 @@ paths:
           description: '{"code": 1,"msg": "操作成功","data": null}'
           schema:
             $ref: '#/definitions/resp.ApiResult'
-      summary: 更新部署应用
+      summary: 删除部署应用
   /admin/DeployDo:
     get:
       consumes:
@@ -701,6 +683,25 @@ paths:
               $ref: '#/definitions/models.DeployServerRelation'
             type: array
       summary: 获取当前部署应用的服务器列表
+  /admin/DeployUpdate:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: 入参集合
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/req.DeploySetParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '{"code": 1,"msg": "操作成功","data": null}'
+          schema:
+            $ref: '#/definitions/resp.ApiResult'
+      summary: 更新部署应用
   /admin/ScheduleCreate:
     post:
       consumes:
@@ -1093,4 +1094,6 @@ paths:
           schema:
             $ref: '#/definitions/models.Server'
       summary: 服务器注册
+schemes:
+- http
 swagger: "2.0"

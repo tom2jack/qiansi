@@ -51,7 +51,7 @@ func (r *deployApi) Lists(c *gin.Context) {
 // @Accept  json
 // @Param body body req.DeploySetParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/Deploy [POST]
+// @Router /admin/DeployCreate [POST]
 func (r *deployApi) Create(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
@@ -67,7 +67,7 @@ func (r *deployApi) Create(c *gin.Context) {
 // @Accept  json
 // @Param body body req.DeploySetParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/Deploy [put]
+// @Router /admin/DeployUpdate [put]
 func (r *deployApi) Update(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
@@ -83,7 +83,7 @@ func (r *deployApi) Update(c *gin.Context) {
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
 // @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
-// @Router /admin/Deploy [DELETE]
+// @Router /admin/DeployDelete [DELETE]
 func (r *deployApi) Del(c *gin.Context) {
 	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {

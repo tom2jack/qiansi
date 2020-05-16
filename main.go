@@ -20,8 +20,9 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
+// @schemes http
 // @host localhost:1315
-// @basepath /
+// @basepath
 func main() {
 	common.Config.Init()
 	models.Start()

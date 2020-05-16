@@ -139,11 +139,11 @@ type ScheduleDoParam struct {
 
 type ServerListParam struct {
 	PageParam
-	ServerName string
+	ServerName string `form:"ServerName" json:"ServerName"`
 }
 
 type ServerDelParam struct {
-	ServerId int
+	ServerId int `form:"serverId" json:"serverId"`
 }
 
 type ServerSetParam struct {

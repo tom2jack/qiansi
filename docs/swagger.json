@@ -1,4 +1,7 @@
 {
+    "schemes": [
+        "http"
+    ],
     "swagger": "2.0",
     "info": {
         "description": "纸喵软件系列之服务端",
@@ -16,37 +19,8 @@
         "version": "1.0"
     },
     "host": "localhost:1315",
-    "basePath": "/",
     "paths": {
-        "/admin/Deploy": {
-            "put": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "更新部署应用",
-                "parameters": [
-                    {
-                        "description": "入参集合",
-                        "name": "body",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/req.DeploySetParam"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            },
+        "/admin/DeployCreate": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -74,7 +48,9 @@
                         }
                     }
                 }
-            },
+            }
+        },
+        "/admin/DeployDelete": {
             "delete": {
                 "consumes": [
                     "application/json"
@@ -318,6 +294,36 @@
                             "items": {
                                 "$ref": "#/definitions/models.DeployServerRelation"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/DeployUpdate": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "更新部署应用",
+                "parameters": [
+                    {
+                        "description": "入参集合",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/req.DeploySetParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
+                        "schema": {
+                            "$ref": "#/definitions/resp.ApiResult"
                         }
                     }
                 }
@@ -1610,7 +1616,7 @@
                 "id": {
                     "type": "integer"
                 },
-                "inviterUid": {
+                "inviterUId": {
                     "description": "邀请人UID",
                     "type": "integer"
                 },

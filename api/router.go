@@ -58,9 +58,9 @@ func initRoute() {
 			adminRoute.DELETE("/ServerDel", admin.Server.Del)
 
 			adminRoute.GET("/DeployLists", admin.Deploy.Lists)
-			adminRoute.DELETE("/Deploy", admin.Deploy.Del)
-			adminRoute.POST("/Deploy", admin.Deploy.Create)
-			adminRoute.PUT("/Deploy", admin.Deploy.Update)
+			adminRoute.DELETE("/DeployDelete", admin.Deploy.Del)
+			adminRoute.POST("/DeployCreate", admin.Deploy.Create)
+			adminRoute.PUT("/DeployUpdate", admin.Deploy.Update)
 			adminRoute.GET("/DeployRunLogTab", admin.Deploy.RunLogTab)
 			adminRoute.GET("/DeployRunLog", admin.Deploy.RunLog)
 			adminRoute.GET("/DeployLog", admin.Deploy.Log)
