@@ -8,7 +8,7 @@ import (
 	"gitee.com/zhimiao/qiansi/req"
 	"gitee.com/zhimiao/qiansi/resp"
 	"github.com/gin-gonic/gin"
-	"github.com/influxdata/influxdb-client-go"
+	influxdb2 "github.com/influxdata/influxdb-client-go"
 	"github.com/lifei6671/gorand"
 	"strconv"
 	"time"
@@ -128,9 +128,9 @@ func (r *apiApi) ClientMetric(c *gin.Context) {
 		resp.NewApiResult(1).Json(c)
 		return
 	}
-	mds := make([]influxdb.Metric, len(rawData.Metrics))
+	mds := make([]*influxdb2.Point, len(rawData.Metrics))
 	for k, v := range rawData.Metrics {
-		mds[k] = influxdb.NewRowMetric(v.Fields, v.Name, v.Tags, time.Unix(v.Timestamp, 0))
+		mds[k] = influxdb2.NewPoint(v.Name, v.Tags, v.Fields, time.Unix(v.Timestamp, 0))
 	}
 	models.InfluxDB.Write("client_metric", mds...)
 	resp.NewApiResult(1).Json(c)
@@ -176,7 +176,7 @@ func (r *apiApi) DeployLog(c *gin.Context) {
 			mTags[k] = vData
 		}
 	}
-	metric := influxdb.NewRowMetric(mFields, mName, mTags, time.Now())
+	metric := influxdb2.NewPoint(mName, mTags, mFields, time.Now())
 	models.InfluxDB.Write("client_log", metric)
 	resp.NewApiResult(1).Json(c)
 }

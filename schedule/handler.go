@@ -2,7 +2,7 @@ package schedule
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/net"
+	"gitee.com/zhimiao/qiansi/common/netutils"
 	"gitee.com/zhimiao/qiansi/models"
 	"net/http"
 )
@@ -30,8 +30,8 @@ func (h *HTTPHandler) Run(m *models.Schedule) (result string, err error) {
 	if m.Timeout <= 0 || m.Timeout > HttpExecTimeout {
 		m.Timeout = HttpExecTimeout
 	}
-	var resp net.HttpClientResponseWrapper
-	resp = net.HttpClient.Get(m.Command, m.Timeout)
+	var resp netutils.HttpClientResponseWrapper
+	resp = netutils.HttpClient.Get(m.Command, m.Timeout)
 	// 返回状态码非200，均为失败
 	if resp.StatusCode != http.StatusOK {
 		return resp.Body, fmt.Errorf("HTTP状态码非200-->%d", resp.StatusCode)

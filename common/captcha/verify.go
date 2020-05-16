@@ -10,28 +10,30 @@ import (
 	"time"
 )
 
-type VerifyStore struct {
+type verifyStore struct {
 	prefix string
 	// Expiration time of captchas.
 	expiration int
 }
 
+// 验证码存储库
+var VerifyStore *verifyStore
+
 func init() {
 	// init redis store
-	customeStore := &VerifyStore{
-		"QIANSI:verify:",
+	VerifyStore = &verifyStore{
+		"YUANSHU:verify:",
 		30 * 60,
 	}
-	base64Captcha.SetCustomStore(customeStore)
 }
 
 // customizeRdsStore implementing Set method of  Store interface
-func (s *VerifyStore) Set(id string, value string) {
+func (s *verifyStore) Set(id string, value string) {
 	models.Redis.Set(s.prefix+id, value, s.expiration)
 }
 
 // customizeRdsStore implementing Get method of  Store interface
-func (s *VerifyStore) Get(id string, clear bool) string {
+func (s *verifyStore) Get(id string, clear bool) string {
 	reply, _ := models.Redis.Get(s.prefix + id)
 	if clear {
 		models.Redis.Del(s.prefix + id)
@@ -39,16 +41,26 @@ func (s *VerifyStore) Get(id string, clear bool) string {
 	return string(reply)
 }
 
+// Verify 校验功能
+func (s *verifyStore) Verify(id, answer string, clear bool) (match bool) {
+	reply, _ := models.Redis.Get(s.prefix + id)
+	match = reply == answer
+	if clear {
+		models.Redis.Del(s.prefix + id)
+	}
+	return
+}
+
 // 获取手机短信验证码的idkey
 func VerifyBySMSIDKEY(phone string) string {
-	return "QIANSI:verify:phone:" + phone
+	return "phone:" + phone
 }
 
 // 短信验证码发送
 func VerifyBySMS(phone string) error {
 	idkey := VerifyBySMSIDKEY(phone)
-	lock := models.Redis.Exists(idkey)
-	if lock {
+	lock := VerifyStore.Get(idkey, false)
+	if lock != "" {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
@@ -57,34 +69,18 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("发送失败")
 	}
 	logrus.Infof("短信验证码：%s", rnd)
-	models.Redis.Set(idkey, rnd, 30*60)
+	VerifyStore.Set(idkey, rnd)
 	return nil
 }
 
 // 图片验证码生成
 func VerifyByImg(idkey string) (string, string) {
-	idkey, captcaInterfaceInstance := base64Captcha.GenerateCaptcha(idkey, base64Captcha.ConfigDigit{
-		// Height png height in pixel.
-		// 图像验证码的高度像素.
-		50,
-		// Width Captcha png width in pixel.
-		// 图像验证码的宽度像素
-		150,
-		// DefaultLen Default number of digits in captcha solution.
-		// 默认数字验证长度6.
-		6,
-		// MaxSkew max absolute skew factor of a single digit.
-		// 图像验证码的最大干扰洗漱.
-		4.5, //4.5,
-		// DotCount Number of background circles.
-		// 图像验证码干扰圆点的数量.
-		30, //30,
-	})
-	base64blob := base64Captcha.CaptchaWriteToBase64Encoding(captcaInterfaceInstance)
-	return idkey, base64blob
+	c := base64Captcha.NewCaptcha(base64Captcha.DefaultDriverDigit, VerifyStore)
+	id, b64s, _ := c.Generate()
+	return id, b64s
 }
 
 // 验证码校验
 func VerifyCheck(idkey string, value string) bool {
-	return base64Captcha.VerifyCaptchaAndIsClear(idkey, value, false)
+	return VerifyStore.Verify(idkey, value, true)
 }
