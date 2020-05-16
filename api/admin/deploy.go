@@ -46,6 +46,22 @@ func (r *deployApi) Lists(c *gin.Context) {
 	}).Json(c)
 }
 
+// @Summary 获取部署应用详情
+// @Produce  json
+// @Accept  json
+// @Param body body req.DeployParam true "入参集合"
+// @Success 200 {array} models.DeployDetailInfo ""
+// @Router /admin/DeployDetail [get]
+func (r *deployApi) Detail(c *gin.Context) {
+	param := &req.DeployParam{}
+	if err := c.ShouldBind(param); err != nil {
+		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		return
+	}
+	info := models.GetDeployDetailInfo(c.GetInt("UID"), param.DeployId)
+	resp.NewApiResult(1, "读取成功", info).Json(c)
+}
+
 // @Summary 创建部署应用
 // @Produce  json
 // @Accept  json
@@ -54,11 +70,12 @@ func (r *deployApi) Lists(c *gin.Context) {
 // @Router /admin/DeployCreate [POST]
 func (r *deployApi) Create(c *gin.Context) {
 	param := &req.DeploySetParam{}
-	if c.ShouldBind(param) != nil {
+	err := c.ShouldBind(param)
+	if err != nil {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	err := models.CreateDeploy(c.GetInt("UID"), param)
+	err = models.CreateDeploy(c.GetInt("UID"), param)
 	resp.NewApiResult(err).Json(c)
 }
 
@@ -98,11 +115,11 @@ func (r *deployApi) Del(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
-// @Success 200 {array} models.DeployServerRelation "返回"
+// @Success 200 {array} models.DeployRelationServer "返回"
 // @Router /admin/DeployServer [get]
 func (r *deployApi) DeployServer(c *gin.Context) {
 	param := &req.DeployParam{}
-	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
+	if c.ShouldBind(param) != nil {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}

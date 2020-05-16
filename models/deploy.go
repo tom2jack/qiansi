@@ -27,8 +27,8 @@ type DeployTaskInfo struct {
 	DeployDocker DeployDocker `json:"deploy_docker"`
 }
 
-// DeployInfo 根据服务器ID获取部署应用任务信息
-func DeployInfo(serverId int) (result []DeployTaskInfo) {
+// GetDeployTaskInfo 根据服务器ID获取部署应用任务信息
+func GetDeployTaskInfo(serverId int) (result []DeployTaskInfo) {
 	result = []DeployTaskInfo{}
 	Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", serverId).Scan(&result)
 	for i, info := range result {
@@ -43,6 +43,31 @@ func DeployInfo(serverId int) (result []DeployTaskInfo) {
 			Mysql.Model(&DeployDocker{}).Where("deploy_id=?", info.ID).First(&result[i].DeployDocker)
 		default:
 		}
+	}
+	return
+}
+
+// DeployDetailInfo 部署应用信息结构
+type DeployDetailInfo struct {
+	Deploy
+	DeployGit    DeployGit    `json:"deploy_git"`
+	DeployZip    DeployZip    `json:"deploy_zip"`
+	DeployDocker DeployDocker `json:"deploy_docker"`
+}
+
+// GetDeployDetailInfo 根据服应用ID获取部署应用任务信息
+func GetDeployDetailInfo(uid, deployId int) (result DeployDetailInfo) {
+	Mysql.Model(&result.Deploy).Where("id=? and uid=?", deployId, uid).First(&result.Deploy)
+	// 部署类型 0-本地 1-git 2-zip 3-docker
+	switch result.DeployType {
+	case 0:
+	case 1:
+		Mysql.Model(&DeployGit{}).Where("deploy_id=?", result.ID).First(&result.DeployGit)
+	case 2:
+		Mysql.Model(&DeployZip{}).Where("deploy_id=?", result.ID).First(&result.DeployZip)
+	case 3:
+		Mysql.Model(&DeployDocker{}).Where("deploy_id=?", result.ID).First(&result.DeployDocker)
+	default:
 	}
 	return
 }
@@ -116,8 +141,8 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			return fmt.Errorf("应用创建失败")
 		}
 		serverIds := make([]int, len(param.ServerRelation))
-		for _, s := range param.ServerRelation {
-			serverIds = append(serverIds, s.ServerId)
+		for i, s := range param.ServerRelation {
+			serverIds[i] = s.ServerId
 		}
 		server := &Server{Uid: uid}
 		if !server.BatchCheck(serverIds) {
@@ -125,6 +150,9 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		}
 		relation := &DeployServerRelation{}
 		for _, e := range param.ServerRelation {
+			if e.ServerId == 0 {
+				continue
+			}
 			relation.DeployID = deploy.ID
 			relation.ServerID = e.ServerId
 			if tx.Model(&DeployServerRelation{}).Create(relation).Error != nil {
@@ -193,8 +221,8 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			return fmt.Errorf("应用更新失败")
 		}
 		serverIds := make([]int, len(param.ServerRelation))
-		for _, s := range param.ServerRelation {
-			serverIds = append(serverIds, s.ServerId)
+		for i, s := range param.ServerRelation {
+			serverIds[i] = s.ServerId
 		}
 		server := &Server{Uid: uid}
 		if !server.BatchCheck(serverIds) {
@@ -202,6 +230,9 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		}
 		relation := &DeployServerRelation{}
 		for _, e := range param.ServerRelation {
+			if e.ServerId == 0 {
+				continue
+			}
 			relation.DeployID = deploy.ID
 			relation.ServerID = e.ServerId
 			if e.Relation {
@@ -261,7 +292,7 @@ type DeployRelationServer struct {
 }
 
 // DeployServerList 可部署服务器列表
-func DeployServerList(uid, deployId int) (result []DeployServerRelation, err error) {
+func DeployServerList(uid, deployId int) (result []DeployRelationServer, err error) {
 	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
 	return
 }

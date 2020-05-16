@@ -12,14 +12,11 @@ type DashboardIndexMetricParam struct {
 // 部署应用操作入参
 type DeploySetParam struct {
 	ID            int    `json:"id"`             // 应用唯一编号
-	UId           int    `json:"uid"`            // 创建用户UID
 	Title         string `json:"title"`          // 应用名称
 	DeployType    int8   `json:"deploy_type"`    // 部署类型 0-本地 1-git 2-zip 3-docker
 	WorkDir       string `json:"work_dir"`       // 工作目录
 	BeforeCommand string `json:"before_command"` // 前置命令
 	AfterCommand  string `json:"after_command"`  // 后置命令
-	NowVersion    int    `json:"now_version"`    // 当前版本
-	OpenID        string `json:"open_id"`        // 应用开放编码(用于hook部署)
 	// DeployDocker 纸喵部署-docker
 	DeployDocker struct {
 		DockerImage      string `json:"docker_image"`      // 资源地址(完整路径)
@@ -48,16 +45,16 @@ type DeploySetParam struct {
 	} `json:"deploy_zip"`
 	ServerRelation []struct {
 		// 服务器ID
-		ServerId int
+		ServerId int `json:"ServerId"`
 		// 关联操作 true-关联 false-取消
-		Relation bool
+		Relation bool `json:"Relation"`
 	} `json:"server_relation"`
 }
 
 // DeployParam 部署应用入参
 type DeployParam struct {
 	// 部署应用ID
-	DeployId int
+	DeployId int `form:"deploy_id" json:"deploy_id"`
 }
 
 // DeployListParam 部署应用列表入参

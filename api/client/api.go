@@ -65,9 +65,9 @@ func (r *apiApi) RegServer(c *gin.Context) {
 // @Success 200 {array} models.Deploy "{"code": 1,"msg": "读取成功","data": [deploy]}"
 // @Router /clinet/ApiGetDeployTask [GET]
 func (r *apiApi) GetDeployTask(c *gin.Context) {
-	server_id := c.GetInt("SERVER-ID")
-	defer notifyevent.Hook001.DelDeploy(server_id)
-	info := models.DeployInfo(server_id)
+	serverId := c.GetInt("SERVER-ID")
+	defer notifyevent.Hook001.DelDeploy(serverId)
+	info := models.GetDeployTaskInfo(serverId)
 	resp.NewApiResult(1, "读取成功", info).Encypt(c)
 }
 
