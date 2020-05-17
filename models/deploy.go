@@ -140,23 +140,25 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		if err != nil {
 			return fmt.Errorf("应用创建失败")
 		}
-		serverIds := make([]int, len(param.ServerRelation))
-		for i, s := range param.ServerRelation {
-			serverIds[i] = s.ServerId
-		}
-		server := &Server{Uid: uid}
-		if !server.BatchCheck(serverIds) {
-			return fmt.Errorf("含有非法服务器绑定")
-		}
-		relation := &DeployServerRelation{}
-		for _, e := range param.ServerRelation {
-			if e.ServerId == 0 {
-				continue
+		if len(param.ServerRelation) > 0 {
+			serverIds := make([]int, len(param.ServerRelation))
+			for i, s := range param.ServerRelation {
+				serverIds[i] = s.ServerId
 			}
-			relation.DeployID = deploy.ID
-			relation.ServerID = e.ServerId
-			if tx.Model(&DeployServerRelation{}).Create(relation).Error != nil {
-				return fmt.Errorf("服务器关联失败")
+			server := &Server{Uid: uid}
+			if !server.BatchCheck(serverIds) {
+				return fmt.Errorf("含有非法服务器绑定")
+			}
+			relation := &DeployServerRelation{}
+			for _, e := range param.ServerRelation {
+				if e.ServerId == 0 {
+					continue
+				}
+				relation.DeployID = deploy.ID
+				relation.ServerID = e.ServerId
+				if tx.Model(&DeployServerRelation{}).Create(relation).Error != nil {
+					return fmt.Errorf("服务器关联失败")
+				}
 			}
 		}
 		return nil
@@ -220,27 +222,29 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 		if err != nil {
 			return fmt.Errorf("应用更新失败")
 		}
-		serverIds := make([]int, len(param.ServerRelation))
-		for i, s := range param.ServerRelation {
-			serverIds[i] = s.ServerId
-		}
-		server := &Server{Uid: uid}
-		if !server.BatchCheck(serverIds) {
-			return fmt.Errorf("含有非法服务器绑定")
-		}
-		relation := &DeployServerRelation{}
-		for _, e := range param.ServerRelation {
-			if e.ServerId == 0 {
-				continue
+		if len(param.ServerRelation) > 0 {
+			serverIds := make([]int, len(param.ServerRelation))
+			for i, s := range param.ServerRelation {
+				serverIds[i] = s.ServerId
 			}
-			relation.DeployID = deploy.ID
-			relation.ServerID = e.ServerId
-			if e.Relation {
-				if tx.Save(relation).Error != nil {
-					return fmt.Errorf("服务器关联失败")
+			server := &Server{Uid: uid}
+			if !server.BatchCheck(serverIds) {
+				return fmt.Errorf("含有非法服务器绑定")
+			}
+			relation := &DeployServerRelation{}
+			for _, e := range param.ServerRelation {
+				if e.ServerId == 0 {
+					continue
 				}
-			} else if tx.Delete(relation, "server_id=? and deploy_id=?", relation.ServerID, relation.DeployID).Error != nil {
-				return fmt.Errorf("服务器取消关联失败")
+				relation.DeployID = deploy.ID
+				relation.ServerID = e.ServerId
+				if e.Relation {
+					if tx.Save(relation).Error != nil {
+						return fmt.Errorf("服务器关联失败")
+					}
+				} else if tx.Delete(relation, "server_id=? and deploy_id=?", relation.ServerID, relation.DeployID).Error != nil {
+					return fmt.Errorf("服务器取消关联失败")
+				}
 			}
 		}
 		return nil

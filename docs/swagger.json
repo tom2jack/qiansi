@@ -974,18 +974,18 @@
         "models.Deploy": {
             "type": "object",
             "properties": {
-                "afterCommand": {
+                "after_command": {
                     "description": "后置命令",
                     "type": "string"
                 },
-                "beforeCommand": {
+                "before_command": {
                     "description": "前置命令",
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "type": "string"
                 },
-                "deployType": {
+                "deploy_type": {
                     "description": "部署类型 0-本地 1-git 2-zip 3-docker",
                     "type": "integer"
                 },
@@ -993,11 +993,11 @@
                     "description": "应用唯一编号",
                     "type": "integer"
                 },
-                "nowVersion": {
+                "now_version": {
                     "description": "当前版本",
                     "type": "integer"
                 },
-                "openID": {
+                "open_id": {
                     "description": "应用开放编码(用于hook部署)",
                     "type": "string"
                 },
@@ -1009,10 +1009,10 @@
                     "description": "创建用户UID",
                     "type": "integer"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 },
-                "workDir": {
+                "work_dir": {
                     "description": "工作目录",
                     "type": "string"
                 }
@@ -1021,20 +1021,16 @@
         "models.DeployDetailInfo": {
             "type": "object",
             "properties": {
-                "afterCommand": {
+                "after_command": {
                     "description": "后置命令",
                     "type": "string"
                 },
-                "beforeCommand": {
+                "before_command": {
                     "description": "前置命令",
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "type": "string"
-                },
-                "deployType": {
-                    "description": "部署类型 0-本地 1-git 2-zip 3-docker",
-                    "type": "integer"
                 },
                 "deploy_docker": {
                     "type": "object",
@@ -1044,6 +1040,10 @@
                     "type": "object",
                     "$ref": "#/definitions/models.DeployGit"
                 },
+                "deploy_type": {
+                    "description": "部署类型 0-本地 1-git 2-zip 3-docker",
+                    "type": "integer"
+                },
                 "deploy_zip": {
                     "type": "object",
                     "$ref": "#/definitions/models.DeployZip"
@@ -1052,11 +1052,11 @@
                     "description": "应用唯一编号",
                     "type": "integer"
                 },
-                "nowVersion": {
+                "now_version": {
                     "description": "当前版本",
                     "type": "integer"
                 },
-                "openID": {
+                "open_id": {
                     "description": "应用开放编码(用于hook部署)",
                     "type": "string"
                 },
@@ -1068,10 +1068,10 @@
                     "description": "创建用户UID",
                     "type": "integer"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 },
-                "workDir": {
+                "work_dir": {
                     "description": "工作目录",
                     "type": "string"
                 }
@@ -1080,34 +1080,34 @@
         "models.DeployDocker": {
             "type": "object",
             "properties": {
-                "containerEnv": {
+                "container_env": {
                     "description": "环境变量注入",
                     "type": "string"
                 },
-                "containerName": {
+                "container_name": {
                     "description": "容器名称",
                     "type": "string"
                 },
-                "containerPorts": {
+                "container_ports": {
                     "description": "端口暴露 a:b a内部 b外部",
                     "type": "string"
                 },
-                "containerVolumes": {
+                "container_volumes": {
                     "description": "地址映射 a:b a宿主机 b容器内",
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "type": "string"
                 },
-                "deployID": {
+                "deploy_id": {
                     "description": "部署应用编号",
                     "type": "integer"
                 },
-                "dockerImage": {
+                "docker_image": {
                     "description": "资源地址(完整路径)",
                     "type": "string"
                 },
-                "isRuning": {
+                "is_runing": {
                     "description": "是否启动 -1-不启动 1-启动",
                     "type": "integer"
                 },
@@ -1115,10 +1115,10 @@
                     "description": "密码",
                     "type": "string"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 },
-                "userName": {
+                "user_name": {
                     "description": "账号",
                     "type": "string"
                 }
@@ -1131,18 +1131,18 @@
                     "description": "git分支",
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "type": "string"
                 },
-                "deployID": {
+                "deploy_id": {
                     "description": "部署应用编号",
                     "type": "integer"
                 },
-                "deployKeys": {
+                "deploy_keys": {
                     "description": "部署私钥",
                     "type": "string"
                 },
-                "deployPath": {
+                "deploy_path": {
                     "description": "本地部署地址",
                     "type": "string"
                 },
@@ -1150,14 +1150,14 @@
                     "description": "密码",
                     "type": "string"
                 },
-                "remoteURL": {
+                "remote_url": {
                     "description": "资源地址",
                     "type": "string"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 },
-                "userName": {
+                "user_name": {
                     "description": "账号",
                     "type": "string"
                 }
@@ -1172,11 +1172,14 @@
                 "createTime": {
                     "type": "string"
                 },
-                "deployID": {
+                "create_time": {
+                    "type": "string"
+                },
+                "deploy_id": {
                     "description": "部署服务id",
                     "type": "integer"
                 },
-                "deployVersion": {
+                "deploy_version": {
                     "description": "已部署版本",
                     "type": "integer"
                 },
@@ -1189,10 +1192,6 @@
                 "id": {
                     "type": "integer"
                 },
-                "serverID": {
-                    "description": "服务器ID",
-                    "type": "integer"
-                },
                 "serverName": {
                     "type": "string"
                 },
@@ -1202,10 +1201,17 @@
                 "serverStatus": {
                     "type": "integer"
                 },
+                "server_id": {
+                    "description": "服务器ID",
+                    "type": "integer"
+                },
                 "uid": {
                     "type": "integer"
                 },
                 "updateTime": {
+                    "type": "string"
+                },
+                "update_time": {
                     "type": "string"
                 }
             }
@@ -1213,14 +1219,14 @@
         "models.DeployZip": {
             "type": "object",
             "properties": {
-                "createTime": {
+                "create_time": {
                     "type": "string"
                 },
-                "deployID": {
+                "deploy_id": {
                     "description": "部署应用编号",
                     "type": "integer"
                 },
-                "deployPath": {
+                "deploy_path": {
                     "description": "本地部署地址",
                     "type": "string"
                 },
@@ -1228,11 +1234,11 @@
                     "description": "密码",
                     "type": "string"
                 },
-                "remoteURL": {
+                "remote_url": {
                     "description": "资源地址",
                     "type": "string"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 }
             }
