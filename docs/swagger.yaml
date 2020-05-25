@@ -593,17 +593,17 @@ definitions:
     type: object
   resp.UserInfoVO:
     properties:
-      createTime:
+      create_time:
         type: string
       id:
         type: integer
-      inviterUid:
+      inviter_uid:
         description: 邀请人UID
         type: integer
-      maxDeploy:
+      max_deploy:
         description: 最大部署应用数量
         type: integer
-      maxSchedule:
+      max_schedule:
         description: 最大调度任务数量
         type: integer
       password:
@@ -617,7 +617,7 @@ definitions:
         type: integer
       token:
         type: string
-      updateTime:
+      update_time:
         type: string
     type: object
 host: localhost:1315

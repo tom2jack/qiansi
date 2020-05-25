@@ -12,8 +12,8 @@ type SysConfig struct {
 }
 
 // 根据Key获取配置
-func (m *SysConfig) Get(key string) bool {
-	m.Key = key
-	db := Mysql.First(m)
-	return db.Error == nil && db.RowsAffected > 0
+func GetSysConfig(key string) string {
+	m := SysConfig{Key: key}
+	Mysql.Model(&m).First(&m)
+	return m.Data
 }

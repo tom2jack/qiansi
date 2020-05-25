@@ -79,9 +79,7 @@ func (r *apiApi) GetDeployTask(c *gin.Context) {
 func (r *apiApi) GetTelegrafConfig(c *gin.Context) {
 	server_id := c.GetInt("SERVER-ID")
 	uid := c.GetInt("SERVER-UID")
-	sysConfig := &models.SysConfig{}
-	sysConfig.Get("telegraf_config")
-	defaultConfig := sysConfig.Data
+	defaultConfig := models.GetSysConfig("telegraf_config")
 	telegraf := &models.Telegraf{
 		ServerID: server_id,
 		UId:      uid,
