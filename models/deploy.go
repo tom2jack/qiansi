@@ -253,13 +253,13 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 
 // DelDeploy 删除部署应用
 func DelDeploy(uid, DeployID int) error {
-	return Mysql.Transaction(func(tx *gorm.DB) (err error) {
+	return Mysql.Transaction(func(tx *gorm.DB) error {
 		info := Deploy{ID: DeployID}
 		db := tx.Model(&info).Where("uid=?", uid).First(&info)
 		if db.Error != nil || db.RowsAffected == 0 {
-			err = fmt.Errorf("应用不存在")
-			return
+			return fmt.Errorf("应用不存在")
 		}
+		tx.Delete(&info)
 		// 部署类型 0-本地 1-git 2-zip 3-docker
 		switch info.DeployType {
 		case 0:
