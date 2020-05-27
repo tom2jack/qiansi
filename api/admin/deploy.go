@@ -164,7 +164,7 @@ func (r *deployApi) RunLog(c *gin.Context) {
 	data, _ := models.InfluxDB.QueryToArray(fmt.Sprintf(
 		`from(bucket: "client_log")
 					|> range(start: -30d)
-					|> filter(fn: (r) => r._measurement == "deploy" and r.DEPLOY_ID=="%v" and r.DEPLOY_VERSION == "%v" and r.SERVER_ID == "%v")`,
+					|> filter(fn: (r) => r._measurement == "deploy" and r.DEPLOY_ID=="%d" and r.DEPLOY_VERSION == "%d" and r.SERVER_ID == "%d")`,
 		param.DeployId,
 		param.Version,
 		param.ServerId,

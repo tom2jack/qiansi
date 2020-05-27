@@ -66,8 +66,8 @@ type DeployListParam struct {
 type DeployRunLogParam struct {
 	DeployParam
 	// 服务器ID
-	ServerId int
-	Version  int
+	ServerId int `form:"server_id" json:"server_id"`
+	Version  int `form:"version" json:"version"`
 }
 
 // DeployLogParam 部署日志接口入参
