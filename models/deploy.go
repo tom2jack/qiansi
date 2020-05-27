@@ -168,9 +168,8 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 // UpdateDeploy 更新部署应用
 func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
-		scan := ModelBase{}
-		tx.Raw("SELECT EXISTS(SELECT 1 FROM deploy WHERE id=? and uid=?) as has", param.ID, uid).Scan(&scan)
-		if !scan.Has {
+		info := Deploy{}
+		if tx.Model(&info).Where("id=? and uid=?", param.ID, uid).First(&info).RowsAffected != 1 {
 			return fmt.Errorf("应用不存在")
 		}
 		deploy := Deploy{
@@ -185,7 +184,7 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			return fmt.Errorf("应用更新失败")
 		}
 		// 部署类型 0-本地 1-git 2-zip 3-docker
-		switch deploy.DeployType {
+		switch info.DeployType {
 		case 0:
 		case 1:
 			err = tx.Model(&DeployGit{}).Update(&DeployGit{
@@ -297,7 +296,7 @@ type DeployRelationServer struct {
 
 // DeployServerList 可部署服务器列表
 func DeployServerList(uid, deployId int) (result []DeployRelationServer, err error) {
-	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
+	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version,a.id as server_id from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
 	return
 }
 
