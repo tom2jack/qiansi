@@ -322,7 +322,7 @@ func (m *Deploy) GetIdByOpenId() bool {
 // Count 统计当前用户部署应用数量
 func (m *Deploy) Count() (num int, err error) {
 	db := Mysql.Model(m).Where("uid=?", m.UId).Count(&num)
-	if db.Error != nil || db.RowsAffected == 0 {
+	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 	}
 	return
@@ -335,7 +335,7 @@ func (m *Deploy) CountDo() (num int, err error) {
 	}
 	r := &Result{}
 	db := Mysql.Model(m).Select("sum(now_version) as total").Where("uid=?", m.UId).Scan(r)
-	if db.Error != nil || db.RowsAffected == 0 {
+	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 		return
 	}

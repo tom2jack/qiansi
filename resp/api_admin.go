@@ -6,19 +6,19 @@ import (
 )
 
 type DashboardIndexMetricVO struct {
-	ActiveServerNum int
-	CPURate         []map[string]interface{}
-	MenRate         []map[string]interface{}
+	ActiveServerNum int                      `json:"active_server_num"`
+	CPURate         []map[string]interface{} `json:"cpu_rate"`
+	MenRate         []map[string]interface{} `json:"men_rate"`
 }
 
 type DashboardInfoVO struct {
-	DeployNum    int
-	MaxDeploy    int
-	ScheduleNum  int
-	MaxSchedule  int
-	ServerNum    int
-	InviteNum    int
-	DeployRunNum int
+	DeployNum    int `json:"deploy_num"`
+	MaxDeploy    int `json:"max_deploy"`
+	ScheduleNum  int `json:"schedule_num"`
+	MaxSchedule  int `json:"max_schedule"`
+	ServerNum    int `json:"server_num"`
+	InviteNum    int `json:"invite_num"`
+	DeployRunNum int `json:"deploy_run_num"`
 }
 
 // 部署服务器

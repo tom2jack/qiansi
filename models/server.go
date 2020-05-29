@@ -84,7 +84,7 @@ func (m *Server) BatchCheck(ids []int) bool {
 // Count 统计当前用户客戶端注冊數量
 func (m *Server) Count() (num int, err error) {
 	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
-	if db.Error != nil || db.RowsAffected == 0 {
+	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 	}
 	return

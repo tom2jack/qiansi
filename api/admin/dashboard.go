@@ -32,12 +32,13 @@ func (r *dashboardApi) Info(c *gin.Context) {
 	}
 	// 部署次數
 	deploy := &models.Deploy{UId: uid}
+	// vo.DeployNum
 	vo.DeployRunNum, _ = deploy.CountDo()
 	// 获取服务器数量
 	server := &models.Server{Uid: uid}
 	vo.ServerNum, _ = server.Count()
 	// 邀请数
-	member := models.Member{Id: uid}
+	member := &models.Member{InviterUid: uid}
 	vo.InviteNum, _ = member.InviterCount()
 	resp.NewApiResult(1, "读取成功", vo).Json(c)
 }

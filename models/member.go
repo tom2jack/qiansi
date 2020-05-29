@@ -48,8 +48,8 @@ func (m *Member) AddScheduleNum(num int) (err error) {
 
 // Count 统计当前用户邀请人数
 func (m *Member) InviterCount() (num int, err error) {
-	db := Mysql.Model(m).Where("inviter_uid=?", m.Id).Count(&num)
-	if db.Error != nil || db.RowsAffected == 0 {
+	db := Mysql.Model(m).Where("inviter_uid=?", m.InviterUid).Count(&num)
+	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 		return
 	}

@@ -84,7 +84,7 @@ func (m *Schedule) Del() bool {
 // Count 统计当前用户调度应用数量
 func (m *Schedule) Count() (num int, err error) {
 	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
-	if db.Error != nil || db.RowsAffected == 0 {
+	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 	}
 	return
