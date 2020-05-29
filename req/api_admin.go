@@ -157,15 +157,15 @@ type UserSiginParam struct {
 	// 手机号
 	Phone string `json:"phone"`
 	// 密码
-	Password string
+	Password string `json:"password"`
 }
 
 type UserSiginUpParam struct {
 	UserSiginParam
 	// 短信验证码
-	Code string
+	Code string `json:"code"`
 	// 邀请人
-	InviterUid int
+	InviterUid int `json:"inviter_uid"`
 }
 
 type UserResetPwdParam struct {
