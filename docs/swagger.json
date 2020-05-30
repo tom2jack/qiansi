@@ -1166,10 +1166,8 @@
         "models.DeployRelationServer": {
             "type": "object",
             "properties": {
-                "apiSecret": {
-                    "type": "string"
-                },
-                "createTime": {
+                "api_secret": {
+                    "description": "API密钥",
                     "type": "string"
                 },
                 "create_time": {
@@ -1183,33 +1181,36 @@
                     "description": "已部署版本",
                     "type": "integer"
                 },
-                "deviceId": {
+                "device_id": {
+                    "description": "服务器唯一设备号",
                     "type": "string"
                 },
                 "domain": {
+                    "description": "服务器地址(域名/ip)",
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
-                },
-                "serverName": {
-                    "type": "string"
-                },
-                "serverRuleId": {
-                    "type": "integer"
-                },
-                "serverStatus": {
                     "type": "integer"
                 },
                 "server_id": {
                     "description": "服务器ID",
                     "type": "integer"
                 },
-                "uid": {
+                "server_name": {
+                    "description": "服务器备注名",
+                    "type": "string"
+                },
+                "server_rule_id": {
+                    "description": "服务器规则id",
                     "type": "integer"
                 },
-                "updateTime": {
-                    "type": "string"
+                "server_status": {
+                    "description": "服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定",
+                    "type": "integer"
+                },
+                "uid": {
+                    "description": "用户ID",
+                    "type": "integer"
                 },
                 "update_time": {
                     "type": "string"
@@ -1246,34 +1247,41 @@
         "models.Server": {
             "type": "object",
             "properties": {
-                "apiSecret": {
+                "api_secret": {
+                    "description": "API密钥",
                     "type": "string"
                 },
-                "createTime": {
+                "create_time": {
                     "type": "string"
                 },
-                "deviceId": {
+                "device_id": {
+                    "description": "服务器唯一设备号",
                     "type": "string"
                 },
                 "domain": {
+                    "description": "服务器地址(域名/ip)",
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "serverName": {
+                "server_name": {
+                    "description": "服务器备注名",
                     "type": "string"
                 },
-                "serverRuleId": {
+                "server_rule_id": {
+                    "description": "服务器规则id",
                     "type": "integer"
                 },
-                "serverStatus": {
+                "server_status": {
+                    "description": "服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定",
                     "type": "integer"
                 },
                 "uid": {
+                    "description": "用户ID",
                     "type": "integer"
                 },
-                "updateTime": {
+                "update_time": {
                     "type": "string"
                 }
             }
@@ -1281,16 +1289,16 @@
         "req.DashboardIndexMetricParam": {
             "type": "object",
             "required": [
-                "serverId"
+                "server_id"
             ],
             "properties": {
-                "endTime": {
+                "end_time": {
                     "type": "string"
                 },
-                "serverId": {
+                "server_id": {
                     "type": "integer"
                 },
-                "startTime": {
+                "start_time": {
                     "type": "string"
                 }
             }
@@ -1371,7 +1379,7 @@
                     "description": "部署应用ID",
                     "type": "integer"
                 },
-                "serverId": {
+                "server_id": {
                     "description": "服务器ID",
                     "type": "integer"
                 },
@@ -1670,7 +1678,7 @@
                     "description": "短信验证码",
                     "type": "string"
                 },
-                "inviterUid": {
+                "inviter_uid": {
                     "description": "邀请人",
                     "type": "integer"
                 },
@@ -1718,17 +1726,17 @@
         "resp.DashboardIndexMetricVO": {
             "type": "object",
             "properties": {
-                "activeServerNum": {
+                "active_server_num": {
                     "type": "integer"
                 },
-                "cpurate": {
+                "cpu_rate": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "additionalProperties": true
                     }
                 },
-                "menRate": {
+                "men_rate": {
                     "type": "array",
                     "items": {
                         "type": "object",
@@ -1740,25 +1748,25 @@
         "resp.DashboardInfoVO": {
             "type": "object",
             "properties": {
-                "deployNum": {
+                "deploy_num": {
                     "type": "integer"
                 },
-                "deployRunNum": {
+                "deploy_run_num": {
                     "type": "integer"
                 },
-                "inviteNum": {
+                "invite_num": {
                     "type": "integer"
                 },
-                "maxDeploy": {
+                "max_deploy": {
                     "type": "integer"
                 },
-                "maxSchedule": {
+                "max_schedule": {
                     "type": "integer"
                 },
-                "scheduleNum": {
+                "schedule_num": {
                     "type": "integer"
                 },
-                "serverNum": {
+                "server_num": {
                     "type": "integer"
                 }
             }
@@ -1826,21 +1834,21 @@
         "resp.UserInfoVO": {
             "type": "object",
             "properties": {
-                "create_time": {
+                "createTime": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "inviter_uid": {
+                "inviterUid": {
                     "description": "邀请人UID",
                     "type": "integer"
                 },
-                "max_deploy": {
+                "maxDeploy": {
                     "description": "最大部署应用数量",
                     "type": "integer"
                 },
-                "max_schedule": {
+                "maxSchedule": {
                     "description": "最大调度任务数量",
                     "type": "integer"
                 },
@@ -1859,7 +1867,7 @@
                 "token": {
                     "type": "string"
                 },
-                "update_time": {
+                "updateTime": {
                     "type": "string"
                 }
             }

@@ -140,11 +140,10 @@ definitions:
     type: object
   models.DeployRelationServer:
     properties:
-      apiSecret:
+      api_secret:
+        description: API密钥
         type: string
       create_time:
-        type: string
-      createTime:
         type: string
       deploy_id:
         description: 部署服务id
@@ -152,26 +151,30 @@ definitions:
       deploy_version:
         description: 已部署版本
         type: integer
-      deviceId:
+      device_id:
+        description: 服务器唯一设备号
         type: string
       domain:
+        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
       server_id:
         description: 服务器ID
         type: integer
-      serverName:
+      server_name:
+        description: 服务器备注名
         type: string
-      serverRuleId:
+      server_rule_id:
+        description: 服务器规则id
         type: integer
-      serverStatus:
+      server_status:
+        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
         type: integer
       uid:
+        description: 用户ID
         type: integer
       update_time:
-        type: string
-      updateTime:
         type: string
     type: object
   models.DeployZip:
@@ -195,37 +198,44 @@ definitions:
     type: object
   models.Server:
     properties:
-      apiSecret:
+      api_secret:
+        description: API密钥
         type: string
-      createTime:
+      create_time:
         type: string
-      deviceId:
+      device_id:
+        description: 服务器唯一设备号
         type: string
       domain:
+        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
-      serverName:
+      server_name:
+        description: 服务器备注名
         type: string
-      serverRuleId:
+      server_rule_id:
+        description: 服务器规则id
         type: integer
-      serverStatus:
+      server_status:
+        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
         type: integer
       uid:
+        description: 用户ID
         type: integer
-      updateTime:
+      update_time:
         type: string
     type: object
   req.DashboardIndexMetricParam:
     properties:
-      endTime:
+      end_time:
         type: string
-      serverId:
+      server_id:
         type: integer
-      startTime:
+      start_time:
         type: string
     required:
-    - serverId
+    - server_id
     type: object
   req.DeployDoParam:
     properties:
@@ -279,7 +289,7 @@ definitions:
       deploy_id:
         description: 部署应用ID
         type: integer
-      serverId:
+      server_id:
         description: 服务器ID
         type: integer
       version:
@@ -489,7 +499,7 @@ definitions:
       code:
         description: 短信验证码
         type: string
-      inviterUid:
+      inviter_uid:
         description: 邀请人
         type: integer
       password:
@@ -522,14 +532,14 @@ definitions:
     type: object
   resp.DashboardIndexMetricVO:
     properties:
-      activeServerNum:
+      active_server_num:
         type: integer
-      cpurate:
+      cpu_rate:
         items:
           additionalProperties: true
           type: object
         type: array
-      menRate:
+      men_rate:
         items:
           additionalProperties: true
           type: object
@@ -537,19 +547,19 @@ definitions:
     type: object
   resp.DashboardInfoVO:
     properties:
-      deployNum:
+      deploy_num:
         type: integer
-      deployRunNum:
+      deploy_run_num:
         type: integer
-      inviteNum:
+      invite_num:
         type: integer
-      maxDeploy:
+      max_deploy:
         type: integer
-      maxSchedule:
+      max_schedule:
         type: integer
-      scheduleNum:
+      schedule_num:
         type: integer
-      serverNum:
+      server_num:
         type: integer
     type: object
   resp.DeployRunLogTabVO:
@@ -593,17 +603,17 @@ definitions:
     type: object
   resp.UserInfoVO:
     properties:
-      create_time:
+      createTime:
         type: string
       id:
         type: integer
-      inviter_uid:
+      inviterUid:
         description: 邀请人UID
         type: integer
-      max_deploy:
+      maxDeploy:
         description: 最大部署应用数量
         type: integer
-      max_schedule:
+      maxSchedule:
         description: 最大调度任务数量
         type: integer
       password:
@@ -617,7 +627,7 @@ definitions:
         type: integer
       token:
         type: string
-      update_time:
+      updateTime:
         type: string
     type: object
 host: localhost:1315

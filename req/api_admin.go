@@ -4,9 +4,9 @@ import "time"
 
 // DashboardIndexMetricParam 监控入参
 type DashboardIndexMetricParam struct {
-	ServerId  int `binding:"required"`
-	StartTime time.Time
-	EndTime   time.Time
+	ServerId  int       `binding:"required" json:"server_id" form:"server_id"`
+	StartTime time.Time `json:"start_time" form:"start_time"`
+	EndTime   time.Time `json:"end_time" form:"end_time"`
 }
 
 // 部署应用操作入参
