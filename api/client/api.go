@@ -126,8 +126,12 @@ func (r *apiApi) ClientMetric(c *gin.Context) {
 		resp.NewApiResult(1).Json(c)
 		return
 	}
+	serverId := strconv.Itoa(c.GetInt("SERVER-ID"))
+	serverUid := strconv.Itoa(c.GetInt("SERVER-UID"))
 	mds := make([]*influxdb2.Point, len(rawData.Metrics))
 	for k, v := range rawData.Metrics {
+		v.Tags["SERVER_ID"] = serverId
+		v.Tags["SERVER_UID"] = serverUid
 		mds[k] = influxdb2.NewPoint(v.Name, v.Tags, v.Fields, time.Unix(v.Timestamp, 0))
 	}
 	models.InfluxDB.Write("client_metric", mds...)
