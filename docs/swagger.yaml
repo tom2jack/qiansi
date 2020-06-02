@@ -140,10 +140,11 @@ definitions:
     type: object
   models.DeployRelationServer:
     properties:
-      api_secret:
-        description: API密钥
+      apiSecret:
         type: string
       create_time:
+        type: string
+      createTime:
         type: string
       deploy_id:
         description: 部署服务id
@@ -151,30 +152,26 @@ definitions:
       deploy_version:
         description: 已部署版本
         type: integer
-      device_id:
-        description: 服务器唯一设备号
+      deviceId:
         type: string
       domain:
-        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
       server_id:
         description: 服务器ID
         type: integer
-      server_name:
-        description: 服务器备注名
+      serverName:
         type: string
-      server_rule_id:
-        description: 服务器规则id
+      serverRuleId:
         type: integer
-      server_status:
-        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
+      serverStatus:
         type: integer
       uid:
-        description: 用户ID
         type: integer
       update_time:
+        type: string
+      updateTime:
         type: string
     type: object
   models.DeployZip:
@@ -198,32 +195,25 @@ definitions:
     type: object
   models.Server:
     properties:
-      api_secret:
-        description: API密钥
+      apiSecret:
         type: string
-      create_time:
+      createTime:
         type: string
-      device_id:
-        description: 服务器唯一设备号
+      deviceId:
         type: string
       domain:
-        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
-      server_name:
-        description: 服务器备注名
+      serverName:
         type: string
-      server_rule_id:
-        description: 服务器规则id
+      serverRuleId:
         type: integer
-      server_status:
-        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
+      serverStatus:
         type: integer
       uid:
-        description: 用户ID
         type: integer
-      update_time:
+      updateTime:
         type: string
     type: object
   req.DashboardIndexMetricParam:
