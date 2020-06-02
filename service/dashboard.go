@@ -43,11 +43,10 @@ func GetClientCPURate(uid, serverId int, startTime, endTime time.Time) (result [
 	fluxQuery := fmt.Sprintf(`
 		from(bucket: "client_metric")
 			|> range(start: %s, stop: %s)
-			|> filter(fn: (r) => r._measurement == "cpu" and r.SERVER_ID == "%d" and r.SERVER_UID == "%d")
-			|> filter(fn: (r) => r._field == "usage_user" or r._field == "usage_system" or r._field == "usage_idle")
-			|> filter(fn: (r) => r.cpu == "cpu-total")
-			|> aggregateWindow(every: 10000ms, fn: mean, createEmpty: false)
-			|> yield(name: "mean")
+			|> filter(fn: (r) => r["SERVER_ID"] == "%d" and r["SERVER_UID"] == "%d")
+			|> filter(fn: (r) => r["_measurement"] == "cpu")
+			|> filter(fn: (r) => r["_field"] == "usage_user")
+			|> filter(fn: (r) => r["cpu"] == "cpu-total")
 		`,
 		startTime.Format(time.RFC3339),
 		endTime.Format(time.RFC3339),
@@ -63,10 +62,9 @@ func GetClientMemRate(uid, serverId int, startTime, endTime time.Time) (result [
 	fluxQuery := fmt.Sprintf(`
 		from(bucket: "client_metric")
 			|> range(start: %s, stop: %s)
-			|> filter(fn: (r) => r._measurement == "mem" and r.SERVER_ID == "%d" and r.SERVER_UID == "%d")
-			|> filter(fn: (r) => r._field == "used_percent")
-			|> aggregateWindow(every: 10000ms, fn: mean, createEmpty: false)
-			|> yield(name: "mean")
+			|> filter(fn: (r) => r["SERVER_ID"] == "%d" and r["SERVER_UID"] == "%d")
+			|> filter(fn: (r) => r["_measurement"] == "mem")
+			|> filter(fn: (r) => r["_field"] == "used_percent")
 		`,
 		startTime.Format(time.RFC3339),
 		endTime.Format(time.RFC3339),

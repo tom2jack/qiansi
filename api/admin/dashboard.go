@@ -55,8 +55,16 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	param.EndTime = time.Now()
-	param.StartTime = param.EndTime.Add(-1 * time.Minute)
+	if param.StartTime.IsZero() {
+		param.EndTime = time.Now()
+	}
+	if param.EndTime.IsZero() {
+		param.StartTime = param.EndTime.Add(-1 * time.Hour)
+	}
+	if param.EndTime.Sub(param.StartTime) > 2*time.Hour {
+		resp.NewApiResult(-4, "检索时间不可大于2H").Json(c)
+		return
+	}
 	uid := c.GetInt("UID")
 	s := &models.Server{Uid: uid}
 	serIds := s.UserServerIds()
