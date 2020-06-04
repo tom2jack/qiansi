@@ -6,6 +6,7 @@ import (
 	"gitee.com/zhimiao/qiansi/common"
 	"github.com/gomodule/redigo/redis"
 	"github.com/influxdata/influxdb-client-go"
+	"github.com/influxdata/influxdb-client-go/api/write"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
@@ -23,7 +24,7 @@ type zmRedis struct {
 }
 
 type zmInflux struct {
-	Client *influxdb2.InfluxDBClient
+	Client influxdb2.Client
 }
 
 type CommonMap map[string]interface{}
@@ -48,7 +49,9 @@ func Start() {
 
 // 初始化influxDb
 func loadInfluxDB() {
-	InfluxDB = &zmInflux{}
+	InfluxDB = &zmInflux{
+		Client: influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token),
+	}
 }
 
 // Setup Initialize the Redis instance
@@ -169,36 +172,25 @@ func (r *zmRedis) Del(key string) (bool, error) {
 	return redis.Bool(conn.Do("DEL", key))
 }
 
-func (m *zmInflux) DB() influxdb2.InfluxDBClient {
-	client := influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token)
-	return client
-}
-
-func (m *zmInflux) Write(bucket string, metric ...*influxdb2.Point) (err error) {
-	conn := m.DB()
-	defer conn.Close()
-	writeApi := conn.WriteApi(common.Config.InfluxDB.Org, bucket)
+func (m *zmInflux) Write(bucket string, metric ...*write.Point) (err error) {
+	writeApi := m.Client.WriteApi(common.Config.InfluxDB.Org, bucket)
+	defer writeApi.Close()
+	defer writeApi.Flush()
 	for _, v := range metric {
 		writeApi.WritePoint(v)
 	}
-	writeApi.Flush()
-	writeApi.Close()
 	return
 }
 
 func (m *zmInflux) QueryToRaw(flux string) (raw []byte, err error) {
-	conn := m.DB()
-	defer conn.Close()
-	readApi := conn.QueryApi(common.Config.InfluxDB.Org)
+	readApi := m.Client.QueryApi(common.Config.InfluxDB.Org)
 	data, err := readApi.QueryRaw(context.Background(), flux, influxdb2.DefaultDialect())
 	raw = []byte(data)
 	return
 }
 
 func (m *zmInflux) QueryToArray(flux string) (result []map[string]interface{}, err error) {
-	conn := m.DB()
-	defer conn.Close()
-	readApi := conn.QueryApi(common.Config.InfluxDB.Org)
+	readApi := m.Client.QueryApi(common.Config.InfluxDB.Org)
 	data, err := readApi.Query(context.Background(), flux)
 	if err != nil {
 		return
