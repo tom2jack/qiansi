@@ -171,7 +171,6 @@ func (r *zmRedis) Del(key string) (bool, error) {
 
 func (m *zmInflux) DB() influxdb2.InfluxDBClient {
 	client := influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token)
-
 	return client
 }
 
@@ -183,6 +182,7 @@ func (m *zmInflux) Write(bucket string, metric ...*influxdb2.Point) (err error) 
 		writeApi.WritePoint(v)
 	}
 	writeApi.Flush()
+	writeApi.Close()
 	return
 }
 
