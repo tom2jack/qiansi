@@ -9,10 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	Aliyun *aliyun
-)
-
 type aliyun struct {
 	client *aliyunSDK.Client
 }
@@ -24,7 +20,7 @@ type aliyunSmsResponse struct {
 	RequestId string
 }
 
-func init() {
+func NewAliyunSDK() *aliyun {
 	client, err := aliyunSDK.NewClientWithAccessKey(
 		common.Config.Aliyun.RegionId,
 		common.Config.Aliyun.AccessKey,
@@ -33,7 +29,7 @@ func init() {
 	if err != nil {
 		logrus.Error(err.Error())
 	}
-	Aliyun = &aliyun{client: client}
+	return &aliyun{client: client}
 }
 
 //SendSms 验证码发送

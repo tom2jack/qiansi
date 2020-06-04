@@ -64,7 +64,7 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
-	result := sdk.Aliyun.SendSmsVerify(phone, string(rnd))
+	result := sdk.NewAliyunSDK().SendSmsVerify(phone, string(rnd))
 	if !result {
 		return fmt.Errorf("发送失败")
 	}

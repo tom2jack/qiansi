@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/BurntSushi/toml v0.3.1
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
-	github.com/aliyun/alibaba-cloud-sdk-go v1.61.194
+	github.com/aliyun/alibaba-cloud-sdk-go v1.61.236
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394
 	github.com/chenjiandongx/ginprom v0.0.0-20200410120253-7cfb22707fa6
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
