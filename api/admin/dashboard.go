@@ -2,6 +2,7 @@ package admin
 
 import (
 	"encoding/json"
+	"fmt"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
 	"gitee.com/zhimiao/qiansi/notifyevent"
@@ -67,7 +68,7 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 		return
 	}
 	uid := c.GetInt("UID")
-	serIdsCacheId := "QIANSI:dashboard:user-server-ids"
+	serIdsCacheId := fmt.Sprintf("QIANSI:dashboard:user-server-ids:%d", uid)
 	var serIds []int
 	s, err := models.Redis.Get(serIdsCacheId)
 	if err == nil && s != "" {
