@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"encoding/json"
 	"gitee.com/zhimiao/qiansi/common/utils"
 	"gitee.com/zhimiao/qiansi/models"
 	"gitee.com/zhimiao/qiansi/notifyevent"
@@ -66,8 +67,18 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 		return
 	}
 	uid := c.GetInt("UID")
-	s := &models.Server{Uid: uid}
-	serIds := s.UserServerIds()
+	serIdsCacheId := "QIANSI:dashboard:user-server-ids"
+	var serIds []int
+	s, err := models.Redis.Get(serIdsCacheId)
+	if err == nil && s != "" {
+		json.Unmarshal([]byte(s), &serIds)
+	} else {
+		s := &models.Server{Uid: uid}
+		serIds = s.UserServerIds()
+		if serIdsJson, err := json.Marshal(serIds); err == nil {
+			models.Redis.Set(serIdsCacheId, string(serIdsJson), 5*60)
+		}
+	}
 	vo := resp.DashboardIndexMetricVO{
 		ActiveServerNum: notifyevent.Hook001.GetActiveServerNum(serIds...),
 		CPURate:         service.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime),
