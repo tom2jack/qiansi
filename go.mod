@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/BurntSushi/toml v0.3.1
+	github.com/DeanThompson/ginpprof v0.0.0-20190408063150-3be636683586
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.236
 	github.com/axgle/mahonia v0.0.0-20180208002826-3358181d7394

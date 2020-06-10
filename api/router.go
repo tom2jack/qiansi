@@ -4,9 +4,8 @@ import (
 	"gitee.com/zhimiao/qiansi/api/admin"
 	"gitee.com/zhimiao/qiansi/api/client"
 	_ "gitee.com/zhimiao/qiansi/docs"
-	"github.com/chenjiandongx/ginprom"
+	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 )
@@ -17,8 +16,9 @@ func initRoute() {
 	Router = gin.New()
 	Router.Use(gin.Recovery(), logMiddleware())
 	// 状态监控
-	Router.Use(ginprom.PromMiddleware(nil))
-	Router.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
+	ginpprof.Wrap(Router)
+	// Router.Use(ginprom.PromMiddleware(nil))
+	// Router.GET("/metrics", ginprom.PromHandler(promhttp.Handler()))
 	// 跨域支持
 	Router.Use(corsMiddleware())
 	/* ------ 文档模块 ------- */
