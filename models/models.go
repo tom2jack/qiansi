@@ -6,10 +6,12 @@ import (
 	"gitee.com/zhimiao/qiansi/common"
 	"github.com/gomodule/redigo/redis"
 	"github.com/influxdata/influxdb-client-go"
+	"github.com/influxdata/influxdb-client-go/api"
 	"github.com/influxdata/influxdb-client-go/api/write"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -24,7 +26,10 @@ type zmRedis struct {
 }
 
 type zmInflux struct {
-	Client influxdb2.Client
+	sync.Mutex
+	Client        influxdb2.Client
+	WriteApiCache map[string]api.WriteApi
+	ReadApiCache  map[string]api.QueryApi
 }
 
 type CommonMap map[string]interface{}
@@ -50,7 +55,9 @@ func Start() {
 // 初始化influxDb
 func loadInfluxDB() {
 	InfluxDB = &zmInflux{
-		Client: influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token),
+		Client:        influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token),
+		WriteApiCache: make(map[string]api.WriteApi),
+		ReadApiCache:  make(map[string]api.QueryApi),
 	}
 }
 
@@ -172,9 +179,35 @@ func (r *zmRedis) Del(key string) (bool, error) {
 	return redis.Bool(conn.Do("DEL", key))
 }
 
+func (m *zmInflux) getWriteApi(org, bucket string) (result api.WriteApi) {
+	key := org + " " + bucket
+	m.Lock()
+	defer m.Unlock()
+	var ok bool
+	if result, ok = m.WriteApiCache[key]; ok {
+		return
+	} else {
+		result = m.Client.WriteApi(org, bucket)
+		m.WriteApiCache[key] = result
+	}
+	return
+}
+func (m *zmInflux) getQueryApi(org string) (result api.QueryApi) {
+	key := org
+	m.Lock()
+	defer m.Unlock()
+	var ok bool
+	if result, ok = m.ReadApiCache[key]; ok {
+		return
+	} else {
+		result = m.Client.QueryApi(org)
+		m.ReadApiCache[key] = result
+	}
+	return
+}
+
 func (m *zmInflux) Write(bucket string, metric ...*write.Point) (err error) {
-	writeApi := m.Client.WriteApi(common.Config.InfluxDB.Org, bucket)
-	defer writeApi.Close()
+	writeApi := m.getWriteApi(common.Config.InfluxDB.Org, bucket)
 	defer writeApi.Flush()
 	for _, v := range metric {
 		writeApi.WritePoint(v)
@@ -190,7 +223,7 @@ func (m *zmInflux) QueryToRaw(flux string) (raw []byte, err error) {
 }
 
 func (m *zmInflux) QueryToArray(flux string) (result []map[string]interface{}, err error) {
-	readApi := m.Client.QueryApi(common.Config.InfluxDB.Org)
+	readApi := m.getQueryApi(common.Config.InfluxDB.Org)
 	data, err := readApi.Query(context.Background(), flux)
 	if err != nil {
 		return
