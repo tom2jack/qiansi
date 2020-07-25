@@ -2,9 +2,9 @@ package resp
 
 import (
 	"encoding/json"
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/models"
 	"github.com/gin-gonic/gin"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/models"
 )
 
 // ApiResult api默认返回结构

@@ -1,7 +1,7 @@
 package sdk
 
 import (
-	"gitee.com/zhimiao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common"
 	"testing"
 )
 

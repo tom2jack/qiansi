@@ -1,13 +1,13 @@
 package api
 
 import (
-	"gitee.com/zhimiao/qiansi/api/admin"
-	"gitee.com/zhimiao/qiansi/api/client"
-	_ "gitee.com/zhimiao/qiansi/docs"
 	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"github.com/zhi-miao/qiansi/api/admin"
+	"github.com/zhi-miao/qiansi/api/client"
+	_ "github.com/zhi-miao/qiansi/docs"
 )
 
 var Router *gin.Engine

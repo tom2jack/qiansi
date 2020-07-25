@@ -2,10 +2,10 @@ package models
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/req"
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/req"
 	"strings"
 )
 

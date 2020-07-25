@@ -1,4 +1,4 @@
-module gitee.com/zhimiao/qiansi
+module github.com/zhi-miao/qiansi
 
 go 1.14
 

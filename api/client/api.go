@@ -3,13 +3,13 @@ package client
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/notifyevent"
-	"gitee.com/zhimiao/qiansi/req"
-	"gitee.com/zhimiao/qiansi/resp"
 	"github.com/gin-gonic/gin"
 	"github.com/influxdata/influxdb-client-go/api/write"
 	"github.com/lifei6671/gorand"
+	"github.com/zhi-miao/qiansi/models"
+	"github.com/zhi-miao/qiansi/notifyevent"
+	"github.com/zhi-miao/qiansi/req"
+	"github.com/zhi-miao/qiansi/resp"
 	"strconv"
 	"time"
 )

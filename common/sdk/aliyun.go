@@ -3,10 +3,10 @@ package sdk
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common"
 	aliyunSDK "github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common"
 )
 
 type aliyun struct {

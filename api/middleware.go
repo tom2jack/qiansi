@@ -3,8 +3,8 @@ package api
 import (
 	"encoding/base64"
 	"encoding/json"
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/models"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/models"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

@@ -1,10 +1,10 @@
 package schedule
 
 import (
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/models"
 	"github.com/jakecoffman/cron"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/models"
 	"strconv"
 	"time"
 )

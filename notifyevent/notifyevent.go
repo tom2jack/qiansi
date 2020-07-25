@@ -1,8 +1,8 @@
 package notifyevent
 
 import (
-	"gitee.com/zhimiao/qiansi/common"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common"
 	"net"
 	"os"
 )

@@ -1,11 +1,11 @@
 package main
 
 import (
-	"gitee.com/zhimiao/qiansi/api"
-	"gitee.com/zhimiao/qiansi/common"
-	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/notifyevent"
-	"gitee.com/zhimiao/qiansi/schedule"
+	"github.com/zhi-miao/qiansi/api"
+	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/models"
+	"github.com/zhi-miao/qiansi/notifyevent"
+	"github.com/zhi-miao/qiansi/schedule"
 )
 
 // @title 纸喵 qiansi API

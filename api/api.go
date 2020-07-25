@@ -1,9 +1,9 @@
 package api
 
 import (
-	"gitee.com/zhimiao/qiansi/common"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common"
 	"net/http"
 	"time"
 )

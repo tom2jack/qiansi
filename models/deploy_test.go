@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common"
 	"os"
 	"testing"
 )

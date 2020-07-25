@@ -8,12 +8,12 @@
 package admin
 
 import (
-	"gitee.com/zhimiao/qiansi/common/captcha"
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/models"
-	"gitee.com/zhimiao/qiansi/req"
-	"gitee.com/zhimiao/qiansi/resp"
-	"gitee.com/zhimiao/qiansi/service"
+	"github.com/zhi-miao/qiansi/common/captcha"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/models"
+	"github.com/zhi-miao/qiansi/req"
+	"github.com/zhi-miao/qiansi/resp"
+	"github.com/zhi-miao/qiansi/service"
 	"strconv"
 	"time"
 

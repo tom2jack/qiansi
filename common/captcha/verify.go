@@ -2,10 +2,10 @@ package captcha
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/sdk"
-	"gitee.com/zhimiao/qiansi/models"
 	"github.com/mojocn/base64Captcha"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common/sdk"
+	"github.com/zhi-miao/qiansi/models"
 	"math/rand"
 	"time"
 )

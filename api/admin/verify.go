@@ -1,11 +1,11 @@
 package admin
 
 import (
-	"gitee.com/zhimiao/qiansi/common/captcha"
-	"gitee.com/zhimiao/qiansi/common/utils"
-	"gitee.com/zhimiao/qiansi/req"
-	"gitee.com/zhimiao/qiansi/resp"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common/captcha"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/req"
+	"github.com/zhi-miao/qiansi/resp"
 	"time"
 
 	"github.com/gin-gonic/gin"

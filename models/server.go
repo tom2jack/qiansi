@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/utils"
+	"github.com/zhi-miao/qiansi/common/utils"
 	"sync"
 	"time"
 )

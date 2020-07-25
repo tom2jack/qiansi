@@ -1,7 +1,7 @@
 package resp
 
 import (
-	"gitee.com/zhimiao/qiansi/models"
+	"github.com/zhi-miao/qiansi/models"
 	"time"
 )
 

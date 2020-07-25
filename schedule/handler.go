@@ -2,8 +2,8 @@ package schedule
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common/netutils"
-	"gitee.com/zhimiao/qiansi/models"
+	"github.com/zhi-miao/qiansi/common/netutils"
+	"github.com/zhi-miao/qiansi/models"
 	"net/http"
 )
 

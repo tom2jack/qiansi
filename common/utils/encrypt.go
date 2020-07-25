@@ -7,9 +7,9 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"gitee.com/zhimiao/qiansi/common"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )

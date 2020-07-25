@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	"gitee.com/zhimiao/qiansi/models"
+	"github.com/zhi-miao/qiansi/models"
 	"time"
 )
 
