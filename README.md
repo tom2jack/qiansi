@@ -2,7 +2,17 @@
 
 #### 介绍
 
-千丝平台，集成代码发布、计划任务、配置管理等功能
+千丝平台，集成代码发布、计划任务、配置管理、服务器监控报警等功能
+
+UI界面开源地址： [https://github.com/zhi-miao/qiansi-vue](https://github.com/zhi-miao/qiansi-vue)
+
+客户端开源地址： [https://github.com/zhi-miao/qiansi-client](https://github.com/zhi-miao/qiansi-client)
+
+官方cloud版本：[http://qiansi.zhimiao.org](http://qiansi.zhimiao.org)
+
+官网介绍：[http://zhimiao.org/post/qiansi-news](http://zhimiao.org/post/qiansi-news)
+
+#### 开发文档
 
 > gorm数据库反转生成
 
