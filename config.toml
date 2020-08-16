@@ -1,0 +1,38 @@
+[App]
+  PageSize = 10
+  JwtSecret = ""
+
+[Server]
+  ApiHost = "https://localhost:1315"
+  APIListen = ":1315"
+  UDPListen = ":1315"
+  ReadTimeOut = 60
+  WriteTimeOut = 60
+
+[InfluxDB]
+  Host = "http://localhost:9999"
+  Token = ""
+  Org = "qiansi"
+
+[Mysql]
+  Host = "localhost:3306"
+  User = "qiansi_user"
+  Password = "root"
+  Database = "qiansi"
+  TablePrefix = ""
+
+[Redis]
+  Host = "localhost:6379"
+  Auth = ""
+  MaxIdle = 30
+  MaxActive = 30
+  IdleTimeOut = 200
+
+[Aliyun]
+  AccessKey = ""
+  AccessSecret = ""
+  RegionId = "cn-hangzhou"
+  [Aliyun.SmsConfig]
+    SignName = "倒霉狐狸"
+    TemplateCode = ""
+    RegionId = "cn-hangzhou"
