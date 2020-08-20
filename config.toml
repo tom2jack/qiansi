@@ -36,3 +36,8 @@
     SignName = "倒霉狐狸"
     TemplateCode = ""
     RegionId = "cn-hangzhou"
+
+[MQTT]
+  Host = "localhost:1883"
+  UserName = "server_user"
+  Password = "pwd"

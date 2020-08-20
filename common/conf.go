@@ -48,6 +48,11 @@ type config struct {
 			RegionId     string
 		}
 	}
+	MQTT struct {
+		Host     string
+		Username string
+		Password string
+	}
 }
 
 var Config = &config{}
