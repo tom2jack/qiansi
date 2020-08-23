@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/zhi-miao/qiansi/api"
 	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/device"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/notifyevent"
 	"github.com/zhi-miao/qiansi/schedule"
@@ -25,6 +26,7 @@ import (
 // @basepath
 func main() {
 	common.Config.Init()
+	device.Start()
 	models.Start()
 	go api.Start()
 	go schedule.Start()

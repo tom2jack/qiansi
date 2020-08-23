@@ -38,6 +38,7 @@
     RegionId = "cn-hangzhou"
 
 [MQTT]
-  Host = "localhost:1883"
+  Broker = "tcp://localhost:1883"
   UserName = "server_user"
   Password = "pwd"
+  ClientID = "qiansiserver-deviceid"

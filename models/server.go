@@ -33,6 +33,10 @@ func init() {
 	serverSecretCache.Map = make(map[int]string)
 }
 
+func (m *Server) Create() error {
+	return Mysql.Create(m).Error
+}
+
 // GetApiSecret 获取服务器ApiSecret信息
 func (m *Server) GetApiSecret(id int) (secret string) {
 	serverSecretCache.RLock()
@@ -98,4 +102,14 @@ func (m *Server) UserServerIds() (ids []int) {
 		ids = append(ids, v.Id)
 	}
 	return
+}
+
+//ExistsDevice 设备是否存在
+func (m *Server) ExistsDevice(deviceID string) bool {
+	dto := ModelBase{}
+	err := Mysql.Raw("select exists(select 1 from server where device_id=?) as has", deviceID).Scan(&dto).Error
+	if err != nil {
+		return true
+	}
+	return dto.Has
 }

@@ -55,3 +55,13 @@ func (m *Member) InviterCount() (num int, err error) {
 	}
 	return
 }
+
+//ExistsUID 判断uid是否存在
+func (m *Member) ExistsUID(uid int) bool {
+	dto := ModelBase{}
+	err := Mysql.Model(m).Raw("select exists(select 1 from member where id=?) as has", uid).Scan(&dto).Error
+	if err != nil {
+		return true
+	}
+	return dto.Has
+}

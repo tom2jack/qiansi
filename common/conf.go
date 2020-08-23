@@ -49,9 +49,10 @@ type config struct {
 		}
 	}
 	MQTT struct {
-		Host     string
+		Broker   string
 		Username string
 		Password string
+		ClientID string
 	}
 }
 

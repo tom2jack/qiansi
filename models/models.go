@@ -35,8 +35,8 @@ type zmInflux struct {
 type CommonMap map[string]interface{}
 
 type ModelBase struct {
-	Num int
-	Has bool
+	Num int  `gorm:"column:num"`
+	Has bool `gorm:"column:has"`
 }
 
 type ModelBase1 struct {

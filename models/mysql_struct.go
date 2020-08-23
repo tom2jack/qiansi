@@ -63,3 +63,24 @@ type DeployZip struct {
 	CreateTime time.Time `gorm:"column:create_time;type:datetime;not null" json:"create_time"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
 }
+
+// MqttACL [...]
+type MqttACL struct {
+	ID       int    `gorm:"primary_key;column:id;type:int(11) unsigned;not null" json:"id"`
+	Allow    int    `gorm:"column:allow;type:int(1)" json:"allow"`                // 0: deny, 1: allow
+	IPaddr   string `gorm:"column:ipaddr;type:varchar(60)" json:"ipaddr"`         // IpAddress
+	Username string `gorm:"column:username;type:varchar(100)" json:"username"`    // Username
+	Clientid string `gorm:"column:clientid;type:varchar(100)" json:"clientid"`    // ClientId
+	Access   int    `gorm:"column:access;type:int(2);not null" json:"access"`     // 1: subscribe, 2: publish, 3: pubsub
+	Topic    string `gorm:"column:topic;type:varchar(100);not null" json:"topic"` // Topic Filter
+}
+
+// MqttUser [...]
+type MqttUser struct {
+	ID          int       `gorm:"primary_key;column:id;type:int(11) unsigned;not null" json:"id"`
+	Username    string    `gorm:"unique;column:username;type:varchar(100)" json:"username"`
+	Password    string    `gorm:"column:password;type:varchar(100)" json:"password"`
+	Salt        string    `gorm:"column:salt;type:varchar(35)" json:"salt"`
+	IsSuperuser bool      `gorm:"column:is_superuser;type:tinyint(1)" json:"is_superuser"`
+	Created     time.Time `gorm:"column:created;type:datetime" json:"created"`
+}
