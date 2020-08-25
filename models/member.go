@@ -2,21 +2,23 @@ package models
 
 import (
 	"fmt"
+
 	"github.com/jinzhu/gorm"
-	"time"
 )
 
-// Member 用户表
-type Member struct {
-	Id          int       `gorm:"primary_key;column:id;type:int(10) unsigned;not null"`
-	Phone       string    `gorm:"unique;column:phone;type:char(11);not null"`         // 手机号
-	Password    string    `gorm:"column:password;type:varchar(255);not null"`         // 密码
-	InviterUid  int       `gorm:"column:inviter_uid;type:int(10) unsigned;not null"`  // 邀请人UID
-	MaxDeploy   int       `gorm:"column:max_deploy;type:int(10) unsigned;not null"`   // 最大部署应用数量
-	MaxSchedule int       `gorm:"column:max_schedule;type:int(10) unsigned;not null"` // 最大调度任务数量
-	Status      int8      `gorm:"column:status;type:tinyint(1);not null"`             // 0-锁定 1-正常
-	CreateTime  time.Time `gorm:"column:create_time;type:datetime;not null"`
-	UpdateTime  time.Time `gorm:"column:update_time;type:datetime;not null"`
+type memberModels struct {
+	db *gorm.DB
+}
+
+func GetMemberModels() *memberModels {
+	return &memberModels{
+		db: Mysql,
+	}
+}
+
+func (m *memberModels) SetDB(db *gorm.DB) *memberModels {
+	m.db = db
+	return m
 }
 
 // MaxInfo 获取限制信息
@@ -57,9 +59,9 @@ func (m *Member) InviterCount() (num int, err error) {
 }
 
 //ExistsUID 判断uid是否存在
-func (m *Member) ExistsUID(uid int) bool {
+func (m *memberModels) ExistsUID(uid int) bool {
 	dto := ModelBase{}
-	err := Mysql.Model(m).Raw("select exists(select 1 from member where id=?) as has", uid).Scan(&dto).Error
+	err := m.db.Raw("select exists(select 1 from member where id=?) as has", uid).Scan(&dto).Error
 	if err != nil {
 		return true
 	}

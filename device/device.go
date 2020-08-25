@@ -1,16 +1,13 @@
 package device
 
 import (
+	"os"
+	"time"
+
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/qiansi/common"
-	"os"
-	"time"
 )
-
-type service interface {
-	Start()
-}
 
 var (
 	mqttClient mqtt.Client
@@ -19,6 +16,7 @@ var (
 const (
 	topicRegPub = "qiansi-client/reg/callback/"
 	topicRegSub = "qiansi-client/reg/push/+"
+	waitTimeout = 15 * time.Second
 )
 
 func Start() {
@@ -29,7 +27,7 @@ func Start() {
 		SetPassword(common.Config.MQTT.Password).
 		SetClientID(common.Config.MQTT.ClientID)
 	mqttClient = mqtt.NewClient(option)
-	if !mqttClient.Connect().WaitTimeout(15 * time.Second) {
+	if !mqttClient.Connect().WaitTimeout(waitTimeout) {
 		logrus.Errorf("Can't connect mqtt broker!")
 		os.Exit(1)
 	}
