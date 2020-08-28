@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/jinzhu/gorm"
-	"github.com/zhi-miao/qiansi/common/utils"
+	"github.com/zhi-miao/gutils"
 )
 
 type safeISMap struct {
@@ -15,14 +15,6 @@ type safeISMap struct {
 
 type serverModels struct {
 	db *gorm.DB
-}
-
-var serverSecretCache *safeISMap
-
-func init() {
-	// 初始化serverSecretCache
-	serverSecretCache = new(safeISMap)
-	serverSecretCache.Map = make(map[int]string)
 }
 
 func GetServerModels() *serverModels {
@@ -37,37 +29,30 @@ func (m *serverModels) SetDB(db *gorm.DB) *serverModels {
 }
 
 // Create 创建客户端
-func (m *serverModels) Create(m *Server) error {
-	return m.db.Create(m).Error
-}
-
-// GetApiSecret 获取服务器ApiSecret信息
-func (m *Server) GetApiSecret(id int) (secret string) {
-	serverSecretCache.RLock()
-	secret = serverSecretCache.Map[id]
-	serverSecretCache.RUnlock()
-	if secret == "" {
-		m.Id = id
-		m.Get()
-		serverSecretCache.Lock()
-		serverSecretCache.Map[id] = m.ApiSecret
-		serverSecretCache.Unlock()
-		secret = m.ApiSecret
-	}
-	return
+func (m *serverModels) Create(ser *Server) error {
+	return m.db.Create(ser).Error
 }
 
 // Get 获取服务器信息
-func (m *Server) Get() bool {
-	db := Mysql.Model(m).Where("id=?", m.Id).First(m)
-	return db.Error == nil && db.RowsAffected > 0
+func (m *serverModels) GetOnce(serverID int) (*Server, error) {
+	server := &Server{}
+	err := m.db.Model(server).Where("id=?", serverID).First(server).Error
+	return server, err
+}
+
+// BatchCheck 批量检测是否是当前用户服务器
+func (m *serverModels) BatchCheck(uid int, ids []int) bool {
+	ids = gutils.IdsUniqueFitter(ids)
+	var count int
+	db := m.db.Model(&Server{}).Where("id in (?) and uid=?", ids, uid).Count(&count)
+	return db.Error == nil && count == len(ids)
 }
 
 // List 获取应用列表
 func (m *Server) List(offset int, limit int) ([]Server, int) {
 	data := []Server{}
 	rows := 0
-	db := Mysql.Where("uid=?", m.Uid).Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
+	db := Mysql.Where("uid=?", m.UId).Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
 	if m.ServerName != "" {
 		db = db.Where("server_name like ?", "%"+m.ServerName+"%")
 	}
@@ -77,21 +62,13 @@ func (m *Server) List(offset int, limit int) ([]Server, int) {
 
 func (m *Server) ListByUser() []Server {
 	data := []Server{}
-	Mysql.Where("uid = ?", m.Uid).Find(&data)
+	Mysql.Where("uid = ?", m.UId).Find(&data)
 	return data
-}
-
-// BatchCheck 批量检测是否是当前用户服务器
-func (m *Server) BatchCheck(ids []int) bool {
-	ids = utils.IdsFitter(ids)
-	var count = 0
-	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, m.Uid).Count(&count)
-	return db.Error == nil && count == len(ids)
 }
 
 // Count 统计当前用户客戶端注冊數量
 func (m *Server) Count() (num int, err error) {
-	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
+	db := Mysql.Model(m).Where("uid=?", m.UId).Count(&num)
 	if db.Error != nil {
 		err = fmt.Errorf("查询失败")
 	}
@@ -101,16 +78,16 @@ func (m *Server) Count() (num int, err error) {
 // UserServerIds 获取用户的服务器编号
 func (m *Server) UserServerIds() (ids []int) {
 	data := []Server{}
-	Mysql.Model(m).Select("id").Where("uid = ?", m.Uid).Find(&data)
+	Mysql.Model(m).Select("id").Where("uid = ?", m.UId).Find(&data)
 	for _, v := range data {
-		ids = append(ids, v.Id)
+		ids = append(ids, v.ID)
 	}
 	return
 }
 
 //ExistsDevice 设备是否存在
 func (m *serverModels) ExistsDevice(deviceID string) bool {
-	dto := ModelBase{}
+	dto := TempModelStruct{}
 	err := m.db.Raw("select exists(select 1 from server where device_id=?) as has", deviceID).Scan(&dto).Error
 	if err != nil {
 		return true

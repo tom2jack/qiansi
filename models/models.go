@@ -3,16 +3,17 @@ package models
 import (
 	"context"
 	"fmt"
+	"log"
+	"sync"
+	"time"
+
 	"github.com/gomodule/redigo/redis"
-	"github.com/influxdata/influxdb-client-go"
+	influxdb2 "github.com/influxdata/influxdb-client-go"
 	"github.com/influxdata/influxdb-client-go/api"
 	"github.com/influxdata/influxdb-client-go/api/write"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/zhi-miao/qiansi/common"
-	"log"
-	"sync"
-	"time"
 )
 
 var (
@@ -34,15 +35,10 @@ type zmInflux struct {
 
 type CommonMap map[string]interface{}
 
-type ModelBase struct {
+// TempModelStruct 临时数据结构体
+type TempModelStruct struct {
 	Num int  `gorm:"column:num"`
 	Has bool `gorm:"column:has"`
-}
-
-type ModelBase1 struct {
-	Id         int       `xorm:"not null pk autoincr INT(11)"`
-	UpdateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
-	CreateTime time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
 }
 
 // Start 初始化数据

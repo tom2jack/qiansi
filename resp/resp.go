@@ -1,10 +1,7 @@
 package resp
 
 import (
-	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/zhi-miao/qiansi/common/utils"
-	"github.com/zhi-miao/qiansi/models"
 )
 
 // ApiResult api默认返回结构
@@ -67,18 +64,4 @@ func (r *ApiResult) setCode(code int) *ApiResult {
 
 func (r *ApiResult) Json(c *gin.Context) {
 	c.JSON(200, r)
-}
-
-func (r *ApiResult) Encypt(c *gin.Context) {
-	json_str, err := json.Marshal(r)
-	if err != nil {
-		c.String(500, "ERROR!")
-		return
-	}
-	server_id := c.GetInt("SERVER-ID")
-	server := &models.Server{}
-	result := utils.EncyptogAES(string(json_str), server.GetApiSecret(server_id))
-	// result = base64.StdEncoding.EncodeToString([]byte(result))
-	c.Header("ZHIMIAO-Encypt", "1")
-	c.String(200, result)
 }

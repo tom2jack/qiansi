@@ -60,7 +60,7 @@ func (m *Member) InviterCount() (num int, err error) {
 
 //ExistsUID 判断uid是否存在
 func (m *memberModels) ExistsUID(uid int) bool {
-	dto := ModelBase{}
+	dto := TempModelStruct{}
 	err := m.db.Raw("select exists(select 1 from member where id=?) as has", uid).Scan(&dto).Error
 	if err != nil {
 		return true

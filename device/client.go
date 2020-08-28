@@ -7,12 +7,13 @@ import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/req"
+	"github.com/zhi-miao/qiansi/service"
 )
 
-// 客户端注册
-func register(c mqtt.Client, message mqtt.Message) {
-	defer message.Ack()
+// registerCallBack 客户端注册
+func registerCallBack(c mqtt.Client, message mqtt.Message) {
 	payload := message.Payload()
 	param := &req.RegServer{}
 	err := json.Unmarshal(payload, param)
@@ -30,4 +31,21 @@ func register(c mqtt.Client, message mqtt.Message) {
 	if !c.Publish(topicRegPub+topicID, 0, false, raw).WaitTimeout(waitTimeout) {
 		logrus.Warn("mqtt服务器响应失败")
 	}
+}
+
+// Deploy 启动部署
+func Deploy(deployID int, serverIds ...int) error {
+
+	return nil
+}
+
+// deployCallBack 部署回调
+func deployCallBack(c mqtt.Client, message mqtt.Message) {
+	info := GetAuthInfo(message.Topic())
+	if info == nil {
+		return
+	}
+	payload := &req.DeployCallBack{}
+	UnmarshalPayLoad(message.Payload(), info.APISecret, payload)
+	models.GetDeployModels().UpdateVersion(payload.DeployID, info.ServerID, payload.Version)
 }

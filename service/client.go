@@ -28,12 +28,11 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 		result.ErrMsg = "设备已存在"
 		return
 	}
-
 	err := models.Mysql.Transaction(func(tx *gorm.DB) error {
 		server := &models.Server{
-			Uid:          param.UID,
-			ApiSecret:    string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL)),
-			DeviceId:     param.DeviceID,
+			UId:          param.UID,
+			APISecret:    string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL)),
+			DeviceID:     param.DeviceID,
 			ServerStatus: 1,
 		}
 		sm := models.GetServerModels().SetDB(tx)
@@ -42,18 +41,28 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 			return err
 		}
 		mm := models.GetMQTTModels().SetDB(tx)
-		username := "Q_"+ server.Id
-		mm.CreateClientUser()
+		mqttUser := fmt.Sprintf("Q_%d", server.ID)
+		mqttPwd := string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL))
+		err = mm.CreateClientUser(mqttUser, mqttPwd)
+		if err != nil {
+			return err
+		}
+		err = mm.CreateClientACL(mqttUser, param.DeviceID)
+		if err != nil {
+			return err
+		}
+		result = &resp.RegServer{
+			ID:               server.ID,
+			ApiSecret:        server.APISecret,
+			DeviceID:         param.DeviceID,
+			MqttUserName:     mqttUser,
+			MqttUserPassword: mqttPwd,
+		}
+		return nil
 	})
 	if err != nil {
 		result.ErrMsg = "注册失败"
 		return
 	}
-	err := server.Create()
-	if err == nil {
-		resp.ApiSecret = server.ApiSecret
-		resp.ID = server.Id
-	} else {
-
-	}
+	return
 }

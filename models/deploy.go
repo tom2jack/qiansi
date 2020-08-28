@@ -2,12 +2,34 @@ package models
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/req"
-	"strings"
 )
+
+type deployModels struct {
+	db *gorm.DB
+}
+
+func GetDeployModels() *deployModels {
+	return &deployModels{
+		db: Mysql,
+	}
+}
+
+func (m *deployModels) SetDB(db *gorm.DB) *deployModels {
+	m.db = db
+	return m
+}
+
+func (m *deployModels) UpdateVersion(deployID, serverID, version int) error {
+	return m.db.Model(&DeployServerRelation{}).
+		Where("deploy_id=? and server_id=?", deployID, serverID).
+		Update("deploy_version", version).Error
+}
 
 // DeployList 部署应用列表
 func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows int) {
@@ -145,8 +167,8 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			for i, s := range param.ServerRelation {
 				serverIds[i] = s.ServerId
 			}
-			server := &Server{Uid: uid}
-			if !server.BatchCheck(serverIds) {
+			// 检测服务器是否是自己的
+			if !GetServerModels().SetDB(tx).BatchCheck(uid, serverIds) {
 				return fmt.Errorf("含有非法服务器绑定")
 			}
 			relation := &DeployServerRelation{}
@@ -226,8 +248,8 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 			for i, s := range param.ServerRelation {
 				serverIds[i] = s.ServerId
 			}
-			server := &Server{Uid: uid}
-			if !server.BatchCheck(serverIds) {
+			// 检测服务器是否是自己的
+			if !GetServerModels().SetDB(tx).BatchCheck(uid, serverIds) {
 				return fmt.Errorf("含有非法服务器绑定")
 			}
 			relation := &DeployServerRelation{}
