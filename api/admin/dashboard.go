@@ -37,8 +37,7 @@ func (r *dashboardApi) Info(c *gin.Context) {
 	// vo.DeployNum
 	vo.DeployRunNum, _ = deploy.CountDo()
 	// 获取服务器数量
-	server := &models.Server{Uid: uid}
-	vo.ServerNum, _ = server.Count()
+	vo.ServerNum = models.GetServerModels().Count(uid)
 	// 邀请数
 	member := &models.Member{InviterUid: uid}
 	vo.InviteNum, _ = member.InviterCount()
@@ -74,8 +73,7 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 	if err == nil && s != "" {
 		json.Unmarshal([]byte(s), &serIds)
 	} else {
-		s := &models.Server{Uid: uid}
-		serIds = s.UserServerIds()
+		serIds = models.GetServerModels().UserServerIds(uid)
 		if serIdsJson, err := json.Marshal(serIds); err == nil {
 			models.Redis.Set(serIdsCacheId, string(serIdsJson), 5*60)
 		}

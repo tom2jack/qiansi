@@ -2,6 +2,8 @@ package device
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -34,8 +36,27 @@ func registerCallBack(c mqtt.Client, message mqtt.Message) {
 }
 
 // Deploy 启动部署
-func Deploy(deployID int, serverIds ...int) error {
-
+func Deploy(UID, deployID int, serverIds ...int) error {
+	err := models.GetDeployModels().UpdateVersion(UID, deployID)
+	if err != nil {
+		return errors.New("版本更新失败")
+	}
+	deployModels := models.GetDeployModels()
+	deployInfo := deployModels.GetDeployInfo(deployID)
+	if deployInfo == nil {
+		return errors.New("部署任务不存在")
+	}
+	payloadJson, err := json.Marshal(deployInfo)
+	if err != nil {
+		return errors.New("部署任务异常")
+	}
+	serversInfo := deployModels.GetDeployRelationServers(deployID, serverIds...)
+	if len(serversInfo) == 0 {
+		return errors.New("未挂载服务器")
+	}
+	for _, si := range serversInfo {
+		mqttClient.Publish(fmt.Sprintf(topicDeployPub, si.MqttUser), 0, false, payloadJson)
+	}
 	return nil
 }
 
@@ -46,6 +67,12 @@ func deployCallBack(c mqtt.Client, message mqtt.Message) {
 		return
 	}
 	payload := &req.DeployCallBack{}
-	UnmarshalPayLoad(message.Payload(), info.APISecret, payload)
-	models.GetDeployModels().UpdateVersion(payload.DeployID, info.ServerID, payload.Version)
+	err := UnmarshalPayload(message.Payload(), info.APISecret, payload)
+	if err != nil {
+		return
+	}
+	err = models.GetServerModels().UpdateDeployVersion(payload.DeployID, info.ServerID, payload.Version)
+	if err != nil {
+		return
+	}
 }

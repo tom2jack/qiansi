@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -14,6 +15,14 @@ type deployModels struct {
 	db *gorm.DB
 }
 
+// DeployTaskInfo 部署应用信息结构
+type DeployTaskInfo struct {
+	Deploy
+	DeployGit    DeployGit    `json:"deploy_git"`
+	DeployZip    DeployZip    `json:"deploy_zip"`
+	DeployDocker DeployDocker `json:"deploy_docker"`
+}
+
 func GetDeployModels() *deployModels {
 	return &deployModels{
 		db: Mysql,
@@ -25,10 +34,49 @@ func (m *deployModels) SetDB(db *gorm.DB) *deployModels {
 	return m
 }
 
-func (m *deployModels) UpdateVersion(deployID, serverID, version int) error {
-	return m.db.Model(&DeployServerRelation{}).
-		Where("deploy_id=? and server_id=?", deployID, serverID).
-		Update("deploy_version", version).Error
+// UpdateVersion 更新当前版本
+func (m *deployModels) UpdateVersion(UID, deployID int) error {
+	tempDB := m.db.Model(&Deploy{}).Where("id=? and uid=?", deployID, UID).
+		UpdateColumn("now_version", gorm.Expr("now_version+1"))
+	if tempDB.Error != nil {
+		return tempDB.Error
+	}
+	if tempDB.RowsAffected != 1 {
+		return errors.New("部署任务不存在")
+	}
+	return nil
+}
+
+// GetDeployInfo 获取部署信息
+func (m *deployModels) GetDeployInfo(deployID int) *DeployTaskInfo {
+	result := &DeployTaskInfo{}
+	if m.db.Model(&Deploy{}).Where("id=?", deployID).First(&result.Deploy).RowsAffected == 0 {
+		return nil
+	}
+	// 部署类型 0-本地 1-git 2-zip 3-docker
+	switch result.DeployType {
+	case 0:
+	case 1:
+		m.db.Model(&DeployGit{}).Where("deploy_id=?", result.ID).First(&result.DeployGit)
+	case 2:
+		m.db.Model(&DeployZip{}).Where("deploy_id=?", result.ID).First(&result.DeployZip)
+	case 3:
+		m.db.Model(&DeployDocker{}).Where("deploy_id=?", result.ID).First(&result.DeployDocker)
+	default:
+	}
+	return result
+}
+
+// GetDeployRelationServers 根据应用ID获取服务器信息
+func (m *deployModels) GetDeployRelationServers(deployId int, serverIds ...int) []Server {
+	sql := "select s.* from `server` s, deploy_server_relation r where s.id=r.server_id and r.deploy_id=?"
+	data := make([]Server, 0)
+	if len(serverIds) > 0 {
+		m.db.Raw(sql+" and r.server_id in(?)", deployId, serverIds).Scan(&data)
+	} else {
+		m.db.Raw(sql, deployId).Scan(&data)
+	}
+	return data
 }
 
 // DeployList 部署应用列表
@@ -39,14 +87,6 @@ func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows
 	}
 	db.Offset(param.Offset()).Limit(param.PageSize).Order("id desc").Find(&result).Offset(-1).Limit(-1).Count(&totalRows)
 	return
-}
-
-// DeployTaskInfo 部署应用信息结构
-type DeployTaskInfo struct {
-	Deploy
-	DeployGit    DeployGit    `json:"deploy_git"`
-	DeployZip    DeployZip    `json:"deploy_zip"`
-	DeployDocker DeployDocker `json:"deploy_docker"`
 }
 
 // GetDeployTaskInfo 根据服务器ID获取部署应用任务信息
@@ -297,17 +337,6 @@ func DelDeploy(uid, DeployID int) error {
 		tx.Delete(&DeployServerRelation{}, "deploy_id=?", DeployID)
 		return nil
 	})
-}
-
-// DeployRelationServerIds 根据应用ID
-func DeployRelationServerIds(deployId int) []int {
-	data := []DeployServerRelation{}
-	Mysql.Where("deploy_id=?", deployId).Find(&data)
-	result := make([]int, len(data))
-	for _, datum := range data {
-		result = append(result, datum.ServerID)
-	}
-	return result
 }
 
 // DeployRelationServer 部署服务器信息

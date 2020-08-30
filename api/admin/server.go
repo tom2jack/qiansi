@@ -33,7 +33,7 @@ func (r *serverApi) Lists(c *gin.Context) {
 		return
 	}
 	s := &models.Server{
-		Uid:        c.GetInt("UID"),
+		UId:        c.GetInt("UID"),
 		ServerName: param.ServerName,
 	}
 	lists, rows := s.List(param.Offset(), param.PageSize)
@@ -63,7 +63,7 @@ func (r *serverApi) Set(c *gin.Context) {
 	}
 	po := &models.Server{}
 	utils.SuperConvert(param, po)
-	if models.Mysql.Table("server").Where("id=? and uid=?", po.Id, c.GetInt("UID")).Updates(po).RowsAffected > 0 {
+	if models.Mysql.Table("server").Where("id=? and uid=?", po.ID, c.GetInt("UID")).Updates(po).RowsAffected > 0 {
 		resp.NewApiResult(1, "更新成功", po).Json(c)
 		return
 	}

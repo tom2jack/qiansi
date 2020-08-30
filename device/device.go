@@ -51,6 +51,10 @@ func Start() {
 	go sub()
 }
 
+func GetMqttClient() mqtt.Client {
+	return mqttClient
+}
+
 type authInfo struct {
 	UID       int
 	ServerID  int
@@ -77,8 +81,8 @@ func GetAuthInfo(topic string) *authInfo {
 	return auth
 }
 
-// UnmarshalPayLoad
-func UnmarshalPayLoad(payload []byte, secret string, res interface{}) error {
+// UnmarshalPayload 解码载荷
+func UnmarshalPayload(payload []byte, secret string, res interface{}) error {
 	raw := gutils.DecrptogAES(string(payload), secret)
 	if raw == "" {
 		return errors.New("解码失败")
@@ -88,4 +92,17 @@ func UnmarshalPayLoad(payload []byte, secret string, res interface{}) error {
 		return err
 	}
 	return nil
+}
+
+// MarshalPayload 加密载荷
+func MarshalPayload(payload interface{}, secret string) ([]byte, error) {
+	payloadJson, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+	aes := gutils.EncyptogAES(string(payloadJson), secret)
+	if aes == "" {
+		return nil, errors.New("加密失败")
+	}
+	return []byte(aes), nil
 }

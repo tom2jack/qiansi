@@ -1,6 +1,7 @@
 package models
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -30,7 +31,19 @@ func (m *serverModels) SetDB(db *gorm.DB) *serverModels {
 
 // Create 创建客户端
 func (m *serverModels) Create(ser *Server) error {
-	return m.db.Create(ser).Error
+	err := m.db.Create(ser).Error
+	if err != nil {
+		return err
+	}
+	if ser.ID > 0 {
+		ser.MqttUser = fmt.Sprintf("Q_%d", ser.ID)
+		err := m.db.Model(ser).Where("id=?", ser.ID).Update("mqtt_user", ser.MqttUser).Error
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+	return errors.New("创建失败")
 }
 
 // Get 获取服务器信息
@@ -46,6 +59,29 @@ func (m *serverModels) BatchCheck(uid int, ids []int) bool {
 	var count int
 	db := m.db.Model(&Server{}).Where("id in (?) and uid=?", ids, uid).Count(&count)
 	return db.Error == nil && count == len(ids)
+}
+
+func (m *serverModels) UpdateDeployVersion(deployID, serverID, version int) error {
+	return m.db.Model(&DeployServerRelation{}).
+		Where("deploy_id=? and server_id=?", deployID, serverID).
+		Update("deploy_version", version).Error
+}
+
+// UserServerIds 获取用户的服务器编号
+func (m *serverModels) UserServerIds(UID int) (ids []int) {
+	data := make([]Server, 0)
+	Mysql.Model(&Server{}).Select("id").Where("uid = ?", UID).Find(&data)
+	for _, v := range data {
+		ids = append(ids, v.ID)
+	}
+	return
+}
+
+// Count 统计当前用户客戶端注冊數量
+func (m *serverModels) Count(UID int) int {
+	var num int
+	m.db.Model(&Server{}).Where("uid=?", UID).Count(&num)
+	return num
 }
 
 // List 获取应用列表
@@ -64,25 +100,6 @@ func (m *Server) ListByUser() []Server {
 	data := []Server{}
 	Mysql.Where("uid = ?", m.UId).Find(&data)
 	return data
-}
-
-// Count 统计当前用户客戶端注冊數量
-func (m *Server) Count() (num int, err error) {
-	db := Mysql.Model(m).Where("uid=?", m.UId).Count(&num)
-	if db.Error != nil {
-		err = fmt.Errorf("查询失败")
-	}
-	return
-}
-
-// UserServerIds 获取用户的服务器编号
-func (m *Server) UserServerIds() (ids []int) {
-	data := []Server{}
-	Mysql.Model(m).Select("id").Where("uid = ?", m.UId).Find(&data)
-	for _, v := range data {
-		ids = append(ids, v.ID)
-	}
-	return
 }
 
 //ExistsDevice 设备是否存在

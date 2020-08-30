@@ -1,7 +1,7 @@
 package service
 
 import (
-	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/lifei6671/gorand"
@@ -31,9 +31,13 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 	err := models.Mysql.Transaction(func(tx *gorm.DB) error {
 		server := &models.Server{
 			UId:          param.UID,
+			ServerStatus: 1,
+			MqttUser:     "",
 			APISecret:    string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL)),
 			DeviceID:     param.DeviceID,
-			ServerStatus: 1,
+			Domain:       "",
+			CreateTime:   time.Time{},
+			UpdateTime:   time.Time{},
 		}
 		sm := models.GetServerModels().SetDB(tx)
 		err := sm.Create(server)
@@ -41,13 +45,12 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 			return err
 		}
 		mm := models.GetMQTTModels().SetDB(tx)
-		mqttUser := fmt.Sprintf("Q_%d", server.ID)
 		mqttPwd := string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL))
-		err = mm.CreateClientUser(mqttUser, mqttPwd)
+		err = mm.CreateClientUser(server.MqttUser, mqttPwd)
 		if err != nil {
 			return err
 		}
-		err = mm.CreateClientACL(mqttUser, param.DeviceID)
+		err = mm.CreateClientACL(server.MqttUser, param.DeviceID)
 		if err != nil {
 			return err
 		}
@@ -55,7 +58,7 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 			ID:               server.ID,
 			ApiSecret:        server.APISecret,
 			DeviceID:         param.DeviceID,
-			MqttUserName:     mqttUser,
+			MqttUserName:     server.MqttUser,
 			MqttUserPassword: mqttPwd,
 		}
 		return nil
