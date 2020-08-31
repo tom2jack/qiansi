@@ -47,9 +47,16 @@ func (m *serverModels) Create(ser *Server) error {
 }
 
 // Get 获取服务器信息
-func (m *serverModels) GetOnce(serverID int) (*Server, error) {
+func (m *serverModels) Get(serverID int) (*Server, error) {
 	server := &Server{}
 	err := m.db.Model(server).Where("id=?", serverID).First(server).Error
+	return server, err
+}
+
+// GetByMqttUser 根据mqtt用户名获取服务器信息
+func (m *serverModels) GetByMqttUser(mqttUser string) (*Server, error) {
+	server := &Server{}
+	err := m.db.Model(server).Where("mqtt_user=?", mqttUser).First(server).Error
 	return server, err
 }
 
@@ -84,6 +91,26 @@ func (m *serverModels) Count(UID int) int {
 	return num
 }
 
+//ExistsDevice 设备是否存在
+func (m *serverModels) ExistsDevice(deviceID string) bool {
+	dto := TempModelStruct{}
+	err := m.db.Raw("select exists(select 1 from server where device_id=?) as has", deviceID).Scan(&dto).Error
+	if err != nil {
+		return true
+	}
+	return dto.Has
+}
+
+// GetTelegrafConfig 获取Telegraf私有配置
+func (m *serverModels) GetTelegrafConfig(serverID int) *Telegraf {
+	data := &Telegraf{}
+	tempDB := m.db.Model(data).Where("server_id=?", serverID).First(data)
+	if tempDB.Error == nil && tempDB.RowsAffected > 0 {
+		return data
+	}
+	return nil
+}
+
 // List 获取应用列表
 func (m *Server) List(offset int, limit int) ([]Server, int) {
 	data := []Server{}
@@ -100,14 +127,4 @@ func (m *Server) ListByUser() []Server {
 	data := []Server{}
 	Mysql.Where("uid = ?", m.UId).Find(&data)
 	return data
-}
-
-//ExistsDevice 设备是否存在
-func (m *serverModels) ExistsDevice(deviceID string) bool {
-	dto := TempModelStruct{}
-	err := m.db.Raw("select exists(select 1 from server where device_id=?) as has", deviceID).Scan(&dto).Error
-	if err != nil {
-		return true
-	}
-	return dto.Has
 }

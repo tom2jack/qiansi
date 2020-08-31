@@ -9,14 +9,15 @@ package admin
 
 import (
 	"fmt"
+	"time"
+	"unsafe"
+
 	"github.com/zhi-miao/qiansi/common"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/notifyevent"
 	"github.com/zhi-miao/qiansi/req"
 	"github.com/zhi-miao/qiansi/resp"
-	"time"
-	"unsafe"
 
 	"github.com/gin-gonic/gin"
 )
@@ -249,7 +250,7 @@ func (r *deployApi) Do(c *gin.Context) {
 	server := &[]models.Server{}
 	models.Mysql.Select("id").Where("id in (select server_id from deploy_server_relation where deploy_id=?)", param.DeployId).Find(server)
 	for _, v := range *server {
-		notifyevent.Hook001.AddDeploy(v.Id)
+		notifyevent.Hook001.AddDeploy(v.ID)
 	}
 	resp.NewApiResult(1, "启动成功", server).Json(c)
 }

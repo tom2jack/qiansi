@@ -3,12 +3,12 @@ package device
 import (
 	"encoding/json"
 	"errors"
-	"github.com/zhi-miao/gutils"
-	"github.com/zhi-miao/qiansi/models"
 	"os"
-	"strconv"
 	"strings"
 	"time"
+
+	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/models"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
@@ -20,19 +20,47 @@ var (
 )
 
 const (
-	// 注册通信主题
-	topicRegPub = "qiansi-client/reg/s/"
-	topicRegSub = "qiansi-client/reg/c/+"
-	// 部署通道
-	topicDeployPub = "qiansi-client/chan/%s/deploy/S"
-	topicDeploySub = "qiansi-client/chan/+/deploy/C"
-
 	waitTimeout = 15 * time.Second
 )
 
+const (
+	// 注册通信主题
+	regPub = "qiansi-client/reg/s/"
+	regSub = "qiansi-client/reg/c/+"
+	// 初始化请求
+	runInitSub = "qiansi-client/chan/%s/runInit/C"
+	// telegraf配置推送
+	telegrafConfigPub = "qiansi-client/chan/%s/telegrafConfig/S"
+	// 部署通道
+	deployPub = "qiansi-client/chan/%s/deploy/S"
+	deploySub = "qiansi-client/chan/+/deploy/C"
+	// 监控指标订阅
+	metricSub = "qiansi-client/chan/+/metric/C"
+	// 日志订阅
+	logSub = "qiansi-client/chan/+/log/C"
+)
+
 func sub() {
-	mqttClient.Subscribe(topicRegSub, 0, registerCallBack)
-	mqttClient.Subscribe(topicDeploySub, 0, deployCallBack)
+	if token := mqttClient.Subscribe(runInitSub, 0, runInitCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", runInitSub)
+		return
+	}
+	if token := mqttClient.Subscribe(regSub, 0, registerCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", regSub)
+		return
+	}
+	if token := mqttClient.Subscribe(deploySub, 0, deployCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", deploySub)
+		return
+	}
+	if token := mqttClient.Subscribe(metricSub, 0, metricCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", metricSub)
+		return
+	}
+	if token := mqttClient.Subscribe(logSub, 0, logCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", logSub)
+		return
+	}
 }
 
 func Start() {
@@ -48,7 +76,7 @@ func Start() {
 		os.Exit(1)
 	}
 	logrus.Info("mqtt service loading..")
-	go sub()
+	sub()
 }
 
 func GetMqttClient() mqtt.Client {
@@ -63,26 +91,27 @@ type authInfo struct {
 	APISecret string
 }
 
-func GetAuthInfo(topic string) *authInfo {
+// getAuthInfo 获取消息用户信息
+func getAuthInfo(topic string) *authInfo {
 	topicSplit := strings.Split(topic, "/")
-	if len(topicRegSub) < 3 {
+	if len(topicSplit) < 3 {
 		return nil
 	}
-	auth := &authInfo{}
-	auth.UserName = topicSplit[2]
-	auth.ServerID, _ = strconv.Atoi(strings.TrimLeft(auth.UserName, "Q_"))
-	once, err := models.GetServerModels().GetOnce(auth.ServerID)
+	sInfo, err := models.GetServerModels().GetByMqttUser(topicSplit[2])
 	if err != nil {
 		return nil
 	}
-	auth.APISecret = once.APISecret
-	auth.DeviceID = once.DeviceID
-	auth.UID = once.UId
-	return auth
+	return &authInfo{
+		UID:       sInfo.UId,
+		ServerID:  sInfo.ID,
+		DeviceID:  sInfo.DeviceID,
+		UserName:  sInfo.MqttUser,
+		APISecret: sInfo.APISecret,
+	}
 }
 
-// UnmarshalPayload 解码载荷
-func UnmarshalPayload(payload []byte, secret string, res interface{}) error {
+// dePayload 解码载荷
+func dePayload(payload []byte, secret string, res interface{}) error {
 	raw := gutils.DecrptogAES(string(payload), secret)
 	if raw == "" {
 		return errors.New("解码失败")
@@ -94,8 +123,8 @@ func UnmarshalPayload(payload []byte, secret string, res interface{}) error {
 	return nil
 }
 
-// MarshalPayload 加密载荷
-func MarshalPayload(payload interface{}, secret string) ([]byte, error) {
+// enPayload 加密载荷
+func enPayload(payload interface{}, secret string) ([]byte, error) {
 	payloadJson, err := json.Marshal(payload)
 	if err != nil {
 		return nil, err

@@ -100,14 +100,34 @@ type Member struct {
 
 // Server 服务器注册表
 type Server struct {
-	ID           int       `gorm:"primary_key;column:id;type:int(11) unsigned;not null" json:"id"`
-	UId          int       `gorm:"index:IX_uid;column:uid;type:int(10) unsigned;not null" json:"uid"`  // 用户ID
-	ServerName   string    `gorm:"column:server_name;type:varchar(64);not null" json:"server_name"`    // 服务器备注名
-	ServerStatus int8      `gorm:"column:server_status;type:tinyint(3);not null" json:"server_status"` // 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
-	MqttUser     string    `gorm:"column:mqtt_user;type:varchar(255);not null" json:"mqtt_user"`       // mqtt用户名
-	APISecret    string    `gorm:"column:api_secret;type:varchar(32);not null" json:"api_secret"`      // API密钥
-	DeviceID     string    `gorm:"column:device_id;type:char(36);not null" json:"device_id"`           // 服务器唯一设备号
-	Domain       string    `gorm:"column:domain;type:varchar(255);not null" json:"domain"`             // 服务器地址(域名/ip)
-	CreateTime   time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
-	UpdateTime   time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
+	ID            int       `gorm:"primary_key;column:id;type:int(11) unsigned;not null" json:"id"`
+	UId           int       `gorm:"index:IX_uid;column:uid;type:int(10) unsigned;not null" json:"uid"`      // 用户ID
+	ServerName    string    `gorm:"column:server_name;type:varchar(64);not null" json:"server_name"`        // 服务器备注名
+	ServerStatus  int8      `gorm:"column:server_status;type:tinyint(3);not null" json:"server_status"`     // 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
+	MqttUser      string    `gorm:"column:mqtt_user;type:varchar(255);not null" json:"mqtt_user"`           // mqtt用户名
+	APISecret     string    `gorm:"column:api_secret;type:varchar(32);not null" json:"api_secret"`          // API密钥
+	DeviceID      string    `gorm:"column:device_id;type:char(36);not null" json:"device_id"`               // 服务器唯一设备号
+	ClientVersion string    `gorm:"column:client_version;type:varchar(255);not null" json:"client_version"` // 客户端版本
+	Domain        string    `gorm:"column:domain;type:varchar(255);not null" json:"domain"`                 // 服务器地址(域名/ip)
+	CreateTime    time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
+	UpdateTime    time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
+}
+
+// Telegraf 监控配置表
+type Telegraf struct {
+	ServerID   int       `gorm:"primary_key;column:server_id;type:int(11);not null"` // 服务器ID
+	UId        int       `gorm:"column:uid;type:int(11)"`                            // 用户ID
+	TomlConfig string    `gorm:"column:toml_config;type:longtext"`                   // 私有配置
+	IsOpen     int8      `gorm:"column:is_open;type:tinyint(1)"`                     // 是否开启监控功能 1-开启 2-关闭
+	CreateTime time.Time `gorm:"column:create_time;type:datetime"`
+	UpdateTime time.Time `gorm:"column:update_time;type:datetime"`
+}
+
+// SysConfig 内部回转配置
+type SysConfig struct {
+	Key        string    `gorm:"primary_key;column:key;type:varchar(50);not null"`
+	Data       string    `gorm:"column:data;type:longtext"`       // 数据
+	Readme     string    `gorm:"column:readme;type:varchar(255)"` // 字段说明
+	CreateTime time.Time `gorm:"column:create_time;type:datetime"`
+	UpdateTime time.Time `gorm:"column:update_time;type:timestamp"`
 }

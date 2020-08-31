@@ -26,22 +26,6 @@ func initRoute() {
 	/* ------ 静态页模块 ------- */
 	Router.StaticFile("/", "assets/html/index.html")
 	Router.Static("/static", "assets/html")
-	/* ------ 客户端模块 ------- */
-	clientRoute := Router.Group("/client")
-	{
-		clientRoute.GET("/ApiRegServer", client.Api.RegServer)
-		clientRoute.GET("/ApiDeployRun", client.Api.DeployRun)
-		clientRoute.POST("/ApiDeployRun", client.Api.DeployRun)
-		// 客户端交互请求
-		clientRoute.Use(clientAuthMiddleware())
-		{
-			clientRoute.POST("/ApiDeployLog", client.Api.DeployLog)
-			clientRoute.GET("/ApiGetDeployTask", client.Api.GetDeployTask)
-			clientRoute.GET("/ApiDeployNotify", client.Api.DeployNotify)
-			clientRoute.GET("/ApiGetTelegrafConfig", client.Api.GetTelegrafConfig)
-			clientRoute.POST("/ApiClientMetric", client.Api.ClientMetric)
-		}
-	}
 	/* ------ 后台模块 ------- */
 	adminRoute := Router.Group("/admin")
 	{

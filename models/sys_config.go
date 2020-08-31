@@ -1,19 +1,25 @@
 package models
 
-import "time"
+import "github.com/jinzhu/gorm"
 
-// SysConfig 内部回转配置
-type SysConfig struct {
-	Key        string    `gorm:"primary_key;column:key;type:varchar(50);not null"`
-	Data       string    `gorm:"column:data;type:longtext"`       // 数据
-	Readme     string    `gorm:"column:readme;type:varchar(255)"` // 字段说明
-	CreateTime time.Time `gorm:"column:create_time;type:datetime"`
-	UpdateTime time.Time `gorm:"column:update_time;type:timestamp"`
+type sysConfigModels struct {
+	db *gorm.DB
 }
 
-// 根据Key获取配置
-func GetSysConfig(key string) string {
-	m := SysConfig{Key: key}
-	Mysql.Model(&m).First(&m)
-	return m.Data
+func GetSysConfigModels() *sysConfigModels {
+	return &sysConfigModels{
+		db: Mysql,
+	}
+}
+
+func (m *sysConfigModels) SetDB(db *gorm.DB) *sysConfigModels {
+	m.db = db
+	return m
+}
+
+// GetTelegraf Telegraf系统配置
+func (m *sysConfigModels) GetTelegraf() string {
+	cnf := &SysConfig{Key: "telegraf_config"}
+	m.db.Model(&cnf).First(&cnf)
+	return cnf.Data
 }
