@@ -5,7 +5,6 @@ import (
 	"github.com/zhi-miao/qiansi/common"
 	"github.com/zhi-miao/qiansi/device"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/notifyevent"
 	"github.com/zhi-miao/qiansi/schedule"
 )
 
@@ -30,6 +29,5 @@ func main() {
 	models.Start()
 	go api.Start()
 	go schedule.Start()
-	go notifyevent.Start()
 	select {}
 }

@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/influxdata/influxdb-client-go/api/write"
-	"github.com/zhi-miao/qiansi/resp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/influxdata/influxdb-client-go/api/write"
+	"github.com/zhi-miao/qiansi/resp"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
@@ -120,68 +121,59 @@ func deployCallBack(c mqtt.Client, message mqtt.Message) {
 
 // metricCallBack 监控指标
 func metricCallBack(c mqtt.Client, message mqtt.Message) {
-	raw, err := c.GetRawData()
-	if err != nil {
-		c.Status(403)
+	info := getAuthInfo(message.Topic())
+	if info == nil {
 		return
 	}
 	rawData := req.ClientMetricParam{}
-	err = json.Unmarshal(raw, &rawData)
-	if err != nil {
-		fmt.Print(err.Error())
-		c.Status(400)
+	err := dePayload(message.Payload(), info.APISecret, &rawData)
+	if err != nil || len(rawData.Metrics) == 0 {
 		return
 	}
-	if len(rawData.Metrics) == 0 {
-		resp.NewApiResult(1).Json(c)
-		return
-	}
-	serverId := strconv.Itoa(c.GetInt("SERVER-ID"))
-	serverUid := strconv.Itoa(c.GetInt("SERVER-UID"))
 	mds := make([]*write.Point, len(rawData.Metrics))
 	for k, v := range rawData.Metrics {
-		v.Tags["SERVER_ID"] = serverId
-		v.Tags["SERVER_UID"] = serverUid
+		v.Tags["SERVER_ID"] = strconv.Itoa(info.ServerID)
+		v.Tags["SERVER_UID"] = strconv.Itoa(info.UID)
 		mds[k] = write.NewPoint(v.Name, v.Tags, v.Fields, time.Unix(v.Timestamp, 0))
 	}
-	models.InfluxDB.Write("client_metric", mds...)
+	err = models.InfluxDB.Write("client_metric", mds...)
+	if err != nil {
+		logrus.Warnf("%d号服务器监控指标记录失败", info.ServerID)
+	}
 }
 
 // logCallBack 日志回调
 func logCallBack(c mqtt.Client, message mqtt.Message) {
-	// TODO
-	raw, err := c.GetRawData()
-	if err != nil {
-		c.Status(403)
+	info := getAuthInfo(message.Topic())
+	if info == nil {
 		return
 	}
-	rawData := map[string]interface{}{}
-	err = json.Unmarshal(raw, &rawData)
-
+	rawData := make(map[string]interface{})
+	err := dePayload(message.Payload(), info.APISecret, &rawData)
 	if err != nil {
-		c.Status(400)
 		return
 	}
-	mFields := map[string]interface{}{}
-	mName := ""
-	mTags := map[string]string{
-		"SERVER_ID":     strconv.Itoa(c.GetInt("SERVER-ID")),
-		"SERVER_UID":    strconv.Itoa(c.GetInt("SERVER-UID")),
-		"SERVER_DEVICE": c.GetString("SERVER-DEVICE"),
-	}
+	mName := "DEFAULT"
+	mTags := make(map[string]string)
+	mFields := make(map[string]interface{})
 	for k, v := range rawData {
 		vData := fmt.Sprintf("%v", v)
 		switch k {
-		case "__MODEL__":
+		case "__MODEL__": // 主题模块
 			mName = vData
-		case "__MESSAGE__":
+		case "__MESSAGE__": // 消息体
 			mFields["Message"] = vData
-		case "__LOG_LEVEL__":
+		case "__LOG_LEVEL__": // 消息级别
 			mTags["LOG_LEVEL"] = vData
 		default:
 			mTags[k] = vData
 		}
 	}
-	metric := write.NewPoint(mName, mTags, mFields, time.Now())
-	models.InfluxDB.Write("client_log", metric)
+	mTags["SERVER_ID"] = strconv.Itoa(info.ServerID)
+	mTags["SERVER_UID"] = strconv.Itoa(info.UID)
+	mTags["SERVER_DEVICE"] = info.DeviceID
+	err = models.InfluxDB.Write("client_log", write.NewPoint(mName, mTags, mFields, time.Now()))
+	if err != nil {
+		logrus.Warnf("%d号服务器日志记录失败", info.ServerID)
+	}
 }

@@ -3,14 +3,15 @@ package admin
 import (
 	"encoding/json"
 	"fmt"
+	"time"
+
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/notifyevent"
 	"github.com/zhi-miao/qiansi/req"
 	"github.com/zhi-miao/qiansi/resp"
 	"github.com/zhi-miao/qiansi/service"
-	"time"
 )
 
 type dashboardApi struct{}
@@ -68,18 +69,24 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 	}
 	uid := c.GetInt("UID")
 	serIdsCacheId := fmt.Sprintf("QIANSI:dashboard:user-server-ids:%d", uid)
-	var serIds []int
+	serIds := make([]int, 0)
 	s, err := models.Redis.Get(serIdsCacheId)
 	if err == nil && s != "" {
-		json.Unmarshal([]byte(s), &serIds)
+		err := json.Unmarshal([]byte(s), &serIds)
+		if err != nil {
+			logrus.Warn("服务器列表获取失败")
+		}
 	} else {
 		serIds = models.GetServerModels().UserServerIds(uid)
 		if serIdsJson, err := json.Marshal(serIds); err == nil {
-			models.Redis.Set(serIdsCacheId, string(serIdsJson), 5*60)
+			err := models.Redis.Set(serIdsCacheId, string(serIdsJson), 5*60)
+			if err != nil {
+				logrus.Warn("服务器列表缓存失败")
+			}
 		}
 	}
 	vo := resp.DashboardIndexMetricVO{
-		ActiveServerNum: notifyevent.Hook001.GetActiveServerNum(serIds...),
+		ActiveServerNum: 0, // TODO: 活跃客户端统计
 		CPURate:         service.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime),
 		MenRate:         service.GetClientMemRate(uid, param.ServerId, param.StartTime, param.EndTime),
 	}

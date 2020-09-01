@@ -1,17 +1,15 @@
 package api
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"github.com/zhi-miao/qiansi/common/utils"
-	"github.com/zhi-miao/qiansi/models"
+
+	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
-	"net/http"
-	"strconv"
-	"time"
 )
 
 // corsMiddleware 跨域
@@ -51,40 +49,6 @@ func logMiddleware() gin.HandlerFunc {
 			"req_method":   reqMethod,
 			"req_uri":      reqUrl,
 		}).Info()
-	}
-}
-
-// clientAuthMiddleware 客户端认证中间件
-func clientAuthMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		serverId, _ := strconv.Atoi(c.GetHeader("SERVER-ID"))
-		token := c.GetHeader("CLIENT-TOKEN")
-		if d, e := base64.StdEncoding.DecodeString(token); e == nil {
-			token = string(d)
-		}
-		if serverId == 0 || token == "" {
-			c.AbortWithStatus(403)
-			c.Abort()
-			return
-		}
-		server := &models.Server{}
-		token = utils.DecrptogAES(token, server.GetApiSecret(serverId))
-		type tokenDTO struct {
-			ServerId     int    `json:"server_id"`
-			ServerDevice string `json:"server_device"`
-			ServerUid    int    `json:"server_uid"`
-		}
-		tokenData := tokenDTO{}
-		err := json.Unmarshal([]byte(token), &tokenData)
-		if err != nil || tokenData.ServerId != serverId {
-			c.AbortWithStatus(403)
-			c.Abort()
-			return
-		}
-		c.Set("SERVER-ID", serverId)
-		c.Set("SERVER-UID", tokenData.ServerUid)
-		c.Set("SERVER-DEVICE", tokenData.ServerDevice)
-		c.Next()
 	}
 }
 

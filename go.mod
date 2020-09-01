@@ -21,6 +21,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/lifei6671/gorand v0.1.0
 	github.com/mojocn/base64Captcha v1.3.1
+	github.com/prometheus/common v0.4.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/pflag v1.0.5 // indirect

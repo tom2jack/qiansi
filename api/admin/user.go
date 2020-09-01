@@ -8,14 +8,16 @@
 package admin
 
 import (
+	"strconv"
+	"time"
+
+	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/qiansi/common/captcha"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/req"
 	"github.com/zhi-miao/qiansi/resp"
 	"github.com/zhi-miao/qiansi/service"
-	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -61,8 +63,8 @@ func (r *userApi) Sigin(c *gin.Context) {
 		return
 	}
 	resp.NewApiResult(1, "登陆成功", &resp.UserInfoVO{
-		*member,
-		token,
+		Member: *member,
+		Token:  token,
 	}).Json(c)
 }
 
@@ -124,10 +126,13 @@ func (r *userApi) SiginUp(c *gin.Context) {
 	}
 	if member.Id > 0 {
 		// 用户邀请奖励发放
-		service.InviterActive(param.InviterUid, member.Id)
+		err := service.InviterActive(param.InviterUid, member.Id)
+		if err != nil {
+			logrus.Warnf("邀请奖励%d->%d发放失败, %s", member.Id, param.InviterUid, err.Error())
+		}
 		resp.NewApiResult(1, "注册成功", &resp.UserInfoVO{
-			*member,
-			token,
+			Member: *member,
+			Token:  token,
 		}).Json(c)
 		return
 	}

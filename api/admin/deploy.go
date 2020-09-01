@@ -9,13 +9,13 @@ package admin
 
 import (
 	"fmt"
+	"github.com/zhi-miao/qiansi/device"
 	"time"
 	"unsafe"
 
 	"github.com/zhi-miao/qiansi/common"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/notifyevent"
 	"github.com/zhi-miao/qiansi/req"
 	"github.com/zhi-miao/qiansi/resp"
 
@@ -191,7 +191,7 @@ func (r *deployApi) Log(c *gin.Context) {
 	if param.EndTime.IsZero() {
 		param.EndTime = time.Now()
 	}
-	if param.StartTime.Sub(time.Now()) > time.Hour*24*30 {
+	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30 {
 		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
 		return
 	}
@@ -215,7 +215,7 @@ func (r *deployApi) Log(c *gin.Context) {
 	fluxQuery += "|> group()"
 	rowData, _ := models.InfluxDB.QueryToArray(fluxQuery + `|>count()`)
 	var rows int
-	if rowData != nil && len(rowData) > 0 {
+	if len(rowData) > 0 {
 		if v, ok := rowData[0]["_value"].(int64); ok {
 			// 将 int64 转化为 int
 			rows = *(*int)(unsafe.Pointer(&v))
@@ -242,17 +242,10 @@ func (r *deployApi) Do(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	db := models.Mysql.Exec("update deploy set now_version=now_version+1 where id=?", param.DeployId)
-	if db.Error != nil || db.RowsAffected != 1 {
-		resp.NewApiResult(-5, "部署服务不存在").Json(c)
-		return
+	if err := device.SendDeployTask(c.GetInt("UID"), param.DeployId); err != nil {
+		resp.NewApiResult(err).Json(c)
 	}
-	server := &[]models.Server{}
-	models.Mysql.Select("id").Where("id in (select server_id from deploy_server_relation where deploy_id=?)", param.DeployId).Find(server)
-	for _, v := range *server {
-		notifyevent.Hook001.AddDeploy(v.ID)
-	}
-	resp.NewApiResult(1, "启动成功", server).Json(c)
+	resp.NewApiResult(1, "启动成功").Json(c)
 }
 
 // @Summary 获取部署触发链接
