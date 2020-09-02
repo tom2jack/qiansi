@@ -3,8 +3,8 @@ package main
 import (
 	"github.com/zhi-miao/qiansi/api"
 	"github.com/zhi-miao/qiansi/common/config"
-	"github.com/zhi-miao/qiansi/device"
 	"github.com/zhi-miao/qiansi/models"
+	"github.com/zhi-miao/qiansi/mqttbroker"
 	"github.com/zhi-miao/qiansi/schedule"
 )
 
@@ -25,7 +25,7 @@ import (
 // @basepath
 func main() {
 	config.LoadConfig("config.toml")
-	device.Start()
+	mqttbroker.Start()
 	models.Start()
 	go api.Start()
 	go schedule.Start()

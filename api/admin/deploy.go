@@ -10,7 +10,7 @@ package admin
 import (
 	"fmt"
 	"github.com/zhi-miao/qiansi/common/config"
-	"github.com/zhi-miao/qiansi/device"
+	"github.com/zhi-miao/qiansi/mqttbroker"
 	"time"
 	"unsafe"
 
@@ -242,7 +242,7 @@ func (r *deployApi) Do(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	if err := device.SendDeployTask(c.GetInt("UID"), param.DeployId); err != nil {
+	if err := mqttbroker.SendDeployTask(c.GetInt("UID"), param.DeployId); err != nil {
 		resp.NewApiResult(err).Json(c)
 	}
 	resp.NewApiResult(1, "启动成功").Json(c)

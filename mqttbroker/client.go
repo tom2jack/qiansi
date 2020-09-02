@@ -1,4 +1,4 @@
-package device
+package mqttbroker
 
 import (
 	"encoding/json"
