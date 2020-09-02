@@ -7,8 +7,8 @@ import (
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
+	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/utils"
-	"github.com/zhi-miao/qiansi/req"
 )
 
 type deployModels struct {

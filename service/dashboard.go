@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	"github.com/zhi-miao/qiansi/models"
 	"time"
+
+	"github.com/zhi-miao/qiansi/models"
 )
 
 type MaxInfo struct {

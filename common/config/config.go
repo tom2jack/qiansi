@@ -1,13 +1,10 @@
-package common
+package config
 
 import (
-	"bytes"
-	"github.com/BurntSushi/toml"
 	"github.com/jinzhu/configor"
-	"os"
 )
 
-type config struct {
+type configStruct struct {
 	App struct {
 		PageSize  int
 		JwtSecret string
@@ -32,11 +29,9 @@ type config struct {
 		Org   string
 	}
 	Redis struct {
-		Host        string
-		Auth        string
-		MaxIdle     int
-		MaxActive   int
-		IdleTimeOut int
+		Host string
+		Auth string
+		DB   int
 	}
 	Aliyun struct {
 		AccessKey    string
@@ -56,33 +51,19 @@ type config struct {
 	}
 }
 
-var Config = &config{}
-var filePath = "config.toml"
+var cfg = &configStruct{}
 
 // Init 初始化配置
-func (c *config) Init() error {
-	return configor.Load(Config, filePath)
+func LoadConfig(filePath string) error {
+	return configor.Load(cfg, filePath)
+}
+
+// GetConfig 获取配置
+func GetConfig() *configStruct {
+	return cfg
 }
 
 // ENV 获取当前配置场景
-func (c *config) ENV() string {
+func ENV() string {
 	return configor.ENV()
-}
-
-// Save 保存配置
-func (c *config) Save() (err error) {
-	var (
-		file   *os.File
-		buffer bytes.Buffer
-	)
-	if file, err = os.Create(filePath); err != nil {
-		return
-	}
-	defer file.Close()
-	err = toml.NewEncoder(&buffer).Encode(Config)
-	if err != nil {
-		return
-	}
-	_, err = file.Write(buffer.Bytes())
-	return
 }

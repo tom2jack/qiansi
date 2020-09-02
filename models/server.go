@@ -1,10 +1,15 @@
 package models
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"sync"
+	"time"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
 	"github.com/zhi-miao/gutils"
 )
@@ -15,12 +20,14 @@ type safeISMap struct {
 }
 
 type serverModels struct {
-	db *gorm.DB
+	db    *gorm.DB
+	redis *redis.Client
 }
 
 func GetServerModels() *serverModels {
 	return &serverModels{
-		db: Mysql,
+		db:    Mysql,
+		redis: Redis,
 	}
 }
 
@@ -75,13 +82,70 @@ func (m *serverModels) UpdateDeployVersion(deployID, serverID, version int) erro
 }
 
 // UserServerIds 获取用户的服务器编号
-func (m *serverModels) UserServerIds(UID int) (ids []int) {
+func (m *serverModels) UserServerIds(UID int, tryCache bool) (ids []int) {
+	if tryCache {
+		val, err := m.redis.Get(context.Background(), fmt.Sprintf(UserServerIdsCacheKey, UID)).Result()
+		if err == nil && val != "" {
+			if json.Unmarshal([]byte(val), &ids) == nil {
+				return
+			}
+		}
+	}
 	data := make([]Server, 0)
-	Mysql.Model(&Server{}).Select("id").Where("uid = ?", UID).Find(&data)
+	m.db.Model(&Server{}).Select("id").Where("uid = ?", UID).Find(&data)
 	for _, v := range data {
 		ids = append(ids, v.ID)
 	}
+	if tryCache {
+		jsonByte, err := json.Marshal(ids)
+		if err == nil {
+			m.redis.Set(context.Background(), fmt.Sprintf(UserServerIdsCacheKey, UID), string(jsonByte), 5*time.Minute)
+		}
+	}
 	return
+}
+
+// GetServerIdByDeviceId 根据设备号换取服务器编号
+func (m *serverModels) GetServerIdByDeviceId(deviceID string, tryCache bool) int {
+	if tryCache {
+		val, err := m.redis.HGet(context.Background(), ServerDeviceIDCacheKey, deviceID).Result()
+		if err == nil {
+			serverID, err := strconv.Atoi(val)
+			if err == nil {
+				return serverID
+			}
+		}
+	}
+	data := Server{}
+	if m.db.Model(&Server{}).Select("id").Where("device_id=?", deviceID).First(&data).Error != nil {
+		return 0
+	}
+	if tryCache {
+		m.redis.HSet(context.Background(), ServerDeviceIDCacheKey, deviceID, data.ID)
+	}
+	return data.ID
+}
+
+// UpdateServerOnlineStat 更新设备在线状态
+func (m *serverModels) UpdateServerOnlineStat(serverID int, isOnline bool) error {
+	if isOnline {
+		return m.redis.HSet(context.Background(), ServerOnlineStatusCacheKey, strconv.Itoa(serverID), true).Err()
+	}
+	return m.redis.HDel(context.Background(), ServerOnlineStatusCacheKey, strconv.Itoa(serverID)).Err()
+}
+
+// GetUserActiveServerNum 获取用户活跃服务器数
+func (m *serverModels) GetUserActiveServerNum(UID int) int {
+	serverIds := m.UserServerIds(UID, true)
+	tempStringServerIds := make([]string, 0)
+	for _, serverID := range serverIds {
+		tempStringServerIds = append(tempStringServerIds, strconv.Itoa(serverID))
+	}
+	statList, err := m.redis.HMGet(context.Background(), ServerOnlineStatusCacheKey, tempStringServerIds...).Result()
+	if err != nil {
+		return 0
+	}
+	return len(statList)
 }
 
 // Count 统计当前用户客戶端注冊數量

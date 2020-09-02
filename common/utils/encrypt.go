@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/sirupsen/logrus"
-	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common/config"
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
@@ -23,7 +23,7 @@ func MD5(value string) string {
 
 //ParseToken 解析jwtToken
 func ParseToken(tokenString string) (string, error) {
-	jwtSecret := []byte(common.Config.App.JwtSecret)
+	jwtSecret := []byte(config.GetConfig().App.JwtSecret)
 	tokenClaims, err := jwt.ParseWithClaims(tokenString, &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
@@ -44,7 +44,7 @@ func ParseToken(tokenString string) (string, error) {
 
 //CreateToken 生成jwtToken
 func CreateToken(subject string, expire time.Duration) (string, error) {
-	jwtSecret := []byte(common.Config.App.JwtSecret)
+	jwtSecret := []byte(config.GetConfig().App.JwtSecret)
 	tokenClaims := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		Subject:   subject,
 		ExpiresAt: time.Now().Add(expire).Unix(),

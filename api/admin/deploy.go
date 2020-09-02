@@ -9,15 +9,15 @@ package admin
 
 import (
 	"fmt"
+	"github.com/zhi-miao/qiansi/common/config"
 	"github.com/zhi-miao/qiansi/device"
 	"time"
 	"unsafe"
 
-	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common/req"
+	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/req"
-	"github.com/zhi-miao/qiansi/resp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -266,7 +266,7 @@ func (r *deployApi) Link(c *gin.Context) {
 	}
 	if po.GetOpenId() {
 		url := "/client/ApiDeployRun?Key=" + po.OpenID
-		resp.NewApiResult(1, "操作成功", common.Config.Server.ApiHost+url).Json(c)
+		resp.NewApiResult(1, "操作成功", config.GetConfig().Server.ApiHost+url).Json(c)
 		return
 	}
 	resp.NewApiResult(-5, "获取失败，请重新尝试").Json(c)

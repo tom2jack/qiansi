@@ -6,7 +6,7 @@ import (
 	aliyunSDK "github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
 	"github.com/sirupsen/logrus"
-	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common/config"
 )
 
 type aliyun struct {
@@ -22,9 +22,9 @@ type aliyunSmsResponse struct {
 
 func NewAliyunSDK() *aliyun {
 	client, err := aliyunSDK.NewClientWithAccessKey(
-		common.Config.Aliyun.RegionId,
-		common.Config.Aliyun.AccessKey,
-		common.Config.Aliyun.AccessSecret,
+		config.GetConfig().Aliyun.RegionId,
+		config.GetConfig().Aliyun.AccessKey,
+		config.GetConfig().Aliyun.AccessSecret,
 	)
 	if err != nil {
 		logrus.Error(err.Error())
@@ -48,10 +48,10 @@ func (a *aliyun) SendSmsVerify(phone string, code string) bool {
 	request.Domain = "dysmsapi.aliyuncs.com"
 	request.Version = "2017-05-25"
 	request.ApiName = "SendSms"
-	request.QueryParams["RegionId"] = common.Config.Aliyun.SmsConfig.RegionId
+	request.QueryParams["RegionId"] = config.GetConfig().Aliyun.SmsConfig.RegionId
 	request.QueryParams["PhoneNumbers"] = phone
-	request.QueryParams["SignName"] = common.Config.Aliyun.SmsConfig.SignName
-	request.QueryParams["TemplateCode"] = common.Config.Aliyun.SmsConfig.TemplateCode
+	request.QueryParams["SignName"] = config.GetConfig().Aliyun.SmsConfig.SignName
+	request.QueryParams["TemplateCode"] = config.GetConfig().Aliyun.SmsConfig.TemplateCode
 	request.QueryParams["TemplateParam"] = string(param)
 	response, err := a.client.ProcessCommonRequest(request)
 	if err != nil {

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/utils"
 
 	"net/http"
@@ -66,7 +67,7 @@ func jwtMiddleware() gin.HandlerFunc {
 			if str != "" {
 				c.Set("LOGIN-TOKEN", str)
 				uid, _ := strconv.Atoi(str)
-				c.Set("UID", uid)
+				c.Set(req.UID, uid)
 				if uid > 0 {
 					msg = ""
 				}

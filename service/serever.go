@@ -5,11 +5,17 @@ import (
 
 	"github.com/jinzhu/gorm"
 	"github.com/lifei6671/gorand"
+	"github.com/zhi-miao/qiansi/common/req"
+	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/req"
-	"github.com/zhi-miao/qiansi/resp"
 )
 
+// UpdateServerOnlineStatus 更新设备上线状态
+func UpdateServerOnlineStatus(deviceID string, isOnline bool) {
+
+}
+
+// RegServer 注册服务器
 func RegServer(param *req.RegServer) (result *resp.RegServer) {
 	result = &resp.RegServer{}
 	if !(param.UID > 0) {

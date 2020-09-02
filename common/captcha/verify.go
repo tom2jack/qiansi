@@ -1,19 +1,21 @@
 package captcha
 
 import (
+	"context"
 	"fmt"
+	"math/rand"
+	"time"
+
 	"github.com/mojocn/base64Captcha"
 	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/qiansi/common/sdk"
 	"github.com/zhi-miao/qiansi/models"
-	"math/rand"
-	"time"
 )
 
 type verifyStore struct {
 	prefix string
 	// Expiration time of captchas.
-	expiration int
+	expiration time.Duration
 }
 
 // 验证码存储库
@@ -29,24 +31,24 @@ func init() {
 
 // customizeRdsStore implementing Set method of  Store interface
 func (s *verifyStore) Set(id string, value string) {
-	models.Redis.Set(s.prefix+id, value, s.expiration)
+	models.Redis.Set(context.Background(), s.prefix+id, value, s.expiration)
 }
 
 // customizeRdsStore implementing Get method of  Store interface
 func (s *verifyStore) Get(id string, clear bool) string {
-	reply, _ := models.Redis.Get(s.prefix + id)
+	reply, _ := models.Redis.Get(context.Background(), s.prefix+id).Result()
 	if clear {
-		models.Redis.Del(s.prefix + id)
+		models.Redis.Del(context.Background(), s.prefix+id)
 	}
-	return string(reply)
+	return reply
 }
 
 // Verify 校验功能
 func (s *verifyStore) Verify(id, answer string, clear bool) (match bool) {
-	reply, _ := models.Redis.Get(s.prefix + id)
+	reply, _ := models.Redis.Get(context.Background(), s.prefix+id).Result()
 	match = reply == answer
 	if clear {
-		models.Redis.Del(s.prefix + id)
+		models.Redis.Del(context.Background(), s.prefix+id)
 	}
 	return
 }
@@ -64,7 +66,7 @@ func VerifyBySMS(phone string) error {
 		return fmt.Errorf("短信已发送，请耐心等待")
 	}
 	rnd := fmt.Sprintf("%06v", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(1000000))
-	result := sdk.NewAliyunSDK().SendSmsVerify(phone, string(rnd))
+	result := sdk.NewAliyunSDK().SendSmsVerify(phone, rnd)
 	if !result {
 		return fmt.Errorf("发送失败")
 	}

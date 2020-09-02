@@ -24,9 +24,7 @@
 [Redis]
   Host = "localhost:6379"
   Auth = ""
-  MaxIdle = 30
-  MaxActive = 30
-  IdleTimeOut = 200
+  DB = 0
 
 [Aliyun]
   AccessKey = ""

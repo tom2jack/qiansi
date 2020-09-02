@@ -3,6 +3,7 @@ package device
 import (
 	"encoding/json"
 	"errors"
+	"github.com/zhi-miao/qiansi/common/config"
 	"os"
 	"strings"
 	"time"
@@ -12,7 +13,6 @@ import (
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
-	"github.com/zhi-miao/qiansi/common"
 )
 
 var (
@@ -24,6 +24,8 @@ const (
 )
 
 const (
+	// 设备上下线订阅
+	sysClientOnlineSub = "$SYS/brokers/+/clients/+/+"
 	// 注册通信主题
 	regPub = "qiansi-client/reg/s/"
 	regSub = "qiansi-client/reg/c/+"
@@ -41,6 +43,10 @@ const (
 )
 
 func sub() {
+	if token := mqttClient.Subscribe(sysClientOnlineSub, 0, clientOnlineStatusCallBack); token.Wait() && token.Error() != nil {
+		logrus.Warn("订阅失败->", sysClientOnlineSub)
+		return
+	}
 	if token := mqttClient.Subscribe(runInitSub, 0, runInitCallBack); token.Wait() && token.Error() != nil {
 		logrus.Warn("订阅失败->", runInitSub)
 		return
@@ -65,11 +71,11 @@ func sub() {
 
 func Start() {
 	option := mqtt.NewClientOptions().
-		AddBroker(common.Config.MQTT.Broker).
+		AddBroker(config.GetConfig().MQTT.Broker).
 		SetAutoReconnect(true).
-		SetUsername(common.Config.MQTT.Username).
-		SetPassword(common.Config.MQTT.Password).
-		SetClientID(common.Config.MQTT.ClientID)
+		SetUsername(config.GetConfig().MQTT.Username).
+		SetPassword(config.GetConfig().MQTT.Password).
+		SetClientID(config.GetConfig().MQTT.ClientID)
 	mqttClient = mqtt.NewClient(option)
 	if !mqttClient.Connect().WaitTimeout(waitTimeout) {
 		logrus.Errorf("Can't connect mqtt broker!")

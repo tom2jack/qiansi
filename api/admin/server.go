@@ -8,10 +8,10 @@
 package admin
 
 import (
+	"github.com/zhi-miao/qiansi/common/req"
+	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/req"
-	"github.com/zhi-miao/qiansi/resp"
 
 	"github.com/gin-gonic/gin"
 )

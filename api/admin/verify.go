@@ -3,9 +3,9 @@ package admin
 import (
 	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/qiansi/common/captcha"
+	"github.com/zhi-miao/qiansi/common/req"
+	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/common/utils"
-	"github.com/zhi-miao/qiansi/req"
-	"github.com/zhi-miao/qiansi/resp"
 	"time"
 
 	"github.com/gin-gonic/gin"

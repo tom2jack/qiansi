@@ -1,11 +1,11 @@
 package sdk
 
 import (
-	"github.com/zhi-miao/qiansi/common"
+	"github.com/zhi-miao/qiansi/common/config"
 	"testing"
 )
 
 func TestAliyun_SendSmsVerify(t *testing.T) {
-	common.Config.Init()
+	config.LoadConfig("../../config.toml")
 	NewAliyunSDK().SendSmsVerify("15061370322", "12")
 }

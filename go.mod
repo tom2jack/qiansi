@@ -12,7 +12,8 @@ require (
 	github.com/eclipse/paho.mqtt.golang v1.2.0
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
-	github.com/golang/protobuf v1.4.0 // indirect
+	github.com/go-delve/delve v1.5.0
+	github.com/go-redis/redis/v8 v8.0.0-beta.9
 	github.com/gomodule/redigo/redis v0.0.0-20200429221454-e14091dffc1b
 	github.com/gookit/color v1.2.7 // indirect
 	github.com/influxdata/influxdb-client-go v1.2.0
@@ -33,9 +34,8 @@ require (
 	github.com/zhi-miao/gutils v0.0.0-20200822042950-7ec5154545c6
 	go.uber.org/zap v1.15.0 // indirect
 	golang.org/x/crypto v0.0.0-20200728195943-123391ffb6de
-	golang.org/x/sys v0.0.0-20200420163511-1957bb5e6d1f // indirect
+	golang.org/x/tools v0.0.0-20200902012652-d1954cc86c82
 	google.golang.org/appengine v1.6.6 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 	gopkg.in/go-playground/validator.v8 v8.18.2
 	gopkg.in/go-playground/validator.v9 v9.31.0 // indirect
 )

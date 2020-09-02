@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/zhi-miao/qiansi/common/config"
 	"net/http"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"github.com/zhi-miao/qiansi/api/admin"
-	"github.com/zhi-miao/qiansi/common"
+
 	_ "github.com/zhi-miao/qiansi/docs"
 )
 
@@ -73,13 +74,13 @@ func Start() {
 	// 初始化route
 	initRoute()
 	httpServer := &http.Server{
-		Addr:           common.Config.Server.APIListen,
+		Addr:           config.GetConfig().Server.APIListen,
 		Handler:        Router,
-		ReadTimeout:    time.Duration(common.Config.Server.ReadTimeOut) * time.Second,
-		WriteTimeout:   time.Duration(common.Config.Server.WriteTimeOut) * time.Second,
+		ReadTimeout:    time.Duration(config.GetConfig().Server.ReadTimeOut) * time.Second,
+		WriteTimeout:   time.Duration(config.GetConfig().Server.WriteTimeOut) * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	logrus.Infof("Start HTTP Service Listening %s", common.Config.Server.APIListen)
+	logrus.Infof("Start HTTP Service Listening %s", config.GetConfig().Server.APIListen)
 	if err := httpServer.ListenAndServe(); err != nil {
 		logrus.Error("api server runing error", err)
 	}

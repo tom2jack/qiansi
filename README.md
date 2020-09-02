@@ -38,6 +38,7 @@ swag init
 | QIANSI:verify:${string} | 验证码 |
 | QIANSI:verify: phone:${phoneNumber} | 手机验证码 |
 | QIANSI:schedule:server | 服务端计划任务 |
+| QIANSI:dashboard:user-server-ids:${UID} | 用户服务器ID缓存 |
 
 > 服务模式运行
 

@@ -3,28 +3,32 @@ package models
 import (
 	"context"
 	"fmt"
+	"github.com/zhi-miao/qiansi/common/config"
 	"log"
 	"sync"
 	"time"
 
-	"github.com/gomodule/redigo/redis"
+	"github.com/go-redis/redis/v8"
 	influxdb2 "github.com/influxdata/influxdb-client-go"
 	"github.com/influxdata/influxdb-client-go/api"
 	"github.com/influxdata/influxdb-client-go/api/write"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/zhi-miao/qiansi/common"
 )
 
 var (
-	Redis    *zmRedis
+	Redis    *redis.Client
 	Mysql    *gorm.DB
 	InfluxDB *zmInflux
 )
 
-type zmRedis struct {
-	redis.Pool
-}
+const (
+	UserServerIdsCacheKey = "QIANSI:dashboard:user-server-ids:%d"
+	// 设备上下线状态
+	ServerOnlineStatusCacheKey = "QIANSI:ServerOnlineStatus"
+	// 设备号转服务器编号
+	ServerDeviceIDCacheKey = "QIANSI:ServerDeviceID"
+)
 
 type zmInflux struct {
 	sync.Mutex
@@ -51,7 +55,7 @@ func Start() {
 // 初始化influxDb
 func loadInfluxDB() {
 	InfluxDB = &zmInflux{
-		Client:        influxdb2.NewClient(common.Config.InfluxDB.Host, common.Config.InfluxDB.Token),
+		Client:        influxdb2.NewClient(config.GetConfig().InfluxDB.Host, config.GetConfig().InfluxDB.Token),
 		WriteApiCache: make(map[string]api.WriteApi),
 		ReadApiCache:  make(map[string]api.QueryApi),
 	}
@@ -59,46 +63,27 @@ func loadInfluxDB() {
 
 // Setup Initialize the Redis instance
 func loadRedis() {
-	Redis = &zmRedis{
-		redis.Pool{
-			MaxIdle:     common.Config.Redis.MaxIdle,
-			MaxActive:   common.Config.Redis.MaxActive,
-			IdleTimeout: time.Duration(common.Config.Redis.IdleTimeOut) * time.Second,
-			Dial: func() (redis.Conn, error) {
-				c, err := redis.Dial("tcp", common.Config.Redis.Host)
-				if err != nil {
-					return nil, err
-				}
-				if common.Config.Redis.Auth != "" {
-					if _, err := c.Do("AUTH", common.Config.Redis.Auth); err != nil {
-						c.Close()
-						return nil, err
-					}
-				}
-				return c, err
-			},
-			TestOnBorrow: func(c redis.Conn, t time.Time) error {
-				_, err := c.Do("PING")
-				return err
-			},
-		},
-	}
+	Redis = redis.NewClient(&redis.Options{
+		Addr:     config.GetConfig().Redis.Host,
+		Password: config.GetConfig().Redis.Auth, // no password set
+		DB:       config.GetConfig().Redis.DB,   // use default DB
+	})
 }
 
 // Setup Initialize the Mysql instance
 func loadMysql() {
 	var err error
 	Mysql, err = gorm.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		common.Config.Mysql.User,
-		common.Config.Mysql.Password,
-		common.Config.Mysql.Host,
-		common.Config.Mysql.Database,
+		config.GetConfig().Mysql.User,
+		config.GetConfig().Mysql.Password,
+		config.GetConfig().Mysql.Host,
+		config.GetConfig().Mysql.Database,
 	))
 	if err != nil {
 		log.Fatalf("models.Setup err: %v", err)
 	}
 	gorm.DefaultTableNameHandler = func(db *gorm.DB, defaultTableName string) string {
-		return common.Config.Mysql.TablePrefix + defaultTableName
+		return config.GetConfig().Mysql.TablePrefix + defaultTableName
 	}
 	Mysql.LogMode(true)
 	Mysql.SingularTable(true)
@@ -123,56 +108,6 @@ func loadMysql() {
 			scope.SetColumn("UpdateTime", time.Now())
 		}
 	})
-}
-
-// Set a key/value
-func (r *zmRedis) Set(key string, value string, time int) error {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	_, err := conn.Do("SET", key, value)
-	if err != nil {
-		return err
-	}
-	if time > 0 {
-		_, err = conn.Do("EXPIRE", key, time)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// Exists check a key
-func (r *zmRedis) Exists(key string) bool {
-	conn := r.Pool.Get()
-	defer conn.Close()
-
-	exists, err := redis.Bool(conn.Do("EXISTS", key))
-	if err != nil {
-		return false
-	}
-
-	return exists
-}
-
-// Get get a key
-func (r *zmRedis) Get(key string) (string, error) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-
-	reply, err := redis.String(conn.Do("GET", key))
-	if err != nil {
-		return "", err
-	}
-
-	return reply, nil
-}
-
-// Delete delete a kye
-func (r *zmRedis) Del(key string) (bool, error) {
-	conn := r.Pool.Get()
-	defer conn.Close()
-	return redis.Bool(conn.Do("DEL", key))
 }
 
 func (m *zmInflux) getWriteApi(org, bucket string) (result api.WriteApi) {
@@ -203,7 +138,7 @@ func (m *zmInflux) getQueryApi(org string) (result api.QueryApi) {
 }
 
 func (m *zmInflux) Write(bucket string, metric ...*write.Point) (err error) {
-	writeApi := m.getWriteApi(common.Config.InfluxDB.Org, bucket)
+	writeApi := m.getWriteApi(config.GetConfig().InfluxDB.Org, bucket)
 	defer writeApi.Flush()
 	for _, v := range metric {
 		writeApi.WritePoint(v)
@@ -212,14 +147,14 @@ func (m *zmInflux) Write(bucket string, metric ...*write.Point) (err error) {
 }
 
 func (m *zmInflux) QueryToRaw(flux string) (raw []byte, err error) {
-	readApi := m.Client.QueryApi(common.Config.InfluxDB.Org)
+	readApi := m.Client.QueryApi(config.GetConfig().InfluxDB.Org)
 	data, err := readApi.QueryRaw(context.Background(), flux, influxdb2.DefaultDialect())
 	raw = []byte(data)
 	return
 }
 
 func (m *zmInflux) QueryToArray(flux string) (result []map[string]interface{}, err error) {
-	readApi := m.getQueryApi(common.Config.InfluxDB.Org)
+	readApi := m.getQueryApi(config.GetConfig().InfluxDB.Org)
 	data, err := readApi.Query(context.Background(), flux)
 	if err != nil {
 		return

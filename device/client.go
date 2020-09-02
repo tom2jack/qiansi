@@ -9,14 +9,32 @@ import (
 	"time"
 
 	"github.com/influxdata/influxdb-client-go/api/write"
-	"github.com/zhi-miao/qiansi/resp"
+	"github.com/zhi-miao/qiansi/common/resp"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/models"
-	"github.com/zhi-miao/qiansi/req"
 	"github.com/zhi-miao/qiansi/service"
 )
+
+// clientOnlineStatusCallBack 客户端上下线状态变更回调
+func clientOnlineStatusCallBack(c mqtt.Client, message mqtt.Message) {
+	topicArr := strings.Split(message.Topic(), "/")
+	arrLen := len(topicArr)
+	stat := topicArr[arrLen-1]
+	clientID := topicArr[arrLen-2]
+	serverModel := models.GetServerModels()
+	serverID := serverModel.GetServerIdByDeviceId(clientID, true)
+	if serverID == 0 {
+		return
+	}
+	//  connected 上线, disconnected 下线
+	err := serverModel.UpdateServerOnlineStat(serverID, stat == "connected")
+	if err != nil {
+		logrus.Warn("设备上下线更新失败", err.Error())
+	}
+}
 
 // registerCallBack 客户端注册
 func registerCallBack(c mqtt.Client, message mqtt.Message) {
