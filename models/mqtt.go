@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/sha256"
 	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 )
@@ -29,6 +30,7 @@ func (m *mqttModels) CreateClientUser(username, password string) error {
 		Password:    fmt.Sprintf("%x", sha256.Sum256([]byte(password))),
 		Salt:        "",
 		IsSuperuser: false,
+		Created:     time.Now(),
 	}).Error
 }
 

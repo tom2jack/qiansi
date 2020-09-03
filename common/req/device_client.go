@@ -12,3 +12,8 @@ type DeployCallBack struct {
 	DeployID int `json:"deploy_id"`
 	Version  int `json:"version"`
 }
+
+// ServerInit 客户端上线初始化
+type ServerInit struct {
+	ClientVersion string `json:"client_version"`
+}

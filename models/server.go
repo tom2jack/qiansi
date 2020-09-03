@@ -168,11 +168,8 @@ func (m *serverModels) ExistsDevice(deviceID string) bool {
 // GetTelegrafConfig 获取Telegraf私有配置
 func (m *serverModels) GetTelegrafConfig(serverID int) *Telegraf {
 	data := &Telegraf{}
-	tempDB := m.db.Model(data).Where("server_id=?", serverID).First(data)
-	if tempDB.Error == nil && tempDB.RowsAffected > 0 {
-		return data
-	}
-	return nil
+	m.db.Model(data).Where("server_id=?", serverID).First(data)
+	return data
 }
 
 // List 获取应用列表

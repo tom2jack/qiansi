@@ -42,8 +42,8 @@ func RegServer(param *req.RegServer) (result *resp.RegServer) {
 			APISecret:    string(gorand.KRand(16, gorand.KC_RAND_KIND_ALL)),
 			DeviceID:     param.DeviceID,
 			Domain:       "",
-			CreateTime:   time.Time{},
-			UpdateTime:   time.Time{},
+			CreateTime:   time.Now(),
+			UpdateTime:   time.Now(),
 		}
 		sm := models.GetServerModels().SetDB(tx)
 		err := sm.Create(server)

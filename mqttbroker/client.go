@@ -63,7 +63,12 @@ func runInitCallBack(c mqtt.Client, message mqtt.Message) {
 	if info == nil {
 		return
 	}
-	err := SendTelegrafConfig(info.ServerID)
+	data := req.ServerInit{}
+	err := dePayload(message.Payload(), info.APISecret, &data)
+	if err != nil {
+		return
+	}
+	err = SendTelegrafConfig(info.ServerID)
 	if err != nil {
 		logrus.Warn("telegraf配置发送失败")
 	}

@@ -30,7 +30,7 @@ const (
 	regPub = "qiansi-client/reg/s/"
 	regSub = "qiansi-client/reg/c/+"
 	// 初始化请求
-	runInitSub = "qiansi-client/chan/%s/runInit/C"
+	runInitSub = "qiansi-client/chan/+/runInit/C"
 	// telegraf配置推送
 	telegrafConfigPub = "qiansi-client/chan/%s/telegrafConfig/S"
 	// 部署通道
