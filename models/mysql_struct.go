@@ -101,14 +101,15 @@ type Member struct {
 // Server 服务器注册表
 type Server struct {
 	ID            int       `gorm:"primary_key;column:id;type:int(11) unsigned;not null" json:"id"`
-	UId           int       `gorm:"index:IX_uid;column:uid;type:int(10) unsigned;not null" json:"uid"`      // 用户ID
-	ServerName    string    `gorm:"column:server_name;type:varchar(64);not null" json:"server_name"`        // 服务器备注名
-	ServerStatus  int8      `gorm:"column:server_status;type:tinyint(3);not null" json:"server_status"`     // 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
-	MqttUser      string    `gorm:"column:mqtt_user;type:varchar(255);not null" json:"mqtt_user"`           // mqtt用户名
-	APISecret     string    `gorm:"column:api_secret;type:varchar(32);not null" json:"api_secret"`          // API密钥
-	DeviceID      string    `gorm:"column:device_id;type:char(36);not null" json:"device_id"`               // 服务器唯一设备号
-	ClientVersion string    `gorm:"column:client_version;type:varchar(255);not null" json:"client_version"` // 客户端版本
-	Domain        string    `gorm:"column:domain;type:varchar(255);not null" json:"domain"`                 // 服务器地址(域名/ip)
+	UId           int       `gorm:"index:IX_uid;column:uid;type:int(10) unsigned;not null" json:"uid"`  // 用户ID
+	ServerName    string    `gorm:"column:server_name;type:varchar(64);not null" json:"server_name"`    // 服务器备注名
+	ServerStatus  int8      `gorm:"column:server_status;type:tinyint(3);not null" json:"server_status"` // 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
+	MqttUser      string    `gorm:"column:mqtt_user;type:varchar(255);not null" json:"mqtt_user"`       // mqtt用户名
+	APISecret     string    `gorm:"column:api_secret;type:varchar(32);not null" json:"api_secret"`      // API密钥
+	DeviceID      string    `gorm:"column:device_id;type:char(36);not null" json:"device_id"`           // 服务器唯一设备号
+	ClientVersion string    `gorm:"column:client_version;type:varchar(255)" json:"client_version"`      // 客户端版本
+	Os            string    `gorm:"column:os;type:varchar(255)" json:"os"`                              // 服务器系统
+	Domain        string    `gorm:"column:domain;type:varchar(255);not null" json:"domain"`             // 服务器地址(域名/ip)
 	CreateTime    time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
 	UpdateTime    time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
 }

@@ -64,6 +64,7 @@ func runInitCallBack(c mqtt.Client, message mqtt.Message) {
 		return
 	}
 	data := req.ServerInit{}
+
 	err := dePayload(message.Payload(), info.APISecret, &data)
 	if err != nil {
 		return

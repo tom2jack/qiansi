@@ -16,4 +16,5 @@ type DeployCallBack struct {
 // ServerInit 客户端上线初始化
 type ServerInit struct {
 	ClientVersion string `json:"client_version"`
+	OS            string `json:"os"`
 }
