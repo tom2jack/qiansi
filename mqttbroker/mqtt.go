@@ -3,10 +3,11 @@ package mqttbroker
 import (
 	"encoding/json"
 	"errors"
-	"github.com/zhi-miao/qiansi/common/config"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/zhi-miao/qiansi/common/config"
 
 	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/models"
@@ -40,6 +41,8 @@ const (
 	metricSub = "qiansi-client/chan/+/metric/C"
 	// 日志订阅
 	logSub = "qiansi-client/chan/+/log/C"
+	// 客户端升级
+	updatePub = "qiansi-client/chan/%s/update/S"
 )
 
 func sub() {

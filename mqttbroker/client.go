@@ -126,6 +126,30 @@ func SendTelegrafConfig(serverID int) error {
 	return nil
 }
 
+// SendTelegrafConfig 发送telegraf监控配置
+func UpdateClient(serverID int) error {
+	// updatePub
+	//TODO: 客户端升级指令
+	serverModel := models.GetServerModels()
+	serInfo, err := serverModel.Get(serverID)
+	if err != nil {
+		return err
+	}
+
+	payload, err := enPayload(resp.UpdateClient{
+		Version:   "",
+		SourceURL: "",
+	}, serInfo.APISecret)
+	if err != nil {
+		return err
+	}
+	token := mqttClient.Publish(fmt.Sprintf(updatePub, serInfo.MqttUser), 0, false, payload)
+	if token.Wait() && token.Error() != nil {
+		return token.Error()
+	}
+	return nil
+}
+
 // deployCallBack 部署回调
 func deployCallBack(c mqtt.Client, message mqtt.Message) {
 	info := getAuthInfo(message.Topic())

@@ -23,3 +23,17 @@ func (m *sysConfigModels) GetTelegraf() string {
 	m.db.Model(&cnf).First(&cnf)
 	return cnf.Data
 }
+
+// GetClientLatestVersion 获取客户端最新版本
+func (m *sysConfigModels) GetClientLatestVersion() string {
+	cnf := &SysConfig{Key: "client_latest_version"}
+	m.db.Model(&cnf).First(&cnf)
+	return cnf.Data
+}
+
+// GetClientLatestVersion 获取客户端最新版本
+func (m *sysConfigModels) GetClientLatestVersion() string {
+	cnf := &SysConfig{Key: "client_latest_version"}
+	m.db.Model(&cnf).First(&cnf)
+	return cnf.Data
+}
