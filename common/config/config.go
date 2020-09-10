@@ -42,6 +42,11 @@ type configStruct struct {
 			TemplateCode string
 			RegionId     string
 		}
+		OSS struct {
+			BucketName string
+			Domain     string
+			Endpoint   string
+		}
 	}
 	MQTT struct {
 		Broker   string

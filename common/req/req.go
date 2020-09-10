@@ -7,7 +7,7 @@ const (
 )
 
 type PageParam struct {
-	LastId   int
+	LastId   int `json:"LastId"`
 	Page     int `json:"Page"`
 	PageSize int `json:"PageSize"`
 }

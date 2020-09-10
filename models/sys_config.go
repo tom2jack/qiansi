@@ -31,9 +31,9 @@ func (m *sysConfigModels) GetClientLatestVersion() string {
 	return cnf.Data
 }
 
-// GetClientLatestVersion 获取客户端最新版本
-func (m *sysConfigModels) GetClientLatestVersion() string {
-	cnf := &SysConfig{Key: "client_latest_version"}
+// GetClientLatestSourceURL 获取客户端最新下载地址
+func (m *sysConfigModels) GetClientSourceURL() string {
+	cnf := &SysConfig{Key: "client_source_url"}
 	m.db.Model(&cnf).First(&cnf)
 	return cnf.Data
 }

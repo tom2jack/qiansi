@@ -34,6 +34,13 @@ func (m *deployModels) SetDB(db *gorm.DB) *deployModels {
 	return m
 }
 
+// UpdateServerDeployVersion 更新服务器部署版本
+func (m *deployModels) UpdateServerDeployVersion(deployID, serverID, version int) error {
+	return m.db.Model(&DeployServerRelation{}).
+		Where("deploy_id=? and server_id=?", deployID, serverID).
+		Update("deploy_version", version).Error
+}
+
 // UpdateVersion 更新当前版本
 func (m *deployModels) UpdateVersion(UID, deployID int) error {
 	tempDB := m.db.Model(&Deploy{}).Where("id=? and uid=?", deployID, UID).
@@ -80,7 +87,7 @@ func (m *deployModels) GetDeployRelationServers(deployId int, serverIds ...int) 
 }
 
 // DeployList 部署应用列表
-func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows int) {
+func (m *deployModels) DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows int) {
 	db := Mysql.Model(&Deploy{}).Select("id, uid, title, deploy_type, now_version, open_id, create_time, update_time").Where("uid=?", uid)
 	if param.Title != "" {
 		db = db.Where("title like ?", "%"+param.Title+"%")
@@ -90,7 +97,7 @@ func DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows
 }
 
 // GetDeployTaskInfo 根据服务器ID获取部署应用任务信息
-func GetDeployTaskInfo(serverId int) (result []DeployTaskInfo) {
+func (m *deployModels) GetDeployTaskInfo(serverId int) (result []DeployTaskInfo) {
 	result = []DeployTaskInfo{}
 	Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", serverId).Scan(&result)
 	for i, info := range result {
@@ -118,7 +125,7 @@ type DeployDetailInfo struct {
 }
 
 // GetDeployDetailInfo 根据服应用ID获取部署应用任务信息
-func GetDeployDetailInfo(uid, deployId int) (result DeployDetailInfo) {
+func (m *deployModels) GetDeployDetailInfo(uid, deployId int) (result DeployDetailInfo) {
 	Mysql.Model(&result.Deploy).Where("id=? and uid=?", deployId, uid).First(&result.Deploy)
 	// 部署类型 0-本地 1-git 2-zip 3-docker
 	switch result.DeployType {
@@ -135,7 +142,7 @@ func GetDeployDetailInfo(uid, deployId int) (result DeployDetailInfo) {
 }
 
 // CreateDeploy 创建部署应用
-func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
+func (m *deployModels) CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
 		userInfo := &Member{Id: uid}
 		err := userInfo.MaxInfo()
@@ -228,7 +235,7 @@ func CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 }
 
 // UpdateDeploy 更新部署应用
-func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
+func (m *deployModels) UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
 		info := Deploy{}
 		if tx.Model(&info).Where("id=? and uid=?", param.ID, uid).First(&info).RowsAffected != 1 {
@@ -313,7 +320,7 @@ func UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
 }
 
 // DelDeploy 删除部署应用
-func DelDeploy(uid, DeployID int) error {
+func (m *deployModels) DelDeploy(uid, DeployID int) error {
 	return Mysql.Transaction(func(tx *gorm.DB) error {
 		info := Deploy{ID: DeployID}
 		db := tx.Model(&info).Where("uid=?", uid).First(&info)
@@ -346,23 +353,27 @@ type DeployRelationServer struct {
 }
 
 // DeployServerList 可部署服务器列表
-func DeployServerList(uid, deployId int) (result []DeployRelationServer, err error) {
+func (m *deployModels) DeployServerList(uid, deployId int) (result []DeployRelationServer, err error) {
 	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version,a.id as server_id from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
 	return
 }
 
 // BatchCheck 批量检测是否是当前用户应用
-func (m *Deploy) BatchCheck(ids []int) bool {
+func (m *deployModels) BatchCheck(ids []int, UID int) bool {
 	ids = utils.IdsFitter(ids)
 	var count = 0
-	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, m.UId).Count(&count)
+	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, UID).Count(&count)
 	return db.Error == nil && count == len(ids)
 }
 
-// GetOpenId 获取openid
-func (m *Deploy) GetOpenId() bool {
-	db := Mysql.Select("open_id").Where("uid=?", m.UId).First(m)
-	return db.Error == nil && db.RowsAffected > 0
+// GetOpenID 获取openid
+func (m *deployModels) GetOpenID(deployID, UID int) (string, error) {
+	data := &Deploy{}
+	db := m.db.Model(data).Select("open_id").Where("id=? and uid=?", deployID, UID).First(data)
+	if db.Error != nil {
+		return "", db.Error
+	}
+	return data.OpenID, nil
 }
 
 func (m *Deploy) GetIdByOpenId() bool {

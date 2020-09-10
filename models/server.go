@@ -75,12 +75,6 @@ func (m *serverModels) BatchCheck(uid int, ids []int) bool {
 	return db.Error == nil && count == len(ids)
 }
 
-func (m *serverModels) UpdateDeployVersion(deployID, serverID, version int) error {
-	return m.db.Model(&DeployServerRelation{}).
-		Where("deploy_id=? and server_id=?", deployID, serverID).
-		Update("deploy_version", version).Error
-}
-
 // UserServerIds 获取用户的服务器编号
 func (m *serverModels) UserServerIds(UID int, tryCache bool) (ids []int) {
 	if tryCache {
@@ -172,7 +166,7 @@ func (m *serverModels) GetTelegrafConfig(serverID int) *Telegraf {
 	return data
 }
 
-// List 获取应用列表
+// List 获取服务器列表
 func (m *Server) List(offset int, limit int) ([]Server, int) {
 	data := []Server{}
 	rows := 0

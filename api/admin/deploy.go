@@ -9,10 +9,11 @@ package admin
 
 import (
 	"fmt"
-	"github.com/zhi-miao/qiansi/common/config"
-	"github.com/zhi-miao/qiansi/mqttbroker"
 	"time"
 	"unsafe"
+
+	"github.com/zhi-miao/qiansi/common/config"
+	"github.com/zhi-miao/qiansi/mqttbroker"
 
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
@@ -38,7 +39,7 @@ func (r *deployApi) Lists(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	list, totalRows := models.DeployList(c.GetInt("UID"), param)
+	list, totalRows := models.GetDeployModels().DeployList(c.GetInt(req.UID), param)
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
@@ -59,7 +60,7 @@ func (r *deployApi) Detail(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	info := models.GetDeployDetailInfo(c.GetInt("UID"), param.DeployId)
+	info := models.GetDeployModels().GetDeployDetailInfo(c.GetInt(req.UID), param.DeployId)
 	resp.NewApiResult(1, "读取成功", info).Json(c)
 }
 
@@ -76,7 +77,7 @@ func (r *deployApi) Create(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	err = models.CreateDeploy(c.GetInt("UID"), param)
+	err = models.GetDeployModels().CreateDeploy(c.GetInt(req.UID), param)
 	resp.NewApiResult(err).Json(c)
 }
 
@@ -92,7 +93,7 @@ func (r *deployApi) Update(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	err := models.UpdateDeploy(c.GetInt("UID"), param)
+	err := models.GetDeployModels().UpdateDeploy(c.GetInt(req.UID), param)
 	resp.NewApiResult(err).Json(c)
 }
 
@@ -108,7 +109,7 @@ func (r *deployApi) Del(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	err := models.DelDeploy(c.GetInt("UID"), param.DeployId)
+	err := models.GetDeployModels().DelDeploy(c.GetInt(req.UID), param.DeployId)
 	resp.NewApiResult(err).Json(c)
 }
 
@@ -124,7 +125,7 @@ func (r *deployApi) DeployServer(c *gin.Context) {
 		resp.NewApiResult(-4, "入参绑定失败").Json(c)
 		return
 	}
-	list, err := models.DeployServerList(c.GetInt("UID"), param.DeployId)
+	list, err := models.GetDeployModels().DeployServerList(c.GetInt(req.UID), param.DeployId)
 	if err != nil {
 		resp.NewApiResult(err).Json(c)
 		return
@@ -260,13 +261,10 @@ func (r *deployApi) Link(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	po := &models.Deploy{
-		ID:  param.DeployId,
-		UId: c.GetInt("UID"),
-	}
-	if po.GetOpenId() {
-		url := "/client/ApiDeployRun?Key=" + po.OpenID
-		resp.NewApiResult(1, "操作成功", config.GetConfig().Server.ApiHost+url).Json(c)
+	openID, err := models.GetDeployModels().GetOpenID(param.DeployId, c.GetInt(req.UID))
+	if err == nil && openID != "" {
+		url := fmt.Sprintf("%s/client/ApiDeployRun?Key=%s", config.GetConfig().Server.ApiHost, openID)
+		resp.NewApiResult(1, "操作成功", url).Json(c)
 		return
 	}
 	resp.NewApiResult(-5, "获取失败，请重新尝试").Json(c)

@@ -64,11 +64,11 @@ func runInitCallBack(c mqtt.Client, message mqtt.Message) {
 		return
 	}
 	data := req.ServerInit{}
-
 	err := dePayload(message.Payload(), info.APISecret, &data)
 	if err != nil {
 		return
 	}
+
 	err = SendTelegrafConfig(info.ServerID)
 	if err != nil {
 		logrus.Warn("telegraf配置发送失败")
@@ -135,7 +135,9 @@ func UpdateClient(serverID int) error {
 	if err != nil {
 		return err
 	}
-
+	if serInfo.ClientVersion == latestVersion {
+		return
+	}
 	payload, err := enPayload(resp.UpdateClient{
 		Version:   "",
 		SourceURL: "",
@@ -161,7 +163,7 @@ func deployCallBack(c mqtt.Client, message mqtt.Message) {
 	if err != nil {
 		return
 	}
-	err = models.GetServerModels().UpdateDeployVersion(payload.DeployID, info.ServerID, payload.Version)
+	err = models.GetDeployModels().UpdateServerDeployVersion(payload.DeployID, info.ServerID, payload.Version)
 	if err != nil {
 		return
 	}

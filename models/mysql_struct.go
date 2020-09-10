@@ -109,7 +109,9 @@ type Server struct {
 	DeviceID      string    `gorm:"column:device_id;type:char(36);not null" json:"device_id"`           // 服务器唯一设备号
 	ClientVersion string    `gorm:"column:client_version;type:varchar(255)" json:"client_version"`      // 客户端版本
 	Os            string    `gorm:"column:os;type:varchar(255)" json:"os"`                              // 服务器系统
+	Arch          string    `gorm:"column:arch;type:varchar(255)" json:"arch"`                          // 服务器架构
 	Domain        string    `gorm:"column:domain;type:varchar(255);not null" json:"domain"`             // 服务器地址(域名/ip)
+	LastInitTime  time.Time `gorm:"column:last_init_time;type:datetime" json:"last_init_time"`
 	CreateTime    time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
 	UpdateTime    time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
 }
