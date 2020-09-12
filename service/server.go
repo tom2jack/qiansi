@@ -1,6 +1,12 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"github.com/zhi-miao/qiansi/common/config"
+	"github.com/zhi-miao/qiansi/common/sdk"
+	"github.com/zhi-miao/qiansi/common/utils"
+	"path"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -9,6 +15,39 @@ import (
 	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/models"
 )
+
+type serverService struct{}
+
+func GetServerService() *serverService {
+	return &serverService{}
+}
+
+// GetClientSource 根据系统架构获取客户端最新资源信息
+func (s serverService) GetClientSource(os, arch string) (*resp.UpdateClient, error) {
+	client, err := sdk.NewOSSClient()
+	if err != nil {
+		return nil, err
+	}
+	clientPath := config.GetConfig().Aliyun.OSS.QiansiClientScanPath
+	file, err := client.ListFile(clientPath)
+	if err != nil {
+		return nil, err
+	}
+	for _, s := range file {
+		_, f := path.Split(s)
+		if f != "" {
+			v, o, a, err := utils.ParseQiansiClientFileInfo(f)
+			if err == nil && o == os && a == arch {
+				ossConf := config.GetConfig().Aliyun.OSS
+				return &resp.UpdateClient{
+					Version:   v,
+					SourceURL: fmt.Sprintf("https://%s/%s/%s", ossConf.Domain, ossConf.QiansiClientScanPath, f),
+				}, nil
+			}
+		}
+	}
+	return nil, errors.New("not found the client source")
+}
 
 // UpdateServerOnlineStatus 更新设备上线状态
 func UpdateServerOnlineStatus(deviceID string, isOnline bool) {

@@ -128,20 +128,19 @@ func SendTelegrafConfig(serverID int) error {
 
 // SendTelegrafConfig 发送telegraf监控配置
 func UpdateClient(serverID int) error {
-	// updatePub
-	//TODO: 客户端升级指令
 	serverModel := models.GetServerModels()
 	serInfo, err := serverModel.Get(serverID)
 	if err != nil {
 		return err
 	}
-	if serInfo.ClientVersion == latestVersion {
-		return
+	newSource, err := service.GetServerService().GetClientSource(serInfo.Os, serInfo.Arch)
+	if err != nil {
+		return err
 	}
-	payload, err := enPayload(resp.UpdateClient{
-		Version:   "",
-		SourceURL: "",
-	}, serInfo.APISecret)
+	if serInfo.ClientVersion == newSource.Version {
+		return nil
+	}
+	payload, err := enPayload(newSource, serInfo.APISecret)
 	if err != nil {
 		return err
 	}

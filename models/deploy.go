@@ -3,12 +3,12 @@ package models
 import (
 	"errors"
 	"fmt"
+	"github.com/zhi-miao/gutils"
 	"strings"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
 	"github.com/zhi-miao/qiansi/common/req"
-	"github.com/zhi-miao/qiansi/common/utils"
 )
 
 type deployModels struct {
@@ -360,7 +360,7 @@ func (m *deployModels) DeployServerList(uid, deployId int) (result []DeployRelat
 
 // BatchCheck 批量检测是否是当前用户应用
 func (m *deployModels) BatchCheck(ids []int, UID int) bool {
-	ids = utils.IdsFitter(ids)
+	ids = gutils.IdsUniqueFitter(ids)
 	var count = 0
 	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, UID).Count(&count)
 	return db.Error == nil && count == len(ids)

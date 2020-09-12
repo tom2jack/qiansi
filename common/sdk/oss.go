@@ -28,15 +28,24 @@ func NewOSSClient() (*ossClient, error) {
 
 // ListFile 列文件
 func (o *ossClient) ListFile(path string) ([]string, error) {
-	// 列举包含指定前缀的文件。默认列举100个文件。
-	// lsRes, err := o.b.ListObjects(oss.Prefix("my-object-"))
-	lsRes, err := o.b.ListObjects(oss.Prefix(""))
-	if err != nil {
-		return nil, err
-	}
+	// 列举所有文件。
+	marker := ""
 	data := make([]string, 0)
-	for _, obj := range lsRes.Objects {
-		data = append(data, obj.Key)
+	for {
+		// oss.Prefix("") 可指定前缀
+		lsRes, err := o.b.ListObjects(oss.Marker(marker))
+		if err != nil {
+			return nil, err
+		}
+		// 打印列举文件，默认情况下一次返回100条记录。
+		for _, obj := range lsRes.Objects {
+			data = append(data, obj.Key)
+		}
+		if lsRes.IsTruncated {
+			marker = lsRes.NextMarker
+		} else {
+			break
+		}
 	}
 	return data, nil
 }

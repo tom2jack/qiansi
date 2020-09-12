@@ -43,9 +43,10 @@ type configStruct struct {
 			RegionId     string
 		}
 		OSS struct {
-			BucketName string
-			Domain     string
-			Endpoint   string
+			BucketName           string
+			Domain               string
+			Endpoint             string
+			QiansiClientScanPath string
 		}
 	}
 	MQTT struct {
