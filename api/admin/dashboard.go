@@ -30,10 +30,8 @@ func (r *dashboardApi) Info(c *gin.Context) {
 		ScheduleNum: maxInfo.ScheduleNum,
 		MaxSchedule: maxInfo.MaxSchedule,
 	}
-	// 部署次數
-	deploy := &models.Deploy{UId: uid}
 	// vo.DeployNum
-	vo.DeployRunNum, _ = deploy.CountDo()
+	vo.DeployRunNum, _ = models.GetDeployModels().CountDo(uid)
 	// 获取服务器数量
 	vo.ServerNum = models.GetServerModels().Count(uid)
 	// 邀请数

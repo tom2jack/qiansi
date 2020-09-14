@@ -1,12 +1,13 @@
 package schedule
 
 import (
-	"github.com/jakecoffman/cron"
-	"github.com/sirupsen/logrus"
-	"github.com/zhi-miao/qiansi/common/utils"
-	"github.com/zhi-miao/qiansi/models"
 	"strconv"
 	"time"
+
+	"github.com/jakecoffman/cron"
+	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/models"
 )
 
 type task struct {
@@ -85,7 +86,7 @@ func Start() {
 
 // Add 添加任务
 func (t *task) Add(m models.Schedule) error {
-	err := utils.PanicToError(func() {
+	err := gutils.PanicToError(func() {
 		cronName := strconv.Itoa(m.Id)
 		job := &job{Schedule: m}
 		Task.Cron.AddJob(m.Crontab, job, cronName)

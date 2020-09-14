@@ -134,3 +134,20 @@ type SysConfig struct {
 	CreateTime time.Time `gorm:"column:create_time;type:datetime"`
 	UpdateTime time.Time `gorm:"column:update_time;type:timestamp"`
 }
+
+// Schedule 计划任务主表
+type Schedule struct {
+	ID           int       `gorm:"primary_key;column:id;type:int(10) unsigned;not null" json:"id"`
+	UId          int       `gorm:"column:uid;type:int(10) unsigned;not null" json:"uid"`               // 用户ID
+	Title        string    `gorm:"column:title;type:varchar(60);not null" json:"title"`                // 标题
+	Crontab      string    `gorm:"column:crontab;type:varchar(50);not null" json:"crontab"`            // 规则
+	ScheduleType bool      `gorm:"column:schedule_type;type:tinyint(1);not null" json:"schedule_type"` // 调度类型 1-serverhttp 2-clientShell
+	ServerID     int       `gorm:"column:server_id;type:int(10) unsigned;not null" json:"server_id"`   // 服务器ID
+	Command      string    `gorm:"column:command;type:text;not null" json:"command"`                   // 命令
+	Remain       int       `gorm:"column:remain;type:int(11);not null" json:"remain"`                  // 剩余执行次数 -1无限 0-停止
+	Timeout      int       `gorm:"column:timeout;type:int(10) unsigned;not null" json:"timeout"`       // 超时时间s
+	PrevTime     time.Time `gorm:"column:prev_time;type:datetime;default:null" json:"prev_time"`       // 上次执行时间
+	NextTime     time.Time `gorm:"column:next_time;type:datetime" json:"next_time"`                    // 下次执行时间
+	CreateTime   time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
+	UpdateTime   time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
+}

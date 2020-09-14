@@ -1,12 +1,13 @@
 package admin
 
 import (
+	"time"
+
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/captcha"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,7 +16,7 @@ type verifyApi struct{}
 
 var Verify = &verifyApi{}
 
-var ZM_LOCK = utils.NewLockTable()
+var ZM_LOCK = gutils.NewLockTable()
 
 // @Summary 获取图片验证码
 // @Produce  json

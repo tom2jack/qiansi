@@ -12,10 +12,11 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/captcha"
+	"github.com/zhi-miao/qiansi/common/config"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/service"
 
@@ -52,12 +53,12 @@ func (r *userApi) Sigin(c *gin.Context) {
 	}
 	member := &models.Member{}
 	models.Mysql.Table("member").Where("phone = ?", param.Phone).First(member)
-	if !utils.PasswordVerify(member.Password, param.Password) {
+	if !gutils.PasswordVerify(member.Password, param.Password) {
 		resp.NewApiResult(-5, "密码错误，不给登陆").Json(c)
 		return
 	}
 	member.Password = ""
-	token, err := utils.CreateToken(strconv.Itoa(member.Id), 9*24*time.Hour)
+	token, err := gutils.CreateToken(strconv.Itoa(member.Id), 9*24*time.Hour, []byte(config.GetConfig().App.JwtSecret))
 	if err != nil {
 		resp.NewApiResult(-5, "Token生成失败，无法登陆，请联系管理员").Json(c)
 		return
@@ -112,14 +113,14 @@ func (r *userApi) SiginUp(c *gin.Context) {
 	}
 	member := &models.Member{
 		Phone:       param.Phone,
-		Password:    utils.PasswordHash(param.Password),
+		Password:    gutils.PasswordHash(param.Password),
 		InviterUid:  param.InviterUid,
 		MaxSchedule: 2,
 		MaxDeploy:   2,
 	}
 	models.Mysql.Table("member").Create(member)
 	member.Password = ""
-	token, err := utils.CreateToken(strconv.Itoa(member.Id), 24*time.Hour)
+	token, err := gutils.CreateToken(strconv.Itoa(member.Id), 24*time.Hour, []byte(config.GetConfig().App.JwtSecret))
 	if err != nil {
 		resp.NewApiResult(-5, "Token生成失败，无法登陆，请联系管理员").Json(c)
 		return
@@ -165,10 +166,10 @@ func (r *userApi) ResetPwd(c *gin.Context) {
 	}
 	member := &models.Member{}
 	models.Mysql.Table("member").Where("id = ?", c.GetInt("UID")).First(member)
-	if !utils.PasswordVerify(member.Password, param.OldPassword) {
+	if !gutils.PasswordVerify(member.Password, param.OldPassword) {
 		resp.NewApiResult(-5, "密码错误").Json(c)
 		return
 	}
-	models.Mysql.Table("member").Where("id = ?", c.GetInt("UID")).Update("password", utils.PasswordHash(param.NewPassword))
+	models.Mysql.Table("member").Where("id = ?", c.GetInt("UID")).Update("password", gutils.PasswordHash(param.NewPassword))
 	resp.NewApiResult(1, "修改成功").Json(c)
 }

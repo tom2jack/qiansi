@@ -1,8 +1,9 @@
 package api
 
 import (
+	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/common/config"
 	"github.com/zhi-miao/qiansi/common/req"
-	"github.com/zhi-miao/qiansi/common/utils"
 
 	"net/http"
 	"strconv"
@@ -59,7 +60,7 @@ func jwtMiddleware() gin.HandlerFunc {
 		var msg string = "登陆信息获取失败"
 		token := c.GetHeader("LOGIN-KEY")
 		if token != "" {
-			str, err := utils.ParseToken(token)
+			str, err := gutils.ParseToken(token, []byte(config.GetConfig().App.JwtSecret))
 			if err != nil {
 				print(err.Error())
 				msg = "登录验证失败"

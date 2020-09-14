@@ -169,8 +169,8 @@ type UserSiginUpParam struct {
 }
 
 type UserResetPwdParam struct {
-	OldPassword string
-	NewPassword string
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
 }
 
 type VerifyBySMSParam struct {

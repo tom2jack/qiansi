@@ -3,8 +3,9 @@ package models
 import (
 	"errors"
 	"fmt"
-	"github.com/zhi-miao/gutils"
 	"strings"
+
+	"github.com/zhi-miao/gutils"
 
 	"github.com/jinzhu/gorm"
 	uuid "github.com/satori/go.uuid"
@@ -88,7 +89,7 @@ func (m *deployModels) GetDeployRelationServers(deployId int, serverIds ...int) 
 
 // DeployList 部署应用列表
 func (m *deployModels) DeployList(uid int, param *req.DeployListParam) (result []Deploy, totalRows int) {
-	db := Mysql.Model(&Deploy{}).Select("id, uid, title, deploy_type, now_version, open_id, create_time, update_time").Where("uid=?", uid)
+	db := m.db.Model(&Deploy{}).Select("id, uid, title, deploy_type, now_version, open_id, create_time, update_time").Where("uid=?", uid)
 	if param.Title != "" {
 		db = db.Where("title like ?", "%"+param.Title+"%")
 	}
@@ -99,17 +100,17 @@ func (m *deployModels) DeployList(uid int, param *req.DeployListParam) (result [
 // GetDeployTaskInfo 根据服务器ID获取部署应用任务信息
 func (m *deployModels) GetDeployTaskInfo(serverId int) (result []DeployTaskInfo) {
 	result = []DeployTaskInfo{}
-	Mysql.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", serverId).Scan(&result)
+	m.db.Raw("SELECT d.* FROM `deploy` d LEFT JOIN `deploy_server_relation` r ON d.id=r.deploy_id WHERE r.server_id=? and d.now_version > r.deploy_version", serverId).Scan(&result)
 	for i, info := range result {
 		// 部署类型 0-本地 1-git 2-zip 3-docker
 		switch info.DeployType {
 		case 0:
 		case 1:
-			Mysql.Model(&DeployGit{}).Where("deploy_id=?", info.ID).First(&result[i].DeployGit)
+			m.db.Model(&DeployGit{}).Where("deploy_id=?", info.ID).First(&result[i].DeployGit)
 		case 2:
-			Mysql.Model(&DeployZip{}).Where("deploy_id=?", info.ID).First(&result[i].DeployZip)
+			m.db.Model(&DeployZip{}).Where("deploy_id=?", info.ID).First(&result[i].DeployZip)
 		case 3:
-			Mysql.Model(&DeployDocker{}).Where("deploy_id=?", info.ID).First(&result[i].DeployDocker)
+			m.db.Model(&DeployDocker{}).Where("deploy_id=?", info.ID).First(&result[i].DeployDocker)
 		default:
 		}
 	}
@@ -126,16 +127,16 @@ type DeployDetailInfo struct {
 
 // GetDeployDetailInfo 根据服应用ID获取部署应用任务信息
 func (m *deployModels) GetDeployDetailInfo(uid, deployId int) (result DeployDetailInfo) {
-	Mysql.Model(&result.Deploy).Where("id=? and uid=?", deployId, uid).First(&result.Deploy)
+	m.db.Model(&result.Deploy).Where("id=? and uid=?", deployId, uid).First(&result.Deploy)
 	// 部署类型 0-本地 1-git 2-zip 3-docker
 	switch result.DeployType {
 	case 0:
 	case 1:
-		Mysql.Model(&DeployGit{}).Where("deploy_id=?", result.ID).First(&result.DeployGit)
+		m.db.Model(&DeployGit{}).Where("deploy_id=?", result.ID).First(&result.DeployGit)
 	case 2:
-		Mysql.Model(&DeployZip{}).Where("deploy_id=?", result.ID).First(&result.DeployZip)
+		m.db.Model(&DeployZip{}).Where("deploy_id=?", result.ID).First(&result.DeployZip)
 	case 3:
-		Mysql.Model(&DeployDocker{}).Where("deploy_id=?", result.ID).First(&result.DeployDocker)
+		m.db.Model(&DeployDocker{}).Where("deploy_id=?", result.ID).First(&result.DeployDocker)
 	default:
 	}
 	return
@@ -143,7 +144,7 @@ func (m *deployModels) GetDeployDetailInfo(uid, deployId int) (result DeployDeta
 
 // CreateDeploy 创建部署应用
 func (m *deployModels) CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
-	return Mysql.Transaction(func(tx *gorm.DB) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
 		userInfo := &Member{Id: uid}
 		err := userInfo.MaxInfo()
 		if err != nil {
@@ -236,7 +237,7 @@ func (m *deployModels) CreateDeploy(uid int, param *req.DeploySetParam) (err err
 
 // UpdateDeploy 更新部署应用
 func (m *deployModels) UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
-	return Mysql.Transaction(func(tx *gorm.DB) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
 		info := Deploy{}
 		if tx.Model(&info).Where("id=? and uid=?", param.ID, uid).First(&info).RowsAffected != 1 {
 			return fmt.Errorf("应用不存在")
@@ -321,7 +322,7 @@ func (m *deployModels) UpdateDeploy(uid int, param *req.DeploySetParam) (err err
 
 // DelDeploy 删除部署应用
 func (m *deployModels) DelDeploy(uid, DeployID int) error {
-	return Mysql.Transaction(func(tx *gorm.DB) error {
+	return m.db.Transaction(func(tx *gorm.DB) error {
 		info := Deploy{ID: DeployID}
 		db := tx.Model(&info).Where("uid=?", uid).First(&info)
 		if db.Error != nil || db.RowsAffected == 0 {
@@ -354,7 +355,7 @@ type DeployRelationServer struct {
 
 // DeployServerList 可部署服务器列表
 func (m *deployModels) DeployServerList(uid, deployId int) (result []DeployRelationServer, err error) {
-	err = Mysql.Raw("select a.*,b.deploy_id,b.deploy_version,a.id as server_id from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
+	err = m.db.Raw("select a.*,b.deploy_id,b.deploy_version,a.id as server_id from `server` a LEFT JOIN (SELECT * from deploy_server_relation WHERE deploy_id=?) b ON a.id=b.server_id WHERE a.uid=?", deployId, uid).Scan(&result).Error
 	return
 }
 
@@ -362,7 +363,7 @@ func (m *deployModels) DeployServerList(uid, deployId int) (result []DeployRelat
 func (m *deployModels) BatchCheck(ids []int, UID int) bool {
 	ids = gutils.IdsUniqueFitter(ids)
 	var count = 0
-	db := Mysql.Model(m).Where("id in (?) and uid=?", ids, UID).Count(&count)
+	db := m.db.Model(m).Where("id in (?) and uid=?", ids, UID).Count(&count)
 	return db.Error == nil && count == len(ids)
 }
 
@@ -376,31 +377,26 @@ func (m *deployModels) GetOpenID(deployID, UID int) (string, error) {
 	return data.OpenID, nil
 }
 
-func (m *Deploy) GetIdByOpenId() bool {
-	db := Mysql.Select("id").Where("open_id=?", m.OpenID).First(m)
-	return db.Error == nil && db.RowsAffected > 0
+// GetIdByOpenId 根据openID换取部署应用ID
+func (m *deployModels) GetIdByOpenId(openID string) (int, error) {
+	d := &Deploy{}
+	db := m.db.Model(d).Select("id").Where("open_id=?", openID).First(d)
+	if db.Error != nil {
+		return 0, db.Error
+	}
+	return d.ID, nil
 }
 
 // Count 统计当前用户部署应用数量
-func (m *Deploy) Count() (num int, err error) {
-	db := Mysql.Model(m).Where("uid=?", m.UId).Count(&num)
-	if db.Error != nil {
-		err = fmt.Errorf("查询失败")
-	}
-	return
+func (m *deployModels) Count(uid int) (int, error) {
+	var num int
+	err := m.db.Model(&Deploy{}).Where("uid=?", uid).Count(&num).Error
+	return num, err
 }
 
 // Count 统计当前用户调度应用部署次数
-func (m *Deploy) CountDo() (num int, err error) {
-	type Result struct {
-		Total int
-	}
-	r := &Result{}
-	db := Mysql.Model(m).Select("sum(now_version) as total").Where("uid=?", m.UId).Scan(r)
-	if db.Error != nil {
-		err = fmt.Errorf("查询失败")
-		return
-	}
-	num = r.Total
-	return
+func (m *deployModels) CountDo(uid int) (int, error) {
+	r := TempModelStruct{}
+	err := m.db.Model(&Deploy{}).Select("sum(now_version) as num").Where("uid=?", uid).Scan(&r).Error
+	return r.Num, err
 }

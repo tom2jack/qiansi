@@ -2,28 +2,28 @@ package models
 
 import (
 	"fmt"
+
+	"github.com/jinzhu/gorm"
 	"github.com/sirupsen/logrus"
-	"time"
 )
 
-type Schedule struct {
-	Command      string    `xorm:"not null comment('命令') TEXT"`
-	CreateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
-	Crontab      string    `xorm:"not null comment('规则') VARCHAR(50)"`
-	Id           int       `xorm:"not null pk autoincr INT(10)"`
-	PrevTime     time.Time `gorm:"column:prev_time;type:datetime;default:null"` // 上次执行时间
-	NextTime     time.Time `gorm:"column:next_time;type:datetime"`              // 下次执行时间
-	Remain       int       `xorm:"not null default -1 comment('剩余执行次数 -1无限 0-停止') INT(11)"`
-	ScheduleType int       `xorm:"not null default 1 comment('调度类型 1-serverhttp 2-clientShell') TINYINT(1)"`
-	ServerId     int       `xorm:"not null default 0 comment('服务器ID') INT(10)"`
-	Timeout      int       `xorm:"not null default 30 comment('超时时间s') INT(10)"`
-	Title        string    `xorm:"not null comment('标题') VARCHAR(60)"`
-	Uid          int       `xorm:"not null default 0 comment('用户ID') INT(10)"`
-	UpdateTime   time.Time `xorm:"default 'CURRENT_TIMESTAMP' DATETIME"`
+type scheduleModels struct {
+	db *gorm.DB
+}
+
+func GetScheduleModels() *scheduleModels {
+	return &scheduleModels{
+		db: Mysql,
+	}
+}
+
+func (m *scheduleModels) SetDB(db *gorm.DB) *scheduleModels {
+	m.db = db
+	return m
 }
 
 // List 获取任务列表
-func (m *Schedule) List(offset int, limit int) ([]Schedule, int) {
+func (m *scheduleModels) List(offset int, limit int) ([]Schedule, int) {
 	data := []Schedule{}
 	rows := 0
 	db := Mysql.Where("uid=?", m.Uid)
@@ -34,23 +34,23 @@ func (m *Schedule) List(offset int, limit int) ([]Schedule, int) {
 	return data, rows
 }
 
-func (m *Schedule) Save() bool {
+func (m *scheduleModels) Save() bool {
 	db := Mysql.Save(m)
 	return db.Error == nil && db.RowsAffected > 0
 }
 
-func (m *Schedule) RunCallBack() bool {
+func (m *scheduleModels) RunCallBack() bool {
 	db := Mysql.Model(m).Updates(CommonMap{"prev_time": m.PrevTime, "next_time": m.NextTime, "remain": m.Remain})
 	return db.Error == nil && db.RowsAffected > 0
 }
 
-func (m *Schedule) Get() bool {
+func (m *scheduleModels) Get() bool {
 	db := Mysql.Where("id=? and uid=?", m.Id, m.Uid).First(m)
 	return db.Error == nil && db.RowsAffected > 0
 }
 
 // ExportList 数据输出
-func (m *Schedule) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
+func (m *scheduleModels) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
 	data := []Schedule{}
 	db := Mysql
 	if lastId > 0 {
@@ -64,7 +64,7 @@ func (m *Schedule) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
 }
 
 // Create 创建任务
-func (m *Schedule) Create() bool {
+func (m *scheduleModels) Create() bool {
 	if m.Uid <= 0 {
 		return false
 	}
@@ -76,13 +76,13 @@ func (m *Schedule) Create() bool {
 }
 
 // Del 删除计划任务
-func (m *Schedule) Del() bool {
+func (m *scheduleModels) Del() bool {
 	db := Mysql.Delete(m, "id=? and uid=?", m.Id, m.Uid)
 	return db.Error == nil && db.RowsAffected > 0
 }
 
 // Count 统计当前用户调度应用数量
-func (m *Schedule) Count() (num int, err error) {
+func (m *scheduleModels) Count() (num int, err error) {
 	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
 	if db.Error != nil {
 		err = fmt.Errorf("查询失败")

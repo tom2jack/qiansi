@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/jinzhu/gorm"
 )
@@ -22,40 +22,38 @@ func (m *memberModels) SetDB(db *gorm.DB) *memberModels {
 }
 
 // MaxInfo 获取限制信息
-func (m *Member) MaxInfo() (err error) {
-	db := Mysql.Model(m).Select("max_deploy, max_schedule").First(m)
+func (m *memberModels) UsereInfo(uid int) (*Member, error) {
+	userInfo := &Member{}
+	db := m.db.Model(userInfo).Select("max_deploy, max_schedule").Where("id=?", uid).First(userInfo)
 	if db.RowsAffected == 0 || db.Error != nil {
-		err = fmt.Errorf("查询异常")
+		return nil, errors.New("查询异常")
 	}
-	return
+	return userInfo, nil
 }
 
-// AddDeployNum 添加部署任务数量
-func (m *Member) AddDeployNum(num int) (err error) {
-	db := Mysql.Model(m).Where("id > ?", m.Id).UpdateColumn("max_deploy", gorm.Expr("max_deploy + ?", num))
+// IncrMaxDeployNum 添加部署任务数量上限
+func (m *memberModels) IncrMaxDeployNum(uid, num int) error {
+	db := m.db.Model(m).Where("id=?", uid).UpdateColumn("max_deploy", gorm.Expr("max_deploy+?", num))
 	if db.RowsAffected == 0 || db.Error != nil {
-		err = fmt.Errorf("查询异常")
+		return errors.New("提升失败")
 	}
-	return
+	return nil
 }
 
-// AddScheduleNum 添加调度任务数量
-func (m *Member) AddScheduleNum(num int) (err error) {
-	db := Mysql.Model(m).Where("id > ?", m.Id).UpdateColumn("max_schedule", gorm.Expr("max_schedule + ?", num))
+// IncrMaxScheduleNum 添加调度任务数量上限
+func (m *memberModels) IncrMaxScheduleNum(uid, num int) error {
+	db := m.db.Model(m).Where("id=?", uid).UpdateColumn("max_schedule", gorm.Expr("max_schedule+?", num))
 	if db.RowsAffected == 0 || db.Error != nil {
-		err = fmt.Errorf("查询异常")
+		return errors.New("提升失败")
 	}
-	return
+	return nil
 }
 
 // Count 统计当前用户邀请人数
-func (m *Member) InviterCount() (num int, err error) {
-	db := Mysql.Model(m).Where("inviter_uid=?", m.InviterUid).Count(&num)
-	if db.Error != nil {
-		err = fmt.Errorf("查询失败")
-		return
-	}
-	return
+func (m *memberModels) InviterCount(uid int) (int, error) {
+	var num int
+	err := m.db.Model(&Member{}).Where("inviter_uid=?", uid).Count(&num).Error
+	return num, err
 }
 
 //ExistsUID 判断uid是否存在

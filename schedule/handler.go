@@ -1,10 +1,11 @@
 package schedule
 
 import (
-	"fmt"
-	"github.com/zhi-miao/qiansi/common/netutils"
+	"errors"
+	"time"
+
+	"github.com/go-resty/resty/v2"
 	"github.com/zhi-miao/qiansi/models"
-	"net/http"
 )
 
 type Handler interface {
@@ -12,29 +13,28 @@ type Handler interface {
 }
 
 func createHandler(taskModel *models.Schedule) Handler {
-	var handler Handler = nil
+	var handler Handler
 	switch taskModel.ScheduleType {
 	case 1:
-		handler = new(HTTPHandler)
+		handler = new(httpHandler)
 	}
 	return handler
 }
 
-// HTTP任务
-type HTTPHandler struct{}
+// httpHandler HTTP任务
+type httpHandler struct{}
 
-// http任务执行时间不超过300秒
-const HttpExecTimeout = 3
-
-func (h *HTTPHandler) Run(m *models.Schedule) (result string, err error) {
-	if m.Timeout <= 0 || m.Timeout > HttpExecTimeout {
-		m.Timeout = HttpExecTimeout
+func (h *httpHandler) Run(m *models.Schedule) (result string, err error) {
+	var maxTimeout = 50
+	if m.Timeout <= 0 || m.Timeout > maxTimeout {
+		m.Timeout = maxTimeout
 	}
-	var resp netutils.HttpClientResponseWrapper
-	resp = netutils.HttpClient.Get(m.Command, m.Timeout)
-	// 返回状态码非200，均为失败
-	if resp.StatusCode != http.StatusOK {
-		return resp.Body, fmt.Errorf("HTTP状态码非200-->%d", resp.StatusCode)
+	getRes, err := resty.New().SetTimeout(time.Duration(m.Timeout) * time.Second).R().Get(m.Command)
+	if err != nil {
+		return "", err
 	}
-	return resp.Body, err
+	if getRes.IsSuccess() {
+		return string(getRes.Body()), nil
+	}
+	return "", errors.New(getRes.Status())
 }

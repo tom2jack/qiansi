@@ -2,6 +2,7 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/common/utils"
@@ -61,9 +62,9 @@ func (r *scheduleApi) Create(c *gin.Context) {
 		return
 	}
 	po := &models.Schedule{}
-	utils.SuperConvert(param, po)
-	po.Uid = c.GetInt("UID")
-	err = utils.PanicToError(func() {
+	gutils.SuperConvert(param, po)
+	po.Uid = c.GetInt(req.UID)
+	err = gutils.PanicToError(func() {
 		po.NextTime = schedule.Task.NextTime(po.Crontab)
 	})
 	if err != nil {

@@ -8,6 +8,7 @@
 package admin
 
 import (
+	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/common/utils"
@@ -39,7 +40,7 @@ func (r *serverApi) Lists(c *gin.Context) {
 	lists, rows := s.List(param.Offset(), param.PageSize)
 	vo := make([]resp.ServerVO, len(lists))
 	for k, v := range lists {
-		utils.SuperConvert(&v, &vo[k])
+		gutils.SuperConvert(&v, &vo[k])
 	}
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
@@ -62,7 +63,7 @@ func (r *serverApi) Set(c *gin.Context) {
 		return
 	}
 	po := &models.Server{}
-	utils.SuperConvert(param, po)
+	gutils.SuperConvert(param, po)
 	if models.Mysql.Table("server").Where("id=? and uid=?", po.ID, c.GetInt("UID")).Updates(po).RowsAffected > 0 {
 		resp.NewApiResult(1, "更新成功", po).Json(c)
 		return

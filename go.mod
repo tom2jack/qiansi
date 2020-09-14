@@ -14,6 +14,7 @@ require (
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-redis/redis/v8 v8.0.0-beta.9
+	github.com/go-resty/resty/v2 v2.3.0
 	github.com/influxdata/influxdb-client-go v1.2.0
 	github.com/jakecoffman/cron v0.0.0-20190106200828-7e2009c226a5
 	github.com/jinzhu/configor v1.2.0

@@ -12,6 +12,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
 	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/common/req"
 )
 
 type safeISMap struct {
@@ -167,19 +168,22 @@ func (m *serverModels) GetTelegrafConfig(serverID int) *Telegraf {
 }
 
 // List 获取服务器列表
-func (m *Server) List(offset int, limit int) ([]Server, int) {
+func (m *serverModels) List(uid int, req *req.ServerListParam) ([]Server, int) {
 	data := []Server{}
 	rows := 0
-	db := Mysql.Where("uid=?", m.UId).Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
-	if m.ServerName != "" {
-		db = db.Where("server_name like ?", "%"+m.ServerName+"%")
+	db := m.db.Model(&Server{}).
+		Where("uid=?", uid).
+		Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
+	if req.ServerName != "" {
+		db = db.Where("server_name like ?", "%"+req.ServerName+"%")
 	}
-	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	db.Offset(req.Offset()).Limit(req.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
 }
 
-func (m *Server) ListByUser() []Server {
+// ListByUID 根据用户ID获取服务器列表
+func (m *serverModels) ListByUID(uid int) ([]Server, error) {
 	data := []Server{}
-	Mysql.Where("uid = ?", m.UId).Find(&data)
-	return data
+	err := m.db.Model(&Server{}).Where("uid = ?", uid).Find(&data).Error
+	return data, err
 }
