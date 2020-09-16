@@ -23,20 +23,16 @@ var Dashboard = &dashboardApi{}
 func (r *dashboardApi) Info(c *gin.Context) {
 	uid := c.GetInt("UID")
 	// 获取限额信息
-	maxInfo, _ := service.GetUserModuleMaxInfo(uid)
+	maxInfo, _ := service.GetDashboardService().GetUserModuleMaxInfo(uid)
 	vo := resp.DashboardInfoVO{
-		DeployNum:   maxInfo.DeployNum,
-		MaxDeploy:   maxInfo.MaxDeploy,
-		ScheduleNum: maxInfo.ScheduleNum,
-		MaxSchedule: maxInfo.MaxSchedule,
+		UserMaxInfo: *maxInfo,
 	}
 	// vo.DeployNum
 	vo.DeployRunNum, _ = models.GetDeployModels().CountDo(uid)
 	// 获取服务器数量
 	vo.ServerNum = models.GetServerModels().Count(uid)
 	// 邀请数
-	member := &models.Member{InviterUid: uid}
-	vo.InviteNum, _ = member.InviterCount()
+	vo.InviteNum, _ = models.GetMemberModels().InviterCount(uid)
 	resp.NewApiResult(1, "读取成功", vo).Json(c)
 }
 
@@ -63,10 +59,10 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 		return
 	}
 	uid := c.GetInt(req.UID)
-	vo := resp.DashboardIndexMetricVO{
-		ActiveServerNum: models.GetServerModels().GetUserActiveServerNum(uid),
-		CPURate:         service.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime),
-		MenRate:         service.GetClientMemRate(uid, param.ServerId, param.StartTime, param.EndTime),
-	}
-	resp.NewApiResult(1, "读取成功", vo).Json(c)
+	var result resp.DashboardIndexMetricVO
+	result.ActiveServerNum = models.GetServerModels().GetUserActiveServerNum(uid)
+	dashbardService := service.GetDashboardService()
+	result.CPURate, _ = dashbardService.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime)
+	result.MenRate, _ = dashbardService.GetClientMemRate(uid, param.ServerId, param.StartTime, param.EndTime)
+	resp.NewApiResult(1, "读取成功", result).Json(c)
 }

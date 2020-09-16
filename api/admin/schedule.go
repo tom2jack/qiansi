@@ -27,11 +27,8 @@ func (r *scheduleApi) Lists(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	s := &models.Schedule{
-		Uid:   c.GetInt("UID"),
-		Title: param.Title,
-	}
-	lists, rows := s.List(param.Offset(), param.PageSize)
+	uid := c.GetInt(req.UID)
+	lists, rows := models.GetScheduleModels().List(uid, param)
 	resp.NewApiResult(1, "读取成功", resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
@@ -52,7 +49,8 @@ func (r *scheduleApi) Create(c *gin.Context) {
 		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
 		return
 	}
-	info, err := service.GetUserModuleMaxInfo(c.GetInt("UID"))
+	uid := c.GetInt(req.UID)
+	info, err := service.GetDashboardService().GetUserModuleMaxInfo(uid)
 	if err != nil {
 		resp.NewApiResult(-4, "用户限额检测失败").Json(c)
 		return
@@ -63,7 +61,7 @@ func (r *scheduleApi) Create(c *gin.Context) {
 	}
 	po := &models.Schedule{}
 	gutils.SuperConvert(param, po)
-	po.Uid = c.GetInt(req.UID)
+	po.UId = uid
 	err = gutils.PanicToError(func() {
 		po.NextTime = schedule.Task.NextTime(po.Crontab)
 	})

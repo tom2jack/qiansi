@@ -17,23 +17,23 @@ func (m *sysConfigModels) SetDB(db *gorm.DB) *sysConfigModels {
 	return m
 }
 
-// GetTelegraf Telegraf系统配置
-func (m *sysConfigModels) GetTelegraf() string {
-	cnf := &SysConfig{Key: "telegraf_config"}
+func (m *sysConfigModels) get(key string) string {
+	cnf := &SysConfig{Key: key}
 	m.db.Model(&cnf).First(&cnf)
 	return cnf.Data
+}
+
+// GetTelegraf Telegraf系统配置
+func (m *sysConfigModels) GetTelegraf() string {
+	return m.get("telegraf_config")
 }
 
 // GetClientLatestVersion 获取客户端最新版本
 func (m *sysConfigModels) GetClientLatestVersion() string {
-	cnf := &SysConfig{Key: "client_latest_version"}
-	m.db.Model(&cnf).First(&cnf)
-	return cnf.Data
+	return m.get("client_latest_version")
 }
 
 // GetClientLatestSourceURL 获取客户端最新下载地址
 func (m *sysConfigModels) GetClientSourceURL() string {
-	cnf := &SysConfig{Key: "client_source_url"}
-	m.db.Model(&cnf).First(&cnf)
-	return cnf.Data
+	return m.get("client_source_url")
 }

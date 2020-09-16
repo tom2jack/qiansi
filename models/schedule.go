@@ -1,10 +1,8 @@
 package models
 
 import (
-	"fmt"
-
 	"github.com/jinzhu/gorm"
-	"github.com/sirupsen/logrus"
+	"github.com/zhi-miao/qiansi/common/req"
 )
 
 type scheduleModels struct {
@@ -23,36 +21,49 @@ func (m *scheduleModels) SetDB(db *gorm.DB) *scheduleModels {
 }
 
 // List 获取任务列表
-func (m *scheduleModels) List(offset int, limit int) ([]Schedule, int) {
-	data := []Schedule{}
+func (m *scheduleModels) List(uid int, param *req.ScheduleListParam) ([]Schedule, int) {
+	data := make([]Schedule, 0)
 	rows := 0
-	db := Mysql.Where("uid=?", m.Uid)
-	if m.Title != "" {
-		db = db.Where("title like ?", "%"+m.Title+"%")
+	db := m.db.Where("uid=?", uid)
+	if param.Title != "" {
+		db = db.Where("title like ?", "%"+param.Title+"%")
 	}
-	db.Offset(offset).Limit(limit).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	db.Offset(param.Offset()).Limit(param.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
 }
 
-func (m *scheduleModels) Save() bool {
-	db := Mysql.Save(m)
-	return db.Error == nil && db.RowsAffected > 0
+func (m *scheduleModels) RunCallBack(param *Schedule) error {
+	return m.db.Model(&Schedule{}).Where("id=?", param.ID).Updates(CommonMap{
+		"prev_time": param.PrevTime,
+		"next_time": param.NextTime,
+		"remain":    param.Remain,
+	}).Error
 }
 
-func (m *scheduleModels) RunCallBack() bool {
-	db := Mysql.Model(m).Updates(CommonMap{"prev_time": m.PrevTime, "next_time": m.NextTime, "remain": m.Remain})
-	return db.Error == nil && db.RowsAffected > 0
+func (m *scheduleModels) Get(id, uid int) (Schedule, error) {
+	data := Schedule{}
+	err := m.db.Where("id=? and uid=?", id, uid).First(&data).Error
+	return data, err
 }
 
-func (m *scheduleModels) Get() bool {
-	db := Mysql.Where("id=? and uid=?", m.Id, m.Uid).First(m)
-	return db.Error == nil && db.RowsAffected > 0
+// Create 创建任务
+func (m *scheduleModels) Create(param *Schedule) error {
+	return m.db.Create(param).Error
+}
+
+// Del 删除计划任务
+func (m *scheduleModels) Del(id, uid int) error {
+	return m.db.Where("id=? and uid=?", id, uid).Delete(&Schedule{}).Error
+}
+
+func (m *scheduleModels) Save(param *Schedule) error {
+	return m.db.Save(param).Error
 }
 
 // ExportList 数据输出
 func (m *scheduleModels) ExportList(lastId int, scheduleType int) ([]Schedule, int) {
 	data := []Schedule{}
-	db := Mysql
+	db := m.db
 	if lastId > 0 {
 		db = db.Where("id > ?", lastId)
 	}
@@ -63,29 +74,9 @@ func (m *scheduleModels) ExportList(lastId int, scheduleType int) ([]Schedule, i
 	return data, len(data)
 }
 
-// Create 创建任务
-func (m *scheduleModels) Create() bool {
-	if m.Uid <= 0 {
-		return false
-	}
-	db := Mysql.Create(m)
-	if db.Error != nil {
-		logrus.Warnf("调度任务创建异常(rows: %d): %s", db.RowsAffected, db.Error)
-	}
-	return db.Error == nil && db.RowsAffected > 0
-}
-
-// Del 删除计划任务
-func (m *scheduleModels) Del() bool {
-	db := Mysql.Delete(m, "id=? and uid=?", m.Id, m.Uid)
-	return db.Error == nil && db.RowsAffected > 0
-}
-
 // Count 统计当前用户调度应用数量
-func (m *scheduleModels) Count() (num int, err error) {
-	db := Mysql.Model(m).Where("uid=?", m.Uid).Count(&num)
-	if db.Error != nil {
-		err = fmt.Errorf("查询失败")
-	}
-	return
+func (m *scheduleModels) Count(uid int) (int, error) {
+	var num int
+	err := m.db.Model(&Schedule{}).Where("uid=?", uid).Count(&num).Error
+	return num, err
 }

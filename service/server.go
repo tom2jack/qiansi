@@ -3,11 +3,12 @@ package service
 import (
 	"errors"
 	"fmt"
+	"path"
+	"time"
+
 	"github.com/zhi-miao/qiansi/common/config"
 	"github.com/zhi-miao/qiansi/common/sdk"
 	"github.com/zhi-miao/qiansi/common/utils"
-	"path"
-	"time"
 
 	"github.com/jinzhu/gorm"
 	"github.com/lifei6671/gorand"
@@ -23,7 +24,7 @@ func GetServerService() *serverService {
 }
 
 // GetClientSource 根据系统架构获取客户端最新资源信息
-func (s serverService) GetClientSource(os, arch string) (*resp.UpdateClient, error) {
+func (s *serverService) GetClientSource(os, arch string) (*resp.UpdateClient, error) {
 	client, err := sdk.NewOSSClient()
 	if err != nil {
 		return nil, err
@@ -50,12 +51,12 @@ func (s serverService) GetClientSource(os, arch string) (*resp.UpdateClient, err
 }
 
 // UpdateServerOnlineStatus 更新设备上线状态
-func UpdateServerOnlineStatus(deviceID string, isOnline bool) {
+func (s *serverService) UpdateServerOnlineStatus(deviceID string, isOnline bool) {
 
 }
 
 // RegServer 注册服务器
-func RegServer(param *req.RegServer) (result *resp.RegServer) {
+func (s *serverService) RegServer(param *req.RegServer) (result *resp.RegServer) {
 	result = &resp.RegServer{}
 	if !(param.UID > 0) {
 		result.ErrMsg = "客户端唯一标识号非法"

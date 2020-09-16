@@ -87,7 +87,7 @@ func Start() {
 // Add 添加任务
 func (t *task) Add(m models.Schedule) error {
 	err := gutils.PanicToError(func() {
-		cronName := strconv.Itoa(m.Id)
+		cronName := strconv.Itoa(m.ID)
 		job := &job{Schedule: m}
 		Task.Cron.AddJob(m.Crontab, job, cronName)
 	})
@@ -102,7 +102,7 @@ func (t *task) Run(m *models.Schedule) bool {
 
 // Remove 移除任务
 func (t *task) Remove(m *models.Schedule) {
-	Task.Cron.RemoveJob(strconv.Itoa(m.Id))
+	Task.Cron.RemoveJob(strconv.Itoa(m.ID))
 }
 
 // 任务执行器
@@ -112,10 +112,9 @@ func jobRun() {
 			var m models.Schedule
 			for {
 				m = <-Task.Queue
-				logrus.Infof("Task %d Runing", m.Id)
-				beforeExecJob(&m)
+				logrus.Infof("Task %d Runing", m.ID)
 				taskResult := execJob(&m)
-				logrus.Infof("Task %d End, Result: %#v", m.Id, taskResult)
+				logrus.Infof("Task %d End, Result: %#v", m.ID, taskResult)
 			}
 		}(i)
 	}
@@ -126,28 +125,31 @@ func (t *task) NextTime(cronTable string) time.Time {
 	return cron.Parse(cronTable).Next(time.Now().Local())
 }
 
-// 任务前置执行
-func beforeExecJob(m *models.Schedule) {
-	m.PrevTime = time.Now().Local()
-	m.NextTime = Task.NextTime(m.Crontab)
-	// 数据库回调
-	m.RunCallBack()
-}
-
 // 执行具体任务
 func execJob(m *models.Schedule) jobResult {
-	handler := createHandler(m)
-	if handler == nil {
-		return jobResult{}
-	}
 	defer func() {
 		if err := recover(); err != nil {
 			logrus.Warnf("panic#schedule/schedule.go:execJob#", err)
 		}
 	}()
-	var i int8 = 0
-	var output string
-	var err error
+	var (
+		i      int8
+		output string
+		err    error
+		result jobResult
+	)
+	m.PrevTime = time.Now().Local()
+	m.NextTime = Task.NextTime(m.Crontab)
+	// 数据库回调
+	err = models.GetScheduleModels().RunCallBack(m)
+	if err != nil {
+		result.Err = err
+		return result
+	}
+	handler := createHandler(m)
+	if handler == nil {
+		return result
+	}
 	for i < Task.TryNum {
 		output, err = handler.Run(m)
 		if err == nil {
@@ -155,7 +157,7 @@ func execJob(m *models.Schedule) jobResult {
 		}
 		i++
 		if i < Task.TryNum {
-			logrus.Warnf("任务执行失败#任务id-%d#重试第%d次#输出-%s#错误-%s", m.Id, i, output, err.Error())
+			logrus.Warnf("任务执行失败#任务id-%d#重试第%d次#输出-%s#错误-%s", m.ID, i, output, err.Error())
 			// 默认重试间隔时间，每次递增10s
 			time.Sleep(time.Duration(i) * time.Second * 10)
 		}

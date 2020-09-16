@@ -1,18 +1,27 @@
 package service
 
 import (
-	"github.com/zhi-miao/qiansi/models"
 	"math/rand"
+	"time"
+
+	"github.com/zhi-miao/qiansi/models"
 )
 
-// InviterActive 邀请活动
-func InviterActive(inviter, invitee int) (err error) {
-	member := models.Member{Id: inviter}
+type activityService struct{}
+
+func GetActivityService() *activityService {
+	return &activityService{}
+}
+
+// Inviter 邀请活动
+func (s *activityService) Inviter(inviter, invitee int) (err error) {
+	memberModel := models.GetMemberModels()
+	rand.Seed(time.Now().UnixNano())
 	switch rand.Intn(2) {
 	case 0:
-		err = member.AddDeployNum(1)
+		err = memberModel.IncrMaxDeployNum(inviter, 1)
 	case 1:
-		err = member.AddScheduleNum(1)
+		err = memberModel.IncrMaxScheduleNum(inviter, 1)
 	default:
 	}
 	return

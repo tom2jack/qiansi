@@ -4,42 +4,37 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/zhi-miao/qiansi/common/resp"
 	"github.com/zhi-miao/qiansi/models"
 )
 
-type MaxInfo struct {
-	DeployNum   int
-	MaxDeploy   int
-	ScheduleNum int
-	MaxSchedule int
+type dashboardService struct{}
+
+func GetDashboardService() *dashboardService {
+	return &dashboardService{}
 }
 
 // GetUserModuleMaxInfo 获取用户模块限额信息
-func GetUserModuleMaxInfo(uid int) (info MaxInfo, err error) {
-	// info = new(MaxInfo)
-	member := &models.Member{Id: uid}
-	err = member.MaxInfo()
+func (s *dashboardService) GetUserModuleMaxInfo(uid int) (*resp.UserMaxInfo, error) {
+	var info resp.UserMaxInfo
+	user, err := models.GetMemberModels().UsereInfo(uid)
 	if err != nil {
-		return
+		return nil, err
 	}
-	info.MaxDeploy, info.MaxSchedule = member.MaxDeploy, member.MaxSchedule
-	var num int
-	num, err = models.GetDeployModels().Count(uid)
+	info.MaxDeploy, info.MaxSchedule = user.MaxDeploy, user.MaxSchedule
+	info.DeployNum, err = models.GetDeployModels().Count(uid)
 	if err != nil {
-		return
+		return nil, err
 	}
-	info.DeployNum = num
-	schedule := &models.Schedule{Uid: uid}
-	num, err = schedule.Count()
+	info.ScheduleNum, err = models.GetScheduleModels().Count(uid)
 	if err != nil {
-		return
+		return nil, err
 	}
-	info.ScheduleNum = num
-	return
+	return &info, nil
 }
 
 // GetClientCPURate 获取服务器近1h的CPU利用率
-func GetClientCPURate(uid, serverId int, startTime, endTime time.Time) (result []map[string]interface{}) {
+func (s *dashboardService) GetClientCPURate(uid, serverId int, startTime, endTime time.Time) ([]map[string]interface{}, error) {
 	fluxQuery := fmt.Sprintf(`
 		from(bucket: "client_metric")
 			|> range(start: %s, stop: %s)
@@ -53,12 +48,11 @@ func GetClientCPURate(uid, serverId int, startTime, endTime time.Time) (result [
 		serverId,
 		uid,
 	)
-	lists, _ := models.InfluxDB.QueryToArray(fluxQuery)
-	return lists
+	return models.InfluxDB.QueryToArray(fluxQuery)
 }
 
 // GetClientMemRate 获取服务器近1h的内存利用率
-func GetClientMemRate(uid, serverId int, startTime, endTime time.Time) (result []map[string]interface{}) {
+func (s *dashboardService) GetClientMemRate(uid, serverId int, startTime, endTime time.Time) ([]map[string]interface{}, error) {
 	fluxQuery := fmt.Sprintf(`
 		from(bucket: "client_metric")
 			|> range(start: %s, stop: %s)
@@ -71,6 +65,5 @@ func GetClientMemRate(uid, serverId int, startTime, endTime time.Time) (result [
 		serverId,
 		uid,
 	)
-	lists, _ := models.InfluxDB.QueryToArray(fluxQuery)
-	return lists
+	return models.InfluxDB.QueryToArray(fluxQuery)
 }

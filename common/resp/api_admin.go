@@ -1,8 +1,9 @@
 package resp
 
 import (
-	"github.com/zhi-miao/qiansi/models"
 	"time"
+
+	"github.com/zhi-miao/qiansi/models"
 )
 
 type DashboardIndexMetricVO struct {
@@ -12,13 +13,17 @@ type DashboardIndexMetricVO struct {
 }
 
 type DashboardInfoVO struct {
-	DeployNum    int `json:"deploy_num"`
-	MaxDeploy    int `json:"max_deploy"`
-	ScheduleNum  int `json:"schedule_num"`
-	MaxSchedule  int `json:"max_schedule"`
+	UserMaxInfo
 	ServerNum    int `json:"server_num"`
 	InviteNum    int `json:"invite_num"`
 	DeployRunNum int `json:"deploy_run_num"`
+}
+
+type UserMaxInfo struct {
+	DeployNum   int `json:"deploy_num"`
+	MaxDeploy   int `json:"max_deploy"`
+	ScheduleNum int `json:"schedule_num"`
+	MaxSchedule int `json:"max_schedule"`
 }
 
 // 部署服务器

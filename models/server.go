@@ -168,16 +168,16 @@ func (m *serverModels) GetTelegrafConfig(serverID int) *Telegraf {
 }
 
 // List 获取服务器列表
-func (m *serverModels) List(uid int, req *req.ServerListParam) ([]Server, int) {
+func (m *serverModels) List(uid int, param *req.ServerListParam) ([]Server, int) {
 	data := []Server{}
 	rows := 0
 	db := m.db.Model(&Server{}).
 		Where("uid=?", uid).
 		Select("id, uid, server_name, server_status, server_rule_id, device_id, domain, create_time, update_time")
-	if req.ServerName != "" {
-		db = db.Where("server_name like ?", "%"+req.ServerName+"%")
+	if param.ServerName != "" {
+		db = db.Where("server_name like ?", "%"+param.ServerName+"%")
 	}
-	db.Offset(req.Offset()).Limit(req.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
+	db.Offset(param.Offset()).Limit(param.PageSize).Order("id desc").Find(&data).Offset(-1).Limit(-1).Count(&rows)
 	return data, rows
 }
 

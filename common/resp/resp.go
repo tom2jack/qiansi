@@ -1,15 +1,8 @@
 package resp
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/zhi-miao/qiansi/common/errors"
 )
-
-// ApiResult api默认返回结构
-type ApiResult struct {
-	Code int         `json:"code"`
-	Data interface{} `json:"data"`
-	Msg  string      `json:"msg"`
-}
 
 // PageInfo 分页返回标准结构
 type PageInfo struct {
@@ -19,49 +12,21 @@ type PageInfo struct {
 	Rows      interface{} `json:"Rows"`
 }
 
-// NewApiResult 初始化api返回
-func NewApiResult(arg ...interface{}) *ApiResult {
-	result := &ApiResult{
-		Code: 1,
-		Msg:  "操作成功",
-	}
-	for k, v := range arg {
-		if k == 0 {
-			if v1, ok := v.(int); ok {
-				result.setCode(v1)
-			}
-			if v1, ok := v.(error); ok {
-				result.setCode(-5)
-				result.setMsg(v1.Error())
-			}
-		}
-		if k == 1 {
-			if v2, ok := v.(string); ok {
-				result.setMsg(v2)
-			}
-		}
-		if k == 2 && v != nil {
-			result.setData(v)
-		}
+// ApiErrorResult api默认错误返回结构
+type ApiErrorResult struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+}
+
+func Error(e error) *ApiErrorResult {
+	result := &ApiErrorResult{}
+	switch e := e.(type) {
+	case errors.ApiError:
+		result.Code = e.GetCode()
+		result.Msg = e.Error()
+	default:
+		result.Code = 0
+		result.Msg = e.Error()
 	}
 	return result
-}
-
-func (r *ApiResult) setData(data interface{}) *ApiResult {
-	r.Data = data
-	return r
-}
-
-func (r *ApiResult) setMsg(msg string) *ApiResult {
-	r.Msg = msg
-	return r
-}
-
-func (r *ApiResult) setCode(code int) *ApiResult {
-	r.Code = code
-	return r
-}
-
-func (r *ApiResult) Json(c *gin.Context) {
-	c.JSON(200, r)
 }
