@@ -65,3 +65,13 @@ func (m *memberModels) ExistsUID(uid int) bool {
 	}
 	return dto.Has
 }
+
+// ExistsPhone 判断手机号是否存在
+func (m *memberModels) ExistsPhone(phone string) bool {
+	dto := TempModelStruct{}
+	err := m.db.Raw("select exists(select 1 from member where phone=?) as has", phone).Scan(&dto).Error
+	if err != nil {
+		return true
+	}
+	return dto.Has
+}

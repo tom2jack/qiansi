@@ -17,7 +17,6 @@ import (
 
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 
 	"github.com/gin-gonic/gin"
@@ -36,16 +35,16 @@ var Deploy = &deployApi{}
 func (r *deployApi) Lists(c *gin.Context) {
 	param := &req.DeployListParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	list, totalRows := models.GetDeployModels().DeployList(c.GetInt(req.UID), param)
-	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+	c.JSON(resp.ApiSuccess(resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
 		TotalSize: totalRows,
 		Rows:      list,
-	}).Json(c)
+	}))
 }
 
 // @Summary 获取部署应用详情
@@ -57,11 +56,11 @@ func (r *deployApi) Lists(c *gin.Context) {
 func (r *deployApi) Detail(c *gin.Context) {
 	param := &req.DeployParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	info := models.GetDeployModels().GetDeployDetailInfo(c.GetInt(req.UID), param.DeployId)
-	resp.NewApiResult(1, "读取成功", info).Json(c)
+	c.JSON(resp.ApiSuccess(info))
 }
 
 // @Summary 创建部署应用
@@ -74,11 +73,13 @@ func (r *deployApi) Create(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	err := c.ShouldBind(param)
 	if err != nil {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	err = models.GetDeployModels().CreateDeploy(c.GetInt(req.UID), param)
-	resp.NewApiResult(err).Json(c)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
+	}
 }
 
 // @Summary 更新部署应用
@@ -90,11 +91,13 @@ func (r *deployApi) Create(c *gin.Context) {
 func (r *deployApi) Update(c *gin.Context) {
 	param := &req.DeploySetParam{}
 	if c.ShouldBind(param) != nil {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	err := models.GetDeployModels().UpdateDeploy(c.GetInt(req.UID), param)
-	resp.NewApiResult(err).Json(c)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
+	}
 }
 
 // @Summary 删除部署应用
@@ -106,11 +109,13 @@ func (r *deployApi) Update(c *gin.Context) {
 func (r *deployApi) Del(c *gin.Context) {
 	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	err := models.GetDeployModels().DelDeploy(c.GetInt(req.UID), param.DeployId)
-	resp.NewApiResult(err).Json(c)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
+	}
 }
 
 // @Summary 获取当前部署应用的服务器列表
@@ -122,15 +127,15 @@ func (r *deployApi) Del(c *gin.Context) {
 func (r *deployApi) DeployServer(c *gin.Context) {
 	param := &req.DeployParam{}
 	if c.ShouldBind(param) != nil {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	list, err := models.GetDeployModels().DeployServerList(c.GetInt(req.UID), param.DeployId)
 	if err != nil {
-		resp.NewApiResult(err).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	resp.NewApiResult(1, "读取成功", list).Json(c)
+	c.JSON(resp.ApiSuccess(list))
 }
 
 // @Summary 获取当前部署应用绑定的服务器列表，用于渲染运行日志选项卡
@@ -142,13 +147,13 @@ func (r *deployApi) DeployServer(c *gin.Context) {
 func (r *deployApi) RunLogTab(c *gin.Context) {
 	param := &req.DeployServerParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	d := &[]resp.DeployRunLogTabVO{}
 	sql := "SELECT s.id, s.server_name,r.deploy_version FROM `server` s, `deploy_server_relation` r WHERE s.id=r.server_id and r.deploy_id=? and s.uid=?"
 	models.Mysql.Raw(sql, param.DeployId, c.GetInt("UID")).Scan(d)
-	resp.NewApiResult(1, "读取成功", d).Json(c)
+	c.JSON(resp.ApiSuccess(d))
 }
 
 // @Summary 获取当前部署应用指定服务器的运行日志
@@ -160,7 +165,7 @@ func (r *deployApi) RunLogTab(c *gin.Context) {
 func (r *deployApi) RunLog(c *gin.Context) {
 	param := &req.DeployRunLogParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	data, _ := models.InfluxDB.QueryToArray(fmt.Sprintf(
@@ -171,7 +176,7 @@ func (r *deployApi) RunLog(c *gin.Context) {
 		param.Version,
 		param.ServerId,
 	))
-	resp.NewApiResult(1, "读取成功", data).Json(c)
+	c.JSON(resp.ApiSuccess(data))
 }
 
 // @Summary 获取部署日志
@@ -183,7 +188,7 @@ func (r *deployApi) RunLog(c *gin.Context) {
 func (r *deployApi) Log(c *gin.Context) {
 	param := &req.DeployLogParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	if param.StartTime.IsZero() {
@@ -193,7 +198,7 @@ func (r *deployApi) Log(c *gin.Context) {
 		param.EndTime = time.Now()
 	}
 	if param.EndTime.Sub(param.StartTime) > time.Hour*24*30 {
-		resp.NewApiResult(-4, "日志筛选时长不可大于一个月").Json(c)
+		c.JSON(resp.ApiError("日志筛选时长不可大于一个月"))
 		return
 	}
 	fluxQuery := fmt.Sprintf(
@@ -223,12 +228,12 @@ func (r *deployApi) Log(c *gin.Context) {
 		}
 	}
 	lists, _ := models.InfluxDB.QueryToArray(fluxQuery + fmt.Sprintf(`|> limit(n:%d, offset: %d)`, param.PageSize, param.Offset()))
-	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+	c.JSON(resp.ApiSuccess(resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
 		TotalSize: rows,
 		Rows:      lists,
-	}).Json(c)
+	}))
 }
 
 // @Summary 启动部署
@@ -240,13 +245,13 @@ func (r *deployApi) Log(c *gin.Context) {
 func (r *deployApi) Do(c *gin.Context) {
 	param := &req.DeployDoParam{}
 	if c.ShouldBind(param) != nil || !(param.DeployId > 0) {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
-	if err := mqttbroker.SendDeployTask(c.GetInt("UID"), param.DeployId); err != nil {
-		resp.NewApiResult(err).Json(c)
+	err := mqttbroker.SendDeployTask(c.GetInt("UID"), param.DeployId)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
 	}
-	resp.NewApiResult(1, "启动成功").Json(c)
 }
 
 // @Summary 获取部署触发链接
@@ -258,14 +263,14 @@ func (r *deployApi) Do(c *gin.Context) {
 func (r *deployApi) Link(c *gin.Context) {
 	param := &req.DeployParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	openID, err := models.GetDeployModels().GetOpenID(param.DeployId, c.GetInt(req.UID))
-	if err == nil && openID != "" {
-		url := fmt.Sprintf("%s/client/ApiDeployRun?Key=%s", config.GetConfig().Server.ApiHost, openID)
-		resp.NewApiResult(1, "操作成功", url).Json(c)
+	if err != nil {
+		c.JSON(resp.ApiError("获取失败，请重新尝试"))
 		return
 	}
-	resp.NewApiResult(-5, "获取失败，请重新尝试").Json(c)
+	url := fmt.Sprintf("%s/client/ApiDeployRun?Key=%s", config.GetConfig().Server.ApiHost, openID)
+	c.JSON(resp.ApiSuccess(url))
 }

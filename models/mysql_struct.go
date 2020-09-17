@@ -141,7 +141,7 @@ type Schedule struct {
 	UId          int       `gorm:"column:uid;type:int(10) unsigned;not null" json:"uid"`               // 用户ID
 	Title        string    `gorm:"column:title;type:varchar(60);not null" json:"title"`                // 标题
 	Crontab      string    `gorm:"column:crontab;type:varchar(50);not null" json:"crontab"`            // 规则
-	ScheduleType bool      `gorm:"column:schedule_type;type:tinyint(1);not null" json:"schedule_type"` // 调度类型 1-serverhttp 2-clientShell
+	ScheduleType int8      `gorm:"column:schedule_type;type:tinyint(1);not null" json:"schedule_type"` // 调度类型 1-serverhttp 2-clientShell
 	ServerID     int       `gorm:"column:server_id;type:int(10) unsigned;not null" json:"server_id"`   // 服务器ID
 	Command      string    `gorm:"column:command;type:text;not null" json:"command"`                   // 命令
 	Remain       int       `gorm:"column:remain;type:int(11);not null" json:"remain"`                  // 剩余执行次数 -1无限 0-停止

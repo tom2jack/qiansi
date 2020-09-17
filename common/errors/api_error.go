@@ -2,13 +2,34 @@ package errors
 
 import (
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 )
 
 const (
-	MissingParameter int = iota
+	// 参数缺失
+	MissingParameter ApiErrorCode = iota + 1
+	// 最大限制
+	MaximumLimit
+	// 最小限制
+	MinimumLimit
+	// 参数格式错误
+	InvalidArguments
+	// 服务错误
+	Service
+	// 模型
+	Models
+	// 服务器异常
+	InternalServerError
 )
+
+var ApiErrorHttpCodeRelation = map[ApiErrorCode]int{
+	MissingParameter:    http.StatusBadRequest,
+	InternalServerError: http.StatusInternalServerError,
+}
+
+type ApiErrorCode int
 
 type ApiError interface {
 	Error() string
@@ -17,7 +38,7 @@ type ApiError interface {
 
 type apiError struct {
 	Msg         string
-	Code        int
+	Code        ApiErrorCode
 	MsgTemplate string
 	Args        []interface{}
 }
@@ -26,11 +47,11 @@ func (e *apiError) Error() string {
 	return e.Msg
 }
 
-func (e apiError) GetCode() int {
+func (e apiError) GetCode() ApiErrorCode {
 	return e.Code
 }
 
-func NewApiError(code int, msg string, args ...interface{}) error {
+func NewApiError(code ApiErrorCode, msg string, args ...interface{}) error {
 	e := &apiError{
 		Code: code,
 		Msg:  msg,

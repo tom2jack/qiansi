@@ -2,10 +2,8 @@ package admin
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/schedule"
 	"github.com/zhi-miao/qiansi/service"
@@ -24,17 +22,18 @@ var Schedule = &scheduleApi{}
 func (r *scheduleApi) Lists(c *gin.Context) {
 	param := &req.ScheduleListParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	uid := c.GetInt(req.UID)
 	lists, rows := models.GetScheduleModels().List(uid, param)
-	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+	c.JSON(resp.ApiSuccess(resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
 		TotalSize: rows,
 		Rows:      lists,
-	}).Json(c)
+	}))
+
 }
 
 // @Summary 创建计划任务
@@ -46,39 +45,14 @@ func (r *scheduleApi) Lists(c *gin.Context) {
 func (r *scheduleApi) Create(c *gin.Context) {
 	param := &req.ScheduleCreateParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	uid := c.GetInt(req.UID)
-	info, err := service.GetDashboardService().GetUserModuleMaxInfo(uid)
+	err := service.GetScheduleService().Create(uid, param)
 	if err != nil {
-		resp.NewApiResult(-4, "用户限额检测失败").Json(c)
-		return
+		c.JSON(resp.ApiError(err))
 	}
-	if info.MaxSchedule <= info.ScheduleNum {
-		resp.NewApiResult(-4, "您的调度任务创建数量已达上限").Json(c)
-		return
-	}
-	po := &models.Schedule{}
-	gutils.SuperConvert(param, po)
-	po.UId = uid
-	err = gutils.PanicToError(func() {
-		po.NextTime = schedule.Task.NextTime(po.Crontab)
-	})
-	if err != nil {
-		resp.NewApiResult(-4, "表达式错误").Json(c)
-		return
-	}
-	if !po.Create() {
-		resp.NewApiResult(-5, "任务档案建立失败").Json(c)
-		return
-	}
-	err = schedule.Task.Add(*po)
-	if err != nil {
-		resp.NewApiResult(-5, "添加任务到调度器失败").Json(c)
-		return
-	}
-	resp.NewApiResult(1).Json(c)
 }
 
 // @Summary 删除计划任务
@@ -90,17 +64,16 @@ func (r *scheduleApi) Create(c *gin.Context) {
 func (r *scheduleApi) Del(c *gin.Context) {
 	param := &req.ScheduleDelParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	po := &models.Schedule{
-		Id:  param.Id,
-		Uid: c.GetInt("UID"),
+	uid := c.GetInt(req.UID)
+	err := models.GetScheduleModels().Del(param.Id, uid)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
+		return
 	}
-	if po.Del() {
-		schedule.Task.Remove(po)
-	}
-	resp.NewApiResult(1).Json(c)
+	schedule.Task.Remove(param.Id)
 }
 
 // @Summary 执行计划任务
@@ -112,17 +85,17 @@ func (r *scheduleApi) Del(c *gin.Context) {
 func (r *scheduleApi) Do(c *gin.Context) {
 	param := &req.ScheduleDoParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	po := &models.Schedule{
-		Id:  param.Id,
-		Uid: c.GetInt("UID"),
-	}
-	po.Get()
-	if !schedule.Task.Run(po) {
-		resp.NewApiResult(-5, "任务异常，无法执行").Json(c)
+	uid := c.GetInt(req.UID)
+	po, err := models.GetScheduleModels().Get(param.Id, uid)
+	if err != nil {
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	resp.NewApiResult(1).Json(c)
+	if !schedule.Task.Run(&po) {
+		c.JSON(resp.ApiError("任务异常，无法执行"))
+		return
+	}
 }

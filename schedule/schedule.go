@@ -34,7 +34,7 @@ type job struct {
 func (j *job) Run() {
 	// 判断是否自动销毁
 	if j.Schedule.Remain == 0 || j.Schedule.Remain == 1 {
-		Task.Remove(&j.Schedule)
+		Task.Remove(j.Schedule.ID)
 	}
 	if j.Schedule.Remain == 0 {
 		return
@@ -57,7 +57,7 @@ func Start() {
 	// 启动任务执行器
 	jobRun()
 	logrus.Info("开始初始化定时任务")
-	scheduleModel := new(models.Schedule)
+	scheduleModel := models.GetScheduleModels()
 	taskNum := 0
 	lastId := 0
 	for {
@@ -77,7 +77,7 @@ func Start() {
 			}
 		}
 		taskNum += count
-		lastId = taskList[count-1].Id
+		lastId = taskList[count-1].ID
 	}
 	// 启动任务调度器
 	Task.Cron.Start()
@@ -101,8 +101,8 @@ func (t *task) Run(m *models.Schedule) bool {
 }
 
 // Remove 移除任务
-func (t *task) Remove(m *models.Schedule) {
-	Task.Cron.RemoveJob(strconv.Itoa(m.ID))
+func (t *task) Remove(id int) {
+	Task.Cron.RemoveJob(strconv.Itoa(id))
 }
 
 // 任务执行器

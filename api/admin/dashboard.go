@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 	"github.com/zhi-miao/qiansi/service"
 )
@@ -33,7 +32,7 @@ func (r *dashboardApi) Info(c *gin.Context) {
 	vo.ServerNum = models.GetServerModels().Count(uid)
 	// 邀请数
 	vo.InviteNum, _ = models.GetMemberModels().InviterCount(uid)
-	resp.NewApiResult(1, "读取成功", vo).Json(c)
+	c.JSON(resp.ApiSuccess(vo))
 }
 
 // @Summary 概览大盘
@@ -45,7 +44,7 @@ func (r *dashboardApi) Info(c *gin.Context) {
 func (r *dashboardApi) IndexMetric(c *gin.Context) {
 	param := &req.DashboardIndexMetricParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	if param.StartTime.IsZero() {
@@ -55,7 +54,7 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 		param.StartTime = param.EndTime.Add(-1 * time.Hour)
 	}
 	if param.EndTime.Sub(param.StartTime) > 2*time.Hour {
-		resp.NewApiResult(-4, "检索时间不可大于2H").Json(c)
+		c.JSON(resp.ApiError("检索时间不可大于2H"))
 		return
 	}
 	uid := c.GetInt(req.UID)
@@ -64,5 +63,5 @@ func (r *dashboardApi) IndexMetric(c *gin.Context) {
 	dashbardService := service.GetDashboardService()
 	result.CPURate, _ = dashbardService.GetClientCPURate(uid, param.ServerId, param.StartTime, param.EndTime)
 	result.MenRate, _ = dashbardService.GetClientMemRate(uid, param.ServerId, param.StartTime, param.EndTime)
-	resp.NewApiResult(1, "读取成功", result).Json(c)
+	c.JSON(resp.ApiSuccess(result))
 }

@@ -145,8 +145,7 @@ func (m *deployModels) GetDeployDetailInfo(uid, deployId int) (result DeployDeta
 // CreateDeploy 创建部署应用
 func (m *deployModels) CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
 	return m.db.Transaction(func(tx *gorm.DB) error {
-		userInfo := &Member{Id: uid}
-		info, err := GetMemberModels().UsereInfo(uid)
+		userInfo, err := GetMemberModels().SetDB(tx).UsereInfo(uid)
 		if err != nil {
 			return fmt.Errorf("用户限额检测失败")
 		}

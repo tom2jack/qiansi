@@ -11,7 +11,6 @@ import (
 	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
-	"github.com/zhi-miao/qiansi/common/utils"
 	"github.com/zhi-miao/qiansi/models"
 
 	"github.com/gin-gonic/gin"
@@ -30,24 +29,21 @@ var Server = &serverApi{}
 func (r *serverApi) Lists(c *gin.Context) {
 	param := &req.ServerListParam{}
 	if err := c.ShouldBind(param); err != nil {
-		resp.NewApiResult(-4, utils.Validator(err)).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	s := &models.Server{
-		UId:        c.GetInt("UID"),
-		ServerName: param.ServerName,
-	}
-	lists, rows := s.List(param.Offset(), param.PageSize)
+	uid := c.GetInt(req.UID)
+	lists, rows := models.GetServerModels().List(uid, param)
 	vo := make([]resp.ServerVO, len(lists))
 	for k, v := range lists {
 		gutils.SuperConvert(&v, &vo[k])
 	}
-	resp.NewApiResult(1, "读取成功", resp.PageInfo{
+	c.JSON(resp.ApiSuccess(resp.PageInfo{
 		Page:      param.Page,
 		PageSize:  param.PageSize,
 		TotalSize: rows,
 		Rows:      vo,
-	}).Json(c)
+	}))
 }
 
 // @Summary 设置服务器信息
@@ -59,16 +55,17 @@ func (r *serverApi) Lists(c *gin.Context) {
 func (r *serverApi) Set(c *gin.Context) {
 	param := &req.ServerSetParam{}
 	if c.ShouldBind(param) != nil {
-		resp.NewApiResult(-4, "入参绑定失败").Json(c)
+		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
 	po := &models.Server{}
 	gutils.SuperConvert(param, po)
-	if models.Mysql.Table("server").Where("id=? and uid=?", po.ID, c.GetInt("UID")).Updates(po).RowsAffected > 0 {
-		resp.NewApiResult(1, "更新成功", po).Json(c)
+	// TODO: 移动至models
+	err := models.Mysql.Table("server").Where("id=? and uid=?", po.ID, c.GetInt("UID")).Updates(po).Error
+	if err != nil {
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	resp.NewApiResult(0, "系统错误").Json(c)
 }
 
 // @Summary 删除服务器
@@ -80,15 +77,15 @@ func (r *serverApi) Set(c *gin.Context) {
 func (r *serverApi) Del(c *gin.Context) {
 	param := &req.ServerDelParam{}
 	if err := c.Bind(param); err != nil || param.ServerId == 0 {
-		resp.NewApiResult(-4, "入参解析失败").Json(c)
+		c.JSON(resp.ApiError("入参解析失败"))
 		return
 	}
+	// TODO: 移动至models
 	db := models.Mysql.Delete(models.Server{}, "id=? and uid=?", param.ServerId, c.GetInt("UID"))
 	if db.Error != nil || db.RowsAffected != 1 {
-		resp.NewApiResult(-5, "删除失败", db).Json(c)
+		c.JSON(resp.ApiError("删除失败"))
 		return
 	}
 	// 删除关联
 	models.Mysql.Delete(models.DeployServerRelation{}, "server_id=?", param.ServerId)
-	resp.NewApiResult(1, "操作成功", db).Json(c)
 }

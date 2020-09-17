@@ -1,11 +1,13 @@
 package admin
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
 	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/captcha"
+	"github.com/zhi-miao/qiansi/common/errors"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
 
@@ -25,14 +27,14 @@ var ZM_LOCK = gutils.NewLockTable()
 // @Router /admin/VerifyByImg [get]
 func (r *verifyApi) ByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
-		resp.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
+		c.JSON(resp.ApiError("当前IP数据请求过频，请稍后再试"))
 		return
 	}
 	idkey, img := captcha.VerifyByImg("")
-	resp.NewApiResult(1, "请求成功", map[string]string{
+	c.JSON(resp.ApiSuccess(gin.H{
 		"idkey": idkey,
 		"img":   img,
-	}).Json(c)
+	}))
 }
 
 // @Summary 获取短信验证码
@@ -44,26 +46,26 @@ func (r *verifyApi) ByImg(c *gin.Context) {
 func (r *verifyApi) BySMS(c *gin.Context) {
 	param := &req.VerifyBySMSParam{}
 	if err := c.Bind(param); err != nil {
-		resp.NewApiResult(-4, "入参解析失败"+err.Error()).Json(c)
+		c.JSON(resp.ApiError(err))
 		return
 	}
 	if len(param.Phone) != 11 {
-		resp.NewApiResult(-4, "手机号错误").Json(c)
+		c.JSON(resp.ApiError("手机号错误"))
 		return
 	}
 	if !captcha.VerifyCheck(param.ImgIdKey, param.ImgCode) {
-		resp.NewApiResult(-5, "验证码无效").Json(c)
+		c.JSON(resp.ApiError("验证码无效"))
 		return
 	}
 	if ZM_LOCK.IsLock("phone-ip:"+c.ClientIP(), 15*time.Minute) {
-		resp.NewApiResult(-5, "当前IP数据请求过频，请稍后再试").Json(c)
+		c.JSON(resp.ApiError("当前IP数据请求过频，请稍后再试"))
 		return
 	}
 	err := captcha.VerifyBySMS(param.Phone)
 	if err != nil {
 		logrus.Warnf("[短信发送失败]：%s-%s", param.Phone, err.Error())
-		resp.NewApiResult(-5, "短信发送失败").Json(c)
+		c.JSON(resp.ApiError(errors.InternalServerError, "短信发送失败"))
 		return
 	}
-	resp.NewApiResult(1, "发送成功").Json(c)
+	c.Status(http.StatusOK)
 }

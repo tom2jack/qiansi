@@ -45,7 +45,7 @@ func registerCallBack(c mqtt.Client, message mqtt.Message) {
 		logrus.Warn("报文无法识别", string(payload))
 		return
 	}
-	resp := service.RegServer(param)
+	resp := service.GetServerService().RegServer(param)
 	raw, err := enPayload(resp, param.ResponseEncryptSecret)
 	if err != nil {
 		logrus.Warn("报文无法加密")
