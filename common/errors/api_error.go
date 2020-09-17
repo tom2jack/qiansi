@@ -22,11 +22,14 @@ const (
 	Models
 	// 服务器异常
 	InternalServerError
+	// 未授权
+	Unauthorized
 )
 
 var ApiErrorHttpCodeRelation = map[ApiErrorCode]int{
 	MissingParameter:    http.StatusBadRequest,
 	InternalServerError: http.StatusInternalServerError,
+	Unauthorized:        http.StatusUnauthorized,
 }
 
 type ApiErrorCode int

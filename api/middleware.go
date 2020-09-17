@@ -3,9 +3,10 @@ package api
 import (
 	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/config"
+	"github.com/zhi-miao/qiansi/common/errors"
 	"github.com/zhi-miao/qiansi/common/req"
+	"github.com/zhi-miao/qiansi/common/resp"
 
-	"net/http"
 	"strconv"
 	"time"
 
@@ -57,28 +58,23 @@ func logMiddleware() gin.HandlerFunc {
 // jwtMiddleware jwt鉴权
 func jwtMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var msg string = "登陆信息获取失败"
-		token := c.GetHeader("LOGIN-KEY")
+		msg := "登陆信息获取失败"
+		token := c.GetHeader(req.LOGIN_KEY)
 		if token != "" {
 			str, err := gutils.ParseToken(token, []byte(config.GetConfig().App.JwtSecret))
-			if err != nil {
-				print(err.Error())
+			if err != nil || str == "" {
 				msg = "登录验证失败"
-			}
-			if str != "" {
-				c.Set("LOGIN-TOKEN", str)
+			} else {
 				uid, _ := strconv.Atoi(str)
-				c.Set(req.UID, uid)
 				if uid > 0 {
 					msg = ""
+					c.Set(req.LOGIN_TOKEN, str)
+					c.Set(req.UID, uid)
 				}
 			}
 		}
 		if msg != "" {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code": -1,
-				"msg":  msg,
-			})
+			c.JSON(resp.ApiError(errors.Unauthorized, msg))
 			c.Abort()
 			return
 		}
