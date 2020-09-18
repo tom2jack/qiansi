@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"net/http"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -23,7 +22,7 @@ var ZM_LOCK = gutils.NewLockTable()
 // @Summary 获取图片验证码
 // @Produce  json
 // @Accept  json
-// @Success 200 {object} resp.ApiResult "{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}"
+// @Success 200 {object} gin.H "{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}"
 // @Router /admin/VerifyByImg [get]
 func (r *verifyApi) ByImg(c *gin.Context) {
 	if ZM_LOCK.IsLock("VerifyImg-ip:"+c.ClientIP(), 3*time.Second) {
@@ -41,7 +40,7 @@ func (r *verifyApi) ByImg(c *gin.Context) {
 // @Produce json
 // @Accept  application/json
 // @Param body body req.VerifyBySMSParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code":1,"msg":"发送成功","data":null}"
+// @Success 200
 // @Router /admin/VerifyBySMS [post]
 func (r *verifyApi) BySMS(c *gin.Context) {
 	param := &req.VerifyBySMSParam{}
@@ -67,5 +66,4 @@ func (r *verifyApi) BySMS(c *gin.Context) {
 		c.JSON(resp.ApiError(errors.InternalServerError, "短信发送失败"))
 		return
 	}
-	c.Status(http.StatusOK)
 }

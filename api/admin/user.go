@@ -32,7 +32,7 @@ var User = &userApi{}
 // @Produce  json
 // @Accept json
 // @Param body body req.UserSiginParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid": 0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime": "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}"
+// @Success 200
 // @Router /admin/UserSigin [post]
 func (r *userApi) Sigin(c *gin.Context) {
 	param := &req.UserSiginParam{}
@@ -144,7 +144,7 @@ func (r *userApi) SiginUp(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.UserResetPwdParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "修改成功", "data": null}"
+// @Success 200
 // @Router /admin/UserResetPwd [post]
 func (r *userApi) ResetPwd(c *gin.Context) {
 	param := &req.UserResetPwdParam{}

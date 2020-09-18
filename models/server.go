@@ -3,7 +3,6 @@ package models
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"sync"
@@ -12,6 +11,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/jinzhu/gorm"
 	"github.com/zhi-miao/gutils"
+	"github.com/zhi-miao/qiansi/common/errors"
 	"github.com/zhi-miao/qiansi/common/req"
 )
 
@@ -51,7 +51,7 @@ func (m *serverModels) Create(ser *Server) error {
 		}
 		return nil
 	}
-	return errors.New("创建失败")
+	return errors.NewApiError(errors.Models, "创建失败")
 }
 
 // Get 获取服务器信息
@@ -186,4 +186,35 @@ func (m *serverModels) ListByUID(uid int) ([]Server, error) {
 	data := []Server{}
 	err := m.db.Model(&Server{}).Where("uid = ?", uid).Find(&data).Error
 	return data, err
+}
+
+// Delete 根据用户ID删除服务器
+func (m *serverModels) Delete(id, uid int) error {
+	servInfo, err := m.Get(id)
+	if err != nil {
+		return err
+	}
+	if servInfo.UId != uid {
+		return errors.NewApiError(errors.Models, "非本人服务器无权删除")
+	}
+	db := m.db.Delete(Server{}, "id=? and uid=?", id, uid)
+	if db.Error != nil || db.RowsAffected != 1 {
+		return errors.NewApiError(errors.Models, "服务器删除失败")
+	}
+	// 删除关联
+	if m.db.Delete(DeployServerRelation{}, "server_id=?", id).Error != nil {
+		return errors.NewApiError(errors.Models, "服务器部署关联删除失败")
+	}
+	// 删除mqtt用户
+	mqttModel := GetMQTTModels().SetDB(m.db)
+	err = mqttModel.DeleteClientUser(servInfo.MqttUser)
+	if err != nil {
+		return err
+	}
+	// 删除mqtt用户权限
+	err = mqttModel.DeleteClientACL(servInfo.MqttUser)
+	if err != nil {
+		return err
+	}
+	return nil
 }

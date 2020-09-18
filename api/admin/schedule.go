@@ -40,7 +40,7 @@ func (r *scheduleApi) Lists(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.ScheduleCreateParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200
 // @Router /admin/ScheduleCreate [POST]
 func (r *scheduleApi) Create(c *gin.Context) {
 	param := &req.ScheduleCreateParam{}
@@ -59,7 +59,7 @@ func (r *scheduleApi) Create(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.ScheduleDelParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200
 // @Router /admin/ScheduleDel [DELETE]
 func (r *scheduleApi) Del(c *gin.Context) {
 	param := &req.ScheduleDelParam{}
@@ -80,7 +80,7 @@ func (r *scheduleApi) Del(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.ScheduleDoParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200
 // @Router /admin/ScheduleDo [get]
 func (r *scheduleApi) Do(c *gin.Context) {
 	param := &req.ScheduleDoParam{}

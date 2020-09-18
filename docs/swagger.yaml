@@ -1,4 +1,7 @@
 definitions:
+  gin.H:
+    additionalProperties: true
+    type: object
   models.Deploy:
     properties:
       after_command:
@@ -140,11 +143,16 @@ definitions:
     type: object
   models.DeployRelationServer:
     properties:
-      apiSecret:
+      api_secret:
+        description: API密钥
+        type: string
+      arch:
+        description: 服务器架构
+        type: string
+      client_version:
+        description: 客户端版本
         type: string
       create_time:
-        type: string
-      createTime:
         type: string
       deploy_id:
         description: 部署服务id
@@ -152,26 +160,35 @@ definitions:
       deploy_version:
         description: 已部署版本
         type: integer
-      deviceId:
+      device_id:
+        description: 服务器唯一设备号
         type: string
       domain:
+        description: 服务器地址(域名/ip)
         type: string
       id:
         type: integer
+      last_init_time:
+        type: string
+      mqtt_user:
+        description: mqtt用户名
+        type: string
+      os:
+        description: 服务器系统
+        type: string
       server_id:
         description: 服务器ID
         type: integer
-      serverName:
+      server_name:
+        description: 服务器备注名
         type: string
-      serverRuleId:
-        type: integer
-      serverStatus:
+      server_status:
+        description: 服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定
         type: integer
       uid:
+        description: 用户ID
         type: integer
       update_time:
-        type: string
-      updateTime:
         type: string
     type: object
   models.DeployZip:
@@ -193,29 +210,6 @@ definitions:
       update_time:
         type: string
     type: object
-  models.Server:
-    properties:
-      apiSecret:
-        type: string
-      createTime:
-        type: string
-      deviceId:
-        type: string
-      domain:
-        type: string
-      id:
-        type: integer
-      serverName:
-        type: string
-      serverRuleId:
-        type: integer
-      serverStatus:
-        type: integer
-      uid:
-        type: integer
-      updateTime:
-        type: string
-    type: object
   req.DashboardIndexMetricParam:
     properties:
       end_time:
@@ -235,17 +229,19 @@ definitions:
     type: object
   req.DeployListParam:
     properties:
+      LastId:
+        type: integer
       Page:
         type: integer
       PageSize:
         type: integer
       Title:
         type: string
-      lastId:
-        type: integer
     type: object
   req.DeployLogParam:
     properties:
+      LastId:
+        type: integer
       Page:
         type: integer
       PageSize:
@@ -259,8 +255,6 @@ definitions:
       endTime:
         description: 结束时间
         type: string
-      lastId:
-        type: integer
       serverId:
         description: 服务器
         type: integer
@@ -429,11 +423,11 @@ definitions:
     type: object
   req.ScheduleListParam:
     properties:
+      LastId:
+        type: integer
       Page:
         type: integer
       PageSize:
-        type: integer
-      lastId:
         type: integer
       title:
         type: string
@@ -445,14 +439,14 @@ definitions:
     type: object
   req.ServerListParam:
     properties:
+      LastId:
+        type: integer
       Page:
         type: integer
       PageSize:
         type: integer
       ServerName:
         type: string
-      lastId:
-        type: integer
     type: object
   req.ServerSetParam:
     properties:
@@ -511,12 +505,10 @@ definitions:
         description: 手机号
         type: string
     type: object
-  resp.ApiResult:
+  resp.ApiErrorResult:
     properties:
       code:
         type: integer
-      data:
-        type: object
       msg:
         type: string
     type: object
@@ -648,10 +640,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 创建部署应用
   /admin/DeployDelete:
     delete:
@@ -667,10 +656,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 删除部署应用
   /admin/DeployDetail:
     get:
@@ -707,10 +693,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "启动成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 启动部署
   /admin/DeployLink:
     get:
@@ -726,10 +709,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "启动成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 获取部署触发链接
   /admin/DeployLists:
     get:
@@ -785,10 +765,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 获取当前部署应用指定服务器的运行日志
   /admin/DeployRunLogTab:
     get:
@@ -846,10 +823,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 更新部署应用
   /admin/ScheduleCreate:
     post:
@@ -865,10 +839,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 创建计划任务
   /admin/ScheduleDel:
     delete:
@@ -884,10 +855,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 删除计划任务
   /admin/ScheduleDo:
     get:
@@ -903,10 +871,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 执行计划任务
   /admin/ScheduleLists:
     get:
@@ -941,10 +906,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 删除服务器
   /admin/ServerLists:
     get:
@@ -981,10 +943,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功","data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 设置服务器信息
   /admin/UserResetPwd:
     post:
@@ -1000,10 +959,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "修改成功", "data": null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 修改密码
   /admin/UserSigin:
     post:
@@ -1019,12 +975,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code": 1,"msg": "登录成功", "data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
-            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
-            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 登录
   /admin/UserSiginUp:
     post:
@@ -1041,11 +992,13 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code": 1,"msg": "注册成功","data": {"CreateTime": "2019-02-27T16:11:27+08:00","InviterUid":
-            0,"Password": "","Phone": "15061370322","Status": 1,"Uid": 2, "UpdateTime":
-            "2019-02-27T16:19:54+08:00", "Token":"sdfsdafsd.."}}'
+          description: 响应成功
           schema:
             $ref: '#/definitions/resp.UserInfoVO'
+        "400":
+          description: 错误
+          schema:
+            $ref: '#/definitions/resp.ApiErrorResult'
       summary: 注册账号
   /admin/VerifyByImg:
     get:
@@ -1055,9 +1008,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":1,"msg":"","data":{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}}'
+          description: '{"idkey":"ckFbFAcMo7sy7qGyonAd","img":"data:image/png;base64,iVBORw0..."}'
           schema:
-            $ref: '#/definitions/resp.ApiResult'
+            $ref: '#/definitions/gin.H'
       summary: 获取图片验证码
   /admin/VerifyBySMS:
     post:
@@ -1073,10 +1026,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: '{"code":1,"msg":"发送成功","data":null}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
+        "200": {}
       summary: 获取短信验证码
   /admin/dashboard/IndexMetric:
     get:
@@ -1113,136 +1063,6 @@ paths:
               $ref: '#/definitions/resp.DashboardInfoVO'
             type: array
       summary: 获取基本信息
-  /client/ApiDeployRun:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 入参集合
-        in: query
-        name: key
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: 操作结果
-          schema:
-            $ref: '#/definitions/string'
-      summary: 启动部署
-  /clinet/ApiClientMetric:
-    post:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "操作成功"}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 客户端监控指标推送
-  /clinet/ApiDeployLog:
-    post:
-      consumes:
-      - multipart/form-data
-      parameters:
-      - description: 部署应用ID
-        in: formData
-        name: deployId
-        required: true
-        type: string
-      - description: 部署版本号
-        in: formData
-        name: version
-        required: true
-        type: string
-      - description: 日志文本内容
-        in: formData
-        name: content
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 客户端日志推送
-  /clinet/ApiDeployNotify:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 版本号
-        in: query
-        name: version
-        required: true
-        type: string
-      - description: 部署应用ID
-        in: query
-        name: deploy_id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 客户端部署成功回调
-  /clinet/ApiGetDeployTask:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "读取成功","data": [deploy]}'
-          schema:
-            items:
-              $ref: '#/definitions/models.Deploy'
-            type: array
-      summary: 获取服务器部署任务清单
-  /clinet/ApiGetTelegrafConfig:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: '{"code": 1,"msg": "读取成功","data": [deploy]}'
-          schema:
-            $ref: '#/definitions/resp.ApiResult'
-      summary: 获取Telegraf监控配置
-  /clinet/ApiRegServer:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 用户UID
-        in: query
-        name: uid
-        required: true
-        type: string
-      - description: 客户端设备号
-        in: query
-        name: device
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.Server'
-      summary: 服务器注册
 schemes:
 - http
 swagger: "2.0"

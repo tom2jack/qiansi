@@ -8,6 +8,7 @@
 package admin
 
 import (
+	"github.com/jinzhu/gorm"
 	"github.com/zhi-miao/gutils"
 	"github.com/zhi-miao/qiansi/common/req"
 	"github.com/zhi-miao/qiansi/common/resp"
@@ -50,7 +51,7 @@ func (r *serverApi) Lists(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.ServerSetParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200
 // @Router /admin/ServerSet [POST]
 func (r *serverApi) Set(c *gin.Context) {
 	param := &req.ServerSetParam{}
@@ -72,7 +73,7 @@ func (r *serverApi) Set(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.ServerDelParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200
 // @Router /admin/ServerDel [DELETE]
 func (r *serverApi) Del(c *gin.Context) {
 	param := &req.ServerDelParam{}
@@ -80,12 +81,12 @@ func (r *serverApi) Del(c *gin.Context) {
 		c.JSON(resp.ApiError("入参解析失败"))
 		return
 	}
-	// TODO: 移动至models
-	db := models.Mysql.Delete(models.Server{}, "id=? and uid=?", param.ServerId, c.GetInt("UID"))
-	if db.Error != nil || db.RowsAffected != 1 {
-		c.JSON(resp.ApiError("删除失败"))
+	// 事务删除
+	err := models.Mysql.Transaction(func(tx *gorm.DB) error {
+		return models.GetServerModels().SetDB(tx).Delete(param.ServerId, c.GetInt(req.UID))
+	})
+	if err != nil {
+		c.JSON(resp.ApiError(err))
 		return
 	}
-	// 删除关联
-	models.Mysql.Delete(models.DeployServerRelation{}, "server_id=?", param.ServerId)
 }

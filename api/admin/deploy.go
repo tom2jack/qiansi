@@ -12,6 +12,7 @@ import (
 	"time"
 	"unsafe"
 
+	"github.com/jinzhu/gorm"
 	"github.com/zhi-miao/qiansi/common/config"
 	"github.com/zhi-miao/qiansi/mqttbroker"
 
@@ -67,7 +68,7 @@ func (r *deployApi) Detail(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeploySetParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200
 // @Router /admin/DeployCreate [POST]
 func (r *deployApi) Create(c *gin.Context) {
 	param := &req.DeploySetParam{}
@@ -76,7 +77,9 @@ func (r *deployApi) Create(c *gin.Context) {
 		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
-	err = models.GetDeployModels().CreateDeploy(c.GetInt(req.UID), param)
+	err = models.Mysql.Transaction(func(tx *gorm.DB) error {
+		return models.GetDeployModels().CreateDeploy(c.GetInt(req.UID), param)
+	})
 	if err != nil {
 		c.JSON(resp.ApiError(err))
 	}
@@ -86,7 +89,7 @@ func (r *deployApi) Create(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeploySetParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200
 // @Router /admin/DeployUpdate [put]
 func (r *deployApi) Update(c *gin.Context) {
 	param := &req.DeploySetParam{}
@@ -94,7 +97,9 @@ func (r *deployApi) Update(c *gin.Context) {
 		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
-	err := models.GetDeployModels().UpdateDeploy(c.GetInt(req.UID), param)
+	err := models.Mysql.Transaction(func(tx *gorm.DB) error {
+		return models.GetDeployModels().UpdateDeploy(c.GetInt(req.UID), param)
+	})
 	if err != nil {
 		c.JSON(resp.ApiError(err))
 	}
@@ -104,7 +109,7 @@ func (r *deployApi) Update(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "操作成功","data": null}"
+// @Success 200
 // @Router /admin/DeployDelete [DELETE]
 func (r *deployApi) Del(c *gin.Context) {
 	param := &req.DeployParam{}
@@ -112,7 +117,9 @@ func (r *deployApi) Del(c *gin.Context) {
 		c.JSON(resp.ApiError("入参绑定失败"))
 		return
 	}
-	err := models.GetDeployModels().DelDeploy(c.GetInt(req.UID), param.DeployId)
+	err := models.Mysql.Transaction(func(tx *gorm.DB) error {
+		return models.GetDeployModels().SetDB(tx).DelDeploy(c.GetInt(req.UID), param.DeployId)
+	})
 	if err != nil {
 		c.JSON(resp.ApiError(err))
 	}
@@ -160,7 +167,7 @@ func (r *deployApi) RunLogTab(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployRunLogParam true "入参集合"
-// @Success 200 {object} resp.ApiResult ""
+// @Success 200
 // @Router /admin/DeployRunLog [get]
 func (r *deployApi) RunLog(c *gin.Context) {
 	param := &req.DeployRunLogParam{}
@@ -240,7 +247,7 @@ func (r *deployApi) Log(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployDoParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
+// @Success 200
 // @Router /admin/DeployDo [GET]
 func (r *deployApi) Do(c *gin.Context) {
 	param := &req.DeployDoParam{}
@@ -258,7 +265,7 @@ func (r *deployApi) Do(c *gin.Context) {
 // @Produce  json
 // @Accept  json
 // @Param body body req.DeployParam true "入参集合"
-// @Success 200 {object} resp.ApiResult "{"code": 1,"msg": "启动成功","data": null}"
+// @Success 200
 // @Router /admin/DeployLink [GET]
 func (r *deployApi) Link(c *gin.Context) {
 	param := &req.DeployParam{}

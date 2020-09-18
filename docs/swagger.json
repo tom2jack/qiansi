@@ -41,12 +41,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -71,12 +66,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -134,12 +124,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -164,12 +149,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"启动成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -257,12 +237,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -353,12 +328,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -383,12 +353,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -413,12 +378,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -443,12 +403,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -503,12 +458,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -566,12 +516,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\",\"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -596,12 +541,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"修改成功\", \"data\": null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -626,12 +566,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"登录成功\", \"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -657,9 +592,15 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "{\"code\": 1,\"msg\": \"注册成功\",\"data\": {\"CreateTime\": \"2019-02-27T16:11:27+08:00\",\"InviterUid\": 0,\"Password\": \"\",\"Phone\": \"15061370322\",\"Status\": 1,\"Uid\": 2, \"UpdateTime\": \"2019-02-27T16:19:54+08:00\", \"Token\":\"sdfsdafsd..\"}}",
+                        "description": "响应成功",
                         "schema": {
                             "$ref": "#/definitions/resp.UserInfoVO"
+                        }
+                    },
+                    "400": {
+                        "description": "错误",
+                        "schema": {
+                            "$ref": "#/definitions/resp.ApiErrorResult"
                         }
                     }
                 }
@@ -676,9 +617,9 @@
                 "summary": "获取图片验证码",
                 "responses": {
                     "200": {
-                        "description": "{\"code\":1,\"msg\":\"\",\"data\":{\"idkey\":\"ckFbFAcMo7sy7qGyonAd\",\"img\":\"data:image/png;base64,iVBORw0...\"}}",
+                        "description": "{\"idkey\":\"ckFbFAcMo7sy7qGyonAd\",\"img\":\"data:image/png;base64,iVBORw0...\"}",
                         "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
+                            "$ref": "#/definitions/gin.H"
                         }
                     }
                 }
@@ -705,12 +646,7 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "{\"code\":1,\"msg\":\"发送成功\",\"data\":null}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
+                    "200": {}
                 }
             }
         },
@@ -768,209 +704,13 @@
                     }
                 }
             }
-        },
-        "/client/ApiDeployRun": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "启动部署",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "入参集合",
-                        "name": "key",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "操作结果",
-                        "schema": {
-                            "$ref": "#/definitions/string"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiClientMetric": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "客户端监控指标推送",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"操作成功\"}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiDeployLog": {
-            "post": {
-                "consumes": [
-                    "multipart/form-data"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "客户端日志推送",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "部署应用ID",
-                        "name": "deployId",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "部署版本号",
-                        "name": "version",
-                        "in": "formData",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "日志文本内容",
-                        "name": "content",
-                        "in": "formData",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiDeployNotify": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "客户端部署成功回调",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "版本号",
-                        "name": "version",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "部署应用ID",
-                        "name": "deploy_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiGetDeployTask": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取服务器部署任务清单",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/models.Deploy"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiGetTelegrafConfig": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "获取Telegraf监控配置",
-                "responses": {
-                    "200": {
-                        "description": "{\"code\": 1,\"msg\": \"读取成功\",\"data\": [deploy]}",
-                        "schema": {
-                            "$ref": "#/definitions/resp.ApiResult"
-                        }
-                    }
-                }
-            }
-        },
-        "/clinet/ApiRegServer": {
-            "get": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "summary": "服务器注册",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "用户UID",
-                        "name": "uid",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "客户端设备号",
-                        "name": "device",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/models.Server"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
+        "gin.H": {
+            "type": "object",
+            "additionalProperties": true
+        },
         "models.Deploy": {
             "type": "object",
             "properties": {
@@ -1166,10 +906,16 @@
         "models.DeployRelationServer": {
             "type": "object",
             "properties": {
-                "apiSecret": {
+                "api_secret": {
+                    "description": "API密钥",
                     "type": "string"
                 },
-                "createTime": {
+                "arch": {
+                    "description": "服务器架构",
+                    "type": "string"
+                },
+                "client_version": {
+                    "description": "客户端版本",
                     "type": "string"
                 },
                 "create_time": {
@@ -1183,33 +929,43 @@
                     "description": "已部署版本",
                     "type": "integer"
                 },
-                "deviceId": {
+                "device_id": {
+                    "description": "服务器唯一设备号",
                     "type": "string"
                 },
                 "domain": {
+                    "description": "服务器地址(域名/ip)",
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "serverName": {
+                "last_init_time": {
                     "type": "string"
                 },
-                "serverRuleId": {
-                    "type": "integer"
+                "mqtt_user": {
+                    "description": "mqtt用户名",
+                    "type": "string"
                 },
-                "serverStatus": {
-                    "type": "integer"
+                "os": {
+                    "description": "服务器系统",
+                    "type": "string"
                 },
                 "server_id": {
                     "description": "服务器ID",
                     "type": "integer"
                 },
-                "uid": {
+                "server_name": {
+                    "description": "服务器备注名",
+                    "type": "string"
+                },
+                "server_status": {
+                    "description": "服务器状态 -1-失效 0-待认领 1-已分配通信密钥 2-已绑定",
                     "type": "integer"
                 },
-                "updateTime": {
-                    "type": "string"
+                "uid": {
+                    "description": "用户ID",
+                    "type": "integer"
                 },
                 "update_time": {
                     "type": "string"
@@ -1243,41 +999,6 @@
                 }
             }
         },
-        "models.Server": {
-            "type": "object",
-            "properties": {
-                "apiSecret": {
-                    "type": "string"
-                },
-                "createTime": {
-                    "type": "string"
-                },
-                "deviceId": {
-                    "type": "string"
-                },
-                "domain": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "serverName": {
-                    "type": "string"
-                },
-                "serverRuleId": {
-                    "type": "integer"
-                },
-                "serverStatus": {
-                    "type": "integer"
-                },
-                "uid": {
-                    "type": "integer"
-                },
-                "updateTime": {
-                    "type": "string"
-                }
-            }
-        },
         "req.DashboardIndexMetricParam": {
             "type": "object",
             "required": [
@@ -1307,6 +1028,9 @@
         "req.DeployListParam": {
             "type": "object",
             "properties": {
+                "LastId": {
+                    "type": "integer"
+                },
                 "Page": {
                     "type": "integer"
                 },
@@ -1315,15 +1039,15 @@
                 },
                 "Title": {
                     "type": "string"
-                },
-                "lastId": {
-                    "type": "integer"
                 }
             }
         },
         "req.DeployLogParam": {
             "type": "object",
             "properties": {
+                "LastId": {
+                    "type": "integer"
+                },
                 "Page": {
                     "type": "integer"
                 },
@@ -1341,9 +1065,6 @@
                 "endTime": {
                     "description": "结束时间",
                     "type": "string"
-                },
-                "lastId": {
-                    "type": "integer"
                 },
                 "serverId": {
                     "description": "服务器",
@@ -1580,13 +1301,13 @@
         "req.ScheduleListParam": {
             "type": "object",
             "properties": {
+                "LastId": {
+                    "type": "integer"
+                },
                 "Page": {
                     "type": "integer"
                 },
                 "PageSize": {
-                    "type": "integer"
-                },
-                "lastId": {
                     "type": "integer"
                 },
                 "title": {
@@ -1605,6 +1326,9 @@
         "req.ServerListParam": {
             "type": "object",
             "properties": {
+                "LastId": {
+                    "type": "integer"
+                },
                 "Page": {
                     "type": "integer"
                 },
@@ -1613,9 +1337,6 @@
                 },
                 "ServerName": {
                     "type": "string"
-                },
-                "lastId": {
-                    "type": "integer"
                 }
             }
         },
@@ -1701,14 +1422,11 @@
                 }
             }
         },
-        "resp.ApiResult": {
+        "resp.ApiErrorResult": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
-                },
-                "data": {
-                    "type": "object"
                 },
                 "msg": {
                     "type": "string"

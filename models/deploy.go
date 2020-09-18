@@ -144,206 +144,200 @@ func (m *deployModels) GetDeployDetailInfo(uid, deployId int) (result DeployDeta
 
 // CreateDeploy 创建部署应用
 func (m *deployModels) CreateDeploy(uid int, param *req.DeploySetParam) (err error) {
-	return m.db.Transaction(func(tx *gorm.DB) error {
-		userInfo, err := GetMemberModels().SetDB(tx).UsereInfo(uid)
-		if err != nil {
-			return fmt.Errorf("用户限额检测失败")
+	userInfo, err := GetMemberModels().SetDB(m.db).UsereInfo(uid)
+	if err != nil {
+		return fmt.Errorf("用户限额检测失败")
+	}
+	var deployNum int
+	err = m.db.Model(&Deploy{}).Where("uid=?", uid).Count(&deployNum).Error
+	if err != nil {
+		return fmt.Errorf("部署应用数量查询失败")
+	}
+	if userInfo.MaxDeploy <= deployNum {
+		return fmt.Errorf("您的部署任务创建数量已达上限")
+	}
+	deploy := Deploy{
+		UId:           uid,
+		Title:         param.Title,
+		DeployType:    param.DeployType,
+		WorkDir:       param.WorkDir,
+		BeforeCommand: param.BeforeCommand,
+		AfterCommand:  param.AfterCommand,
+		NowVersion:    0,
+		OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
+	}
+	err = m.db.Model(&deploy).Create(&deploy).Error
+	if err != nil {
+		return fmt.Errorf("应用创建失败")
+	}
+	// 部署类型 0-本地 1-git 2-zip 3-docker
+	switch deploy.DeployType {
+	case 0:
+	case 1:
+		err = m.db.Model(&DeployGit{}).Create(&DeployGit{
+			DeployID:   deploy.ID,
+			RemoteURL:  param.DeployGit.RemoteURL,
+			DeployPath: param.DeployGit.DeployPath,
+			Branch:     param.DeployGit.Branch,
+			DeployKeys: param.DeployGit.DeployKeys,
+			UserName:   param.DeployGit.UserName,
+			Password:   param.DeployGit.Password,
+		}).Error
+	case 2:
+		err = m.db.Model(&DeployZip{}).Create(&DeployZip{
+			DeployID:   deploy.ID,
+			RemoteURL:  param.DeployZip.RemoteURL,
+			DeployPath: param.DeployZip.DeployPath,
+			Password:   param.DeployZip.Password,
+		}).Error
+	case 3:
+		err = m.db.Model(&DeployDocker{}).Create(&DeployDocker{
+			DeployID:         deploy.ID,
+			DockerImage:      param.DeployDocker.DockerImage,
+			UserName:         param.DeployDocker.UserName,
+			Password:         param.DeployDocker.Password,
+			IsRuning:         param.DeployDocker.IsRuning,
+			ContainerName:    param.DeployDocker.ContainerName,
+			ContainerVolumes: param.DeployDocker.ContainerVolumes,
+			ContainerPorts:   param.DeployDocker.ContainerPorts,
+			ContainerEnv:     param.DeployDocker.ContainerEnv,
+		}).Error
+	default:
+		return fmt.Errorf("无法识别的应用类型")
+	}
+	if err != nil {
+		return fmt.Errorf("应用创建失败")
+	}
+	if len(param.ServerRelation) > 0 {
+		serverIds := make([]int, len(param.ServerRelation))
+		for i, s := range param.ServerRelation {
+			serverIds[i] = s.ServerId
 		}
-		var deployNum int
-		err = tx.Model(&Deploy{}).Where("uid=?", uid).Count(&deployNum).Error
-		if err != nil {
-			return fmt.Errorf("部署应用数量查询失败")
+		// 检测服务器是否是自己的
+		if !GetServerModels().SetDB(m.db).BatchCheck(uid, serverIds) {
+			return fmt.Errorf("含有非法服务器绑定")
 		}
-		if userInfo.MaxDeploy <= deployNum {
-			return fmt.Errorf("您的部署任务创建数量已达上限")
-		}
-		deploy := Deploy{
-			UId:           uid,
-			Title:         param.Title,
-			DeployType:    param.DeployType,
-			WorkDir:       param.WorkDir,
-			BeforeCommand: param.BeforeCommand,
-			AfterCommand:  param.AfterCommand,
-			NowVersion:    0,
-			OpenID:        strings.ReplaceAll(uuid.NewV4().String(), "-", ""),
-		}
-		err = tx.Model(&deploy).Create(&deploy).Error
-		if err != nil {
-			return fmt.Errorf("应用创建失败")
-		}
-		// 部署类型 0-本地 1-git 2-zip 3-docker
-		switch deploy.DeployType {
-		case 0:
-		case 1:
-			err = tx.Model(&DeployGit{}).Create(&DeployGit{
-				DeployID:   deploy.ID,
-				RemoteURL:  param.DeployGit.RemoteURL,
-				DeployPath: param.DeployGit.DeployPath,
-				Branch:     param.DeployGit.Branch,
-				DeployKeys: param.DeployGit.DeployKeys,
-				UserName:   param.DeployGit.UserName,
-				Password:   param.DeployGit.Password,
-			}).Error
-		case 2:
-			err = tx.Model(&DeployZip{}).Create(&DeployZip{
-				DeployID:   deploy.ID,
-				RemoteURL:  param.DeployZip.RemoteURL,
-				DeployPath: param.DeployZip.DeployPath,
-				Password:   param.DeployZip.Password,
-			}).Error
-		case 3:
-			err = tx.Model(&DeployDocker{}).Create(&DeployDocker{
-				DeployID:         deploy.ID,
-				DockerImage:      param.DeployDocker.DockerImage,
-				UserName:         param.DeployDocker.UserName,
-				Password:         param.DeployDocker.Password,
-				IsRuning:         param.DeployDocker.IsRuning,
-				ContainerName:    param.DeployDocker.ContainerName,
-				ContainerVolumes: param.DeployDocker.ContainerVolumes,
-				ContainerPorts:   param.DeployDocker.ContainerPorts,
-				ContainerEnv:     param.DeployDocker.ContainerEnv,
-			}).Error
-		default:
-			return fmt.Errorf("无法识别的应用类型")
-		}
-		if err != nil {
-			return fmt.Errorf("应用创建失败")
-		}
-		if len(param.ServerRelation) > 0 {
-			serverIds := make([]int, len(param.ServerRelation))
-			for i, s := range param.ServerRelation {
-				serverIds[i] = s.ServerId
+		relation := &DeployServerRelation{}
+		for _, e := range param.ServerRelation {
+			if e.ServerId == 0 {
+				continue
 			}
-			// 检测服务器是否是自己的
-			if !GetServerModels().SetDB(tx).BatchCheck(uid, serverIds) {
-				return fmt.Errorf("含有非法服务器绑定")
-			}
-			relation := &DeployServerRelation{}
-			for _, e := range param.ServerRelation {
-				if e.ServerId == 0 {
-					continue
-				}
-				relation.DeployID = deploy.ID
-				relation.ServerID = e.ServerId
-				if tx.Model(&DeployServerRelation{}).Create(relation).Error != nil {
-					return fmt.Errorf("服务器关联失败")
-				}
+			relation.DeployID = deploy.ID
+			relation.ServerID = e.ServerId
+			if m.db.Model(&DeployServerRelation{}).Create(relation).Error != nil {
+				return fmt.Errorf("服务器关联失败")
 			}
 		}
-		return nil
-	})
+	}
+	return nil
 }
 
 // UpdateDeploy 更新部署应用
 func (m *deployModels) UpdateDeploy(uid int, param *req.DeploySetParam) (err error) {
-	return m.db.Transaction(func(tx *gorm.DB) error {
-		info := Deploy{}
-		if tx.Model(&info).Where("id=? and uid=?", param.ID, uid).First(&info).RowsAffected != 1 {
-			return fmt.Errorf("应用不存在")
+	info := Deploy{}
+	if m.db.Model(&info).Where("id=? and uid=?", param.ID, uid).First(&info).RowsAffected != 1 {
+		return fmt.Errorf("应用不存在")
+	}
+	deploy := Deploy{
+		ID:            param.ID,
+		Title:         param.Title,
+		WorkDir:       param.WorkDir,
+		BeforeCommand: param.BeforeCommand,
+		AfterCommand:  param.AfterCommand,
+	}
+	err = m.db.Model(&deploy).Update(&deploy).Error
+	if err != nil {
+		return fmt.Errorf("应用更新失败")
+	}
+	// 部署类型 0-本地 1-git 2-zip 3-docker
+	switch info.DeployType {
+	case 0:
+	case 1:
+		err = m.db.Model(&DeployGit{}).Update(&DeployGit{
+			DeployID:   param.ID,
+			RemoteURL:  param.DeployGit.RemoteURL,
+			DeployPath: param.DeployGit.DeployPath,
+			Branch:     param.DeployGit.Branch,
+			DeployKeys: param.DeployGit.DeployKeys,
+			UserName:   param.DeployGit.UserName,
+			Password:   param.DeployGit.Password,
+		}).Error
+	case 2:
+		err = m.db.Model(&DeployZip{}).Update(&DeployZip{
+			DeployID:   param.ID,
+			RemoteURL:  param.DeployZip.RemoteURL,
+			DeployPath: param.DeployZip.DeployPath,
+			Password:   param.DeployZip.Password,
+		}).Error
+	case 3:
+		err = m.db.Model(&DeployDocker{}).Update(&DeployDocker{
+			DeployID:         param.ID,
+			DockerImage:      param.DeployDocker.DockerImage,
+			UserName:         param.DeployDocker.UserName,
+			Password:         param.DeployDocker.Password,
+			IsRuning:         param.DeployDocker.IsRuning,
+			ContainerName:    param.DeployDocker.ContainerName,
+			ContainerVolumes: param.DeployDocker.ContainerVolumes,
+			ContainerPorts:   param.DeployDocker.ContainerPorts,
+			ContainerEnv:     param.DeployDocker.ContainerEnv,
+		}).Error
+	default:
+		return fmt.Errorf("无法识别的应用类型")
+	}
+	if err != nil {
+		return fmt.Errorf("应用更新失败")
+	}
+	if len(param.ServerRelation) > 0 {
+		serverIds := make([]int, len(param.ServerRelation))
+		for i, s := range param.ServerRelation {
+			serverIds[i] = s.ServerId
 		}
-		deploy := Deploy{
-			ID:            param.ID,
-			Title:         param.Title,
-			WorkDir:       param.WorkDir,
-			BeforeCommand: param.BeforeCommand,
-			AfterCommand:  param.AfterCommand,
+		// 检测服务器是否是自己的
+		if !GetServerModels().SetDB(m.db).BatchCheck(uid, serverIds) {
+			return fmt.Errorf("含有非法服务器绑定")
 		}
-		err = tx.Model(&deploy).Update(&deploy).Error
-		if err != nil {
-			return fmt.Errorf("应用更新失败")
-		}
-		// 部署类型 0-本地 1-git 2-zip 3-docker
-		switch info.DeployType {
-		case 0:
-		case 1:
-			err = tx.Model(&DeployGit{}).Update(&DeployGit{
-				DeployID:   param.ID,
-				RemoteURL:  param.DeployGit.RemoteURL,
-				DeployPath: param.DeployGit.DeployPath,
-				Branch:     param.DeployGit.Branch,
-				DeployKeys: param.DeployGit.DeployKeys,
-				UserName:   param.DeployGit.UserName,
-				Password:   param.DeployGit.Password,
-			}).Error
-		case 2:
-			err = tx.Model(&DeployZip{}).Update(&DeployZip{
-				DeployID:   param.ID,
-				RemoteURL:  param.DeployZip.RemoteURL,
-				DeployPath: param.DeployZip.DeployPath,
-				Password:   param.DeployZip.Password,
-			}).Error
-		case 3:
-			err = tx.Model(&DeployDocker{}).Update(&DeployDocker{
-				DeployID:         param.ID,
-				DockerImage:      param.DeployDocker.DockerImage,
-				UserName:         param.DeployDocker.UserName,
-				Password:         param.DeployDocker.Password,
-				IsRuning:         param.DeployDocker.IsRuning,
-				ContainerName:    param.DeployDocker.ContainerName,
-				ContainerVolumes: param.DeployDocker.ContainerVolumes,
-				ContainerPorts:   param.DeployDocker.ContainerPorts,
-				ContainerEnv:     param.DeployDocker.ContainerEnv,
-			}).Error
-		default:
-			return fmt.Errorf("无法识别的应用类型")
-		}
-		if err != nil {
-			return fmt.Errorf("应用更新失败")
-		}
-		if len(param.ServerRelation) > 0 {
-			serverIds := make([]int, len(param.ServerRelation))
-			for i, s := range param.ServerRelation {
-				serverIds[i] = s.ServerId
+		relation := &DeployServerRelation{}
+		for _, e := range param.ServerRelation {
+			if e.ServerId == 0 {
+				continue
 			}
-			// 检测服务器是否是自己的
-			if !GetServerModels().SetDB(tx).BatchCheck(uid, serverIds) {
-				return fmt.Errorf("含有非法服务器绑定")
-			}
-			relation := &DeployServerRelation{}
-			for _, e := range param.ServerRelation {
-				if e.ServerId == 0 {
-					continue
+			relation.DeployID = deploy.ID
+			relation.ServerID = e.ServerId
+			if e.Relation {
+				if m.db.Save(relation).Error != nil {
+					return fmt.Errorf("服务器关联失败")
 				}
-				relation.DeployID = deploy.ID
-				relation.ServerID = e.ServerId
-				if e.Relation {
-					if tx.Save(relation).Error != nil {
-						return fmt.Errorf("服务器关联失败")
-					}
-				} else if tx.Delete(relation, "server_id=? and deploy_id=?", relation.ServerID, relation.DeployID).Error != nil {
-					return fmt.Errorf("服务器取消关联失败")
-				}
+			} else if m.db.Delete(relation, "server_id=? and deploy_id=?", relation.ServerID, relation.DeployID).Error != nil {
+				return fmt.Errorf("服务器取消关联失败")
 			}
 		}
-		return nil
-	})
+	}
+	return nil
 }
 
 // DelDeploy 删除部署应用
 func (m *deployModels) DelDeploy(uid, DeployID int) error {
-	return m.db.Transaction(func(tx *gorm.DB) error {
-		info := Deploy{ID: DeployID}
-		db := tx.Model(&info).Where("uid=?", uid).First(&info)
-		if db.Error != nil || db.RowsAffected == 0 {
-			return fmt.Errorf("应用不存在")
-		}
-		tx.Delete(&info)
-		// 部署类型 0-本地 1-git 2-zip 3-docker
-		switch info.DeployType {
-		case 0:
-		case 1:
-			tx.Delete(&DeployGit{}, "deploy_id=?", DeployID)
-		case 2:
-			tx.Delete(&DeployZip{}, "deploy_id=?", DeployID)
-		case 3:
-			tx.Delete(&DeployDocker{}, "deploy_id=?", DeployID)
-		default:
-			return fmt.Errorf("无法识别的应用类型，请联系管理员删除")
-		}
-		// 删除服务器关联关系
-		tx.Delete(&DeployServerRelation{}, "deploy_id=?", DeployID)
-		return nil
-	})
+	info := Deploy{ID: DeployID}
+	db := m.db.Model(&info).Where("uid=?", uid).First(&info)
+	if db.Error != nil || db.RowsAffected == 0 {
+		return fmt.Errorf("应用不存在")
+	}
+	m.db.Delete(&info)
+	// 部署类型 0-本地 1-git 2-zip 3-docker
+	switch info.DeployType {
+	case 0:
+	case 1:
+		m.db.Delete(&DeployGit{}, "deploy_id=?", DeployID)
+	case 2:
+		m.db.Delete(&DeployZip{}, "deploy_id=?", DeployID)
+	case 3:
+		m.db.Delete(&DeployDocker{}, "deploy_id=?", DeployID)
+	default:
+		return fmt.Errorf("无法识别的应用类型，请联系管理员删除")
+	}
+	// 删除服务器关联关系
+	m.db.Delete(&DeployServerRelation{}, "deploy_id=?", DeployID)
+	return nil
 }
 
 // DeployRelationServer 部署服务器信息

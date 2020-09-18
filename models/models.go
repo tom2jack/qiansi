@@ -123,6 +123,7 @@ func (m *zmInflux) getWriteApi(org, bucket string) (result api.WriteApi) {
 	}
 	return
 }
+
 func (m *zmInflux) getQueryApi(org string) (result api.QueryApi) {
 	key := org
 	m.Lock()
