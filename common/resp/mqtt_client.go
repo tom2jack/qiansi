@@ -22,3 +22,8 @@ type UpdateClient struct {
 	Version   string `json:"version"`    // 客户端版本
 	SourceURL string `json:"source_url"` // 客户端资源
 }
+
+// 遥测请求
+type TelesignalResp struct {
+	OnlineState bool // 是否在线
+}

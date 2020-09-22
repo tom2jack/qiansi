@@ -3,7 +3,7 @@ package mqttbroker
 import (
 	"encoding/json"
 	"errors"
-	"os"
+	"fmt"
 	"strings"
 	"time"
 
@@ -22,54 +22,52 @@ var (
 
 const (
 	waitTimeout = 15 * time.Second
-)
 
-const (
 	// 设备上下线订阅
 	sysClientOnlineSub = "$SYS/brokers/+/clients/+/+"
 	// 注册通信主题
 	regPub = "qiansi-client/reg/s/"
 	regSub = "qiansi-client/reg/c/+"
+
+	// 常规业务主题 设备用户，主题类型，发起方S/C
+	defaultTopicFormat = "qiansi-client/chan/%s/%s/%s"
+
 	// 初始化请求
-	runInitSub = "qiansi-client/chan/+/runInit/C"
+	runInitTopic topic = "runInit"
+	// 遥测
+	telesignalTopic topic = "telesignal"
 	// telegraf配置推送
-	telegrafConfigPub = "qiansi-client/chan/%s/telegrafConfig/S"
+	telegrafConfigTopic topic = "telegrafConfig"
 	// 部署通道
-	deployPub = "qiansi-client/chan/%s/deploy/S"
-	deploySub = "qiansi-client/chan/+/deploy/C"
+	deployTopic topic = "deploy"
 	// 监控指标订阅
-	metricSub = "qiansi-client/chan/+/metric/C"
+	metricTopic topic = "metric"
 	// 日志订阅
-	logSub = "qiansi-client/chan/+/log/C"
+	logTopic topic = "log"
 	// 客户端升级
-	updatePub = "qiansi-client/chan/%s/update/S"
+	updateTopic topic = "update"
 )
 
-func sub() {
+func sub() error {
 	if token := mqttClient.Subscribe(sysClientOnlineSub, 0, clientOnlineStatusCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", sysClientOnlineSub)
-		return
+		return errors.New(sysClientOnlineSub)
 	}
-	if token := mqttClient.Subscribe(runInitSub, 0, runInitCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", runInitSub)
-		return
+	if token := mqttClient.Subscribe(runInitTopic.Sub(), 0, runInitCallBack); token.Wait() && token.Error() != nil {
+		return errors.New(runInitTopic.Sub())
 	}
 	if token := mqttClient.Subscribe(regSub, 0, registerCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", regSub)
-		return
+		return errors.New(sysClientOnlineSub)
 	}
-	if token := mqttClient.Subscribe(deploySub, 0, deployCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", deploySub)
-		return
+	if token := mqttClient.Subscribe(deployTopic.Sub(), 0, deployCallBack); token.Wait() && token.Error() != nil {
+		return errors.New(deployTopic.Sub())
 	}
-	if token := mqttClient.Subscribe(metricSub, 0, metricCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", metricSub)
-		return
+	if token := mqttClient.Subscribe(metricTopic.Sub(), 0, metricCallBack); token.Wait() && token.Error() != nil {
+		return errors.New(metricTopic.Sub())
 	}
-	if token := mqttClient.Subscribe(logSub, 0, logCallBack); token.Wait() && token.Error() != nil {
-		logrus.Warn("订阅失败->", logSub)
-		return
+	if token := mqttClient.Subscribe(logTopic.Sub(), 0, logCallBack); token.Wait() && token.Error() != nil {
+		return errors.New(logTopic.Sub())
 	}
+	return nil
 }
 
 func Start() {
@@ -81,15 +79,26 @@ func Start() {
 		SetClientID(config.GetConfig().MQTT.ClientID)
 	mqttClient = mqtt.NewClient(option)
 	if !mqttClient.Connect().WaitTimeout(waitTimeout) {
-		logrus.Errorf("Can't connect mqtt broker!")
-		os.Exit(1)
+		logrus.Fatal("Can't connect mqtt broker!")
 	}
 	logrus.Info("mqtt service loading..")
-	sub()
+	if err := sub(); err != nil {
+		logrus.Fatal("mqtt broker Sub err", err.Error())
+	}
 }
 
 func GetMqttClient() mqtt.Client {
 	return mqttClient
+}
+
+type topic string
+
+func (t topic) Pub(user string) string {
+	return fmt.Sprintf(defaultTopicFormat, user, t, "S")
+}
+
+func (t topic) Sub() string {
+	return fmt.Sprintf(defaultTopicFormat, "+", t, "C")
 }
 
 type authInfo struct {

@@ -95,7 +95,7 @@ func SendDeployTask(UID, deployID int, serverIds ...int) error {
 		return errors.New("未挂载服务器")
 	}
 	for _, si := range serversInfo {
-		mqttClient.Publish(fmt.Sprintf(deployPub, si.MqttUser), 0, false, payloadJson)
+		mqttClient.Publish(deployTopic.Pub(si.MqttUser), 0, false, payloadJson)
 	}
 	return nil
 }
@@ -119,7 +119,7 @@ func SendTelegrafConfig(serverID int) error {
 	if err != nil {
 		return err
 	}
-	token := mqttClient.Publish(fmt.Sprintf(telegrafConfigPub, serInfo.MqttUser), 0, false, payload)
+	token := mqttClient.Publish(telegrafConfigTopic.Pub(serInfo.MqttUser), 0, false, payload)
 	if token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
@@ -144,7 +144,7 @@ func UpdateClient(serverID int) error {
 	if err != nil {
 		return err
 	}
-	token := mqttClient.Publish(fmt.Sprintf(updatePub, serInfo.MqttUser), 0, false, payload)
+	token := mqttClient.Publish(updateTopic.Pub(serInfo.MqttUser), 0, false, payload)
 	if token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
