@@ -124,19 +124,19 @@ func (m *serverModels) GetServerIdByDeviceId(deviceID string, tryCache bool) int
 // UpdateServerOnlineStat 更新设备在线状态
 func (m *serverModels) UpdateServerOnlineStat(serverID int, isOnline bool) error {
 	if isOnline {
-		return m.redis.HSet(context.Background(), ServerOnlineStatusCacheKey, strconv.Itoa(serverID), true).Err()
+		return m.redis.Set(context.Background(), fmt.Sprintf("%s:%d", ServerOnlineStatusCacheKey, serverID), time.Now().Unix(), 15*time.Second).Err()
 	}
-	return m.redis.HDel(context.Background(), ServerOnlineStatusCacheKey, strconv.Itoa(serverID)).Err()
+	return m.redis.Del(context.Background(), fmt.Sprintf("%s:%d", ServerOnlineStatusCacheKey, serverID)).Err()
 }
 
 // GetUserActiveServerNum 获取用户活跃服务器数
 func (m *serverModels) GetUserActiveServerNum(UID int) int {
 	serverIds := m.UserServerIds(UID, true)
-	tempStringServerIds := make([]string, 0)
+	keys := make([]string, 0)
 	for _, serverID := range serverIds {
-		tempStringServerIds = append(tempStringServerIds, strconv.Itoa(serverID))
+		keys = append(keys, fmt.Sprintf("%s:%d", ServerOnlineStatusCacheKey, serverID))
 	}
-	statList, err := m.redis.HMGet(context.Background(), ServerOnlineStatusCacheKey, tempStringServerIds...).Result()
+	statList, err := m.redis.MGet(context.Background(), keys...).Result()
 	if err != nil {
 		return 0
 	}

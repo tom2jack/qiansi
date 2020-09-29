@@ -189,6 +189,8 @@ func metricCallBack(c mqtt.Client, message mqtt.Message) {
 	if err != nil {
 		logrus.Warnf("%d号服务器监控指标记录失败", info.ServerID)
 	}
+	// 更新服务器在线状态
+	models.GetServerModels().UpdateServerOnlineStat(info.ServerID, true)
 }
 
 // logCallBack 日志回调
