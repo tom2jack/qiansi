@@ -27,6 +27,7 @@ type DeploySetParam struct {
 		ContainerVolumes string `json:"container_volumes"` // 地址映射 a:b a宿主机 b容器内
 		ContainerPorts   string `json:"container_ports"`   // 端口暴露 a:b a内部 b外部
 		ContainerEnv     string `json:"container_env"`     // 环境变量注入
+		ContainerLabels  string `json:"container_labels"`  // labels注入
 	} `json:"deploy_docker"`
 	// DeployGit 纸喵部署-git
 	DeployGit struct {

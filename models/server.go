@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -14,11 +13,6 @@ import (
 	"github.com/zhi-miao/qiansi/common/errors"
 	"github.com/zhi-miao/qiansi/common/req"
 )
-
-type safeISMap struct {
-	sync.RWMutex
-	Map map[int]string
-}
 
 type serverModels struct {
 	db    *gorm.DB

@@ -28,6 +28,7 @@ type DeployDocker struct {
 	ContainerVolumes string    `gorm:"column:container_volumes;type:varchar(1000);not null" json:"container_volumes"` // 地址映射 a:b a宿主机 b容器内
 	ContainerPorts   string    `gorm:"column:container_ports;type:varchar(1000);not null" json:"container_ports"`     // 端口暴露 a:b a内部 b外部
 	ContainerEnv     string    `gorm:"column:container_env;type:varchar(2000);not null" json:"container_env"`         // 环境变量注入
+	ContainerLabels  string    `gorm:"column:container_labels;type:varchar(2000);not null" json:"container_labels"`   // labels注入
 	CreateTime       time.Time `gorm:"column:create_time;type:datetime;not null" json:"create_time"`
 	UpdateTime       time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
 }

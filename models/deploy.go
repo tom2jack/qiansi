@@ -370,14 +370,14 @@ func (m *deployModels) GetOpenID(deployID, UID int) (string, error) {
 	return data.OpenID, nil
 }
 
-// GetIdByOpenId 根据openID换取部署应用ID
-func (m *deployModels) GetIdByOpenId(openID string) (int, error) {
+// GetByOpenId 根据openID换取部署应用信息
+func (m *deployModels) GetByOpenId(openID string) (*Deploy, error) {
 	d := &Deploy{}
-	db := m.db.Model(d).Select("id").Where("open_id=?", openID).First(d)
+	db := m.db.Model(d).Select("id, uid").Where("open_id=?", openID).First(d)
 	if db.Error != nil {
-		return 0, db.Error
+		return nil, db.Error
 	}
-	return d.ID, nil
+	return d, nil
 }
 
 // Count 统计当前用户部署应用数量

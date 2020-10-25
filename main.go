@@ -25,8 +25,8 @@ import (
 // @basepath
 func main() {
 	config.LoadConfig("config.toml")
-	mqttbroker.Start()
 	models.Start()
+	mqttbroker.Start()
 	go api.Start()
 	go schedule.Start()
 	select {}

@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/zhi-miao/qiansi/common/config"
 	"net/http"
 	"time"
+
+	"github.com/zhi-miao/qiansi/common/config"
 
 	"github.com/DeanThompson/ginpprof"
 	"github.com/gin-gonic/gin"
@@ -11,6 +12,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
 	"github.com/zhi-miao/qiansi/api/admin"
+	"github.com/zhi-miao/qiansi/api/open"
 
 	_ "github.com/zhi-miao/qiansi/docs"
 )
@@ -31,6 +33,12 @@ func initRoute() {
 	/* ------ 静态页模块 ------- */
 	Router.StaticFile("/", "assets/html/index.html")
 	Router.Static("/static", "assets/html")
+	/* ------ 开放模块 ------- */
+	clientRoute := Router.Group("/open")
+	{
+		clientRoute.GET("/DeployRun", open.Deploy.DeployRun)
+		clientRoute.POST("/DeployRun", open.Deploy.DeployRun)
+	}
 	/* ------ 后台模块 ------- */
 	adminRoute := Router.Group("/admin")
 	{
