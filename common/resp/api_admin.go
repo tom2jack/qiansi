@@ -65,7 +65,7 @@ type DeployVO struct {
 
 type ServerVO struct {
 	CreateTime   time.Time
-	DeviceId     string
+	DeviceID     string `json:"DeviceId"`
 	Domain       string
 	Id           int
 	ServerName   string
